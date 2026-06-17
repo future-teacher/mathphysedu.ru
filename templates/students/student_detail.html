@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль ученика{% endblock %}
+
+{% block content %}
+{% if student %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">👤 Личный кабинет ученика ({{ student.first_name }})</h4>
+            </div>
+            <div class="card-body">
+                <p class="motivation-quote">
+                    «Привет, {{ student.first_name }}. В этом личном кабинете мы шаг за шагом идём к результату. 
+                    Здесь хранятся материалы с уроков и всё, что помогает тебе видеть прогресс и уверенно двигаться дальше.»
+                </p>
+                
+                <h5 class="mt-4">📋 Основная информация:</h5>
+                <div class="student-info">
+                    <table class="table">
+                        <tr>
+                            <th width="40%">Имя и класс:</th>
+                            <td>{{ student.first_name }} {{ student.last_name }} - {{ student.class_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Telegram ученика:</th>
+                            <td>
+                                {% if student.telegram_username %}
+                                {{ student.telegram_username }}
+                                {% else %}
+                                <span class="text-muted">Не указан</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Контакт родителя:</th>
+                            <td>
+                                {% if student.parent_name %}
+                                {{ student.parent_name }}
+                                {% if student.parent_telegram %}
+                                ({{ student.parent_telegram }})
+                                {% endif %}
+                                {% else %}
+                                <span class="text-muted">Не указан</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Школа:</th>
+                            <td>{{ student.school|default:"Не указана" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Направления подготовки:</th>
+                            <td>
+                                {% for exam_type in student.get_exam_types_display %}
+                                <span class="badge bg-primary mb-1">{{ exam_type }}</span>
+                                {% empty %}
+                                <span class="text-muted">Не указаны</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Текущий уровень:</th>
+                            <td>{{ student.current_level|default:"Не указан" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Слабые темы:</th>
+                            <td>{{ student.weak_topics|default:"Не указаны"|linebreaks }}</td>
+                        </tr>
+                        <tr>
+                            <th>Дата начала занятий:</th>
+                            <td>{{ student.start_date|date:"d.m.Y"|default:"Не указана" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Заметки:</th>
+                            <td>{{ student.notes|default:"Нет заметок"|linebreaks }}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                {% with active_exams=student.get_active_exam_dates %}
+                {% if active_exams %}
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h5>📅 Ближайшие экзамены:</h5>
+                        {% for exam_name, exam_date in active_exams %}
+                        <div class="alert {% if exam_date|timeuntil <= '30 days' %}alert-danger{% else %}alert-info{% endif %} mt-2">
+                            <h6 class="mb-2">{{ exam_name }}: {{ exam_date|date:"j E Y" }}</h6>
+                            <p class="mb-0">До экзамена осталось: <strong>{{ exam_date|timeuntil }}</strong></p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h5>📅 Даты экзаменов:</h5>
+                        <div class="row">
+                            {% if student.exam_date_oge_math %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">ОГЭ по математике</h6>
+                                        <p class="card-text">
+                                            {{ student.exam_date_oge_math|date:"j E Y" }}
+                                            <br><small class="text-muted">Осталось: {{ student.exam_date_oge_math|timeuntil }}</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if student.exam_date_oge_physics %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">ОГЭ по физике</h6>
+                                        <p class="card-text">
+                                            {{ student.exam_date_oge_physics|date:"j E Y" }}
+                                            <br><small class="text-muted">Осталось: {{ student.exam_date_oge_physics|timeuntil }}</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if student.exam_date_ege_math %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">ЕГЭ по математике</h6>
+                                        <p class="card-text">
+                                            {{ student.exam_date_ege_math|date:"j E Y" }}
+                                            <br><small class="text-muted">Осталось: {{ student.exam_date_ege_math|timeuntil }}</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if student.exam_date_ege_physics %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">ЕГЭ по физике</h6>
+                                        <p class="card-text">
+                                            {{ student.exam_date_ege_physics|date:"j E Y" }}
+                                            <br><small class="text-muted">Осталось: {{ student.exam_date_ege_physics|timeuntil }}</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if not student.exam_date_oge_math and not student.exam_date_oge_physics and not student.exam_date_ege_math and not student.exam_date_ege_physics %}
+                            <div class="col-12">
+                                <p class="text-muted">Даты экзаменов не назначены</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endwith %}
+                
+                <div class="mt-4">
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                        ← Вернуться в кабинет
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к профилю ученика.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,233 @@
+/* ===== Общие стили ===== */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-bottom: 20px;
+}
+
+/* Навбар */
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0.5rem 1rem;
+}
+.navbar-brand {
+    font-weight: bold;
+    color: white !important;
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 5px;
+}
+.navbar-nav .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.9);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+.logout-btn:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 5px;
+}
+
+/* Карточки */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+    border: none;
+    padding: 15px 20px;
+}
+.card-header h4, .card-header h5 {
+    margin-bottom: 0;
+}
+.card-body {
+    padding: 20px;
+}
+
+/* Кнопки */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+/* Таблицы */
+.table {
+    margin-bottom: 0;
+}
+.table th {
+    border-top: none;
+    background-color: #f8f9fa;
+}
+
+/* Цитата */
+.motivation-quote {
+    font-style: italic;
+    color: #666;
+    margin: 20px 0;
+    padding-left: 20px;
+    border-left: 4px solid #667eea;
+}
+
+/* Футер */
+footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Offcanvas */
+.offcanvas {
+    max-width: 300px;
+}
+
+.offcanvas-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.offcanvas-title {
+    color: white;
+}
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Аватар */
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.initials {
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+}
+
+/* Список */
+.list-group-item {
+    border: none;
+    padding: 12px 15px;
+}
+
+.list-group-item i.emoji {
+    margin-right: 10px;
+    font-style: normal;
+}
+
+/* ===== Адаптивность ===== */
+@media (min-width: 992px) {
+    .navbar-collapse {
+        display: flex !important;
+    }
+    .offcanvas {
+        display: none;
+    }
+    .btn-group .btn {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    .table th, .table td {
+        padding: 1rem 0.75rem;
+    }
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.7rem;
+    }
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    .filter-buttons-full {
+        width: auto !important;
+        display: inline-flex !important;
+    }
+    .filter-buttons-full .btn {
+        flex: none !important;
+        width: auto !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        display: none !important;
+    }
+    .navbar-toggler {
+        display: block !important;
+    }
+    .card-body {
+        padding: 15px;
+    }
+    .table th, .table td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.85rem;
+    }
+    .filter-buttons-full {
+        width: 100% !important;
+        display: flex !important;
+    }
+    .filter-buttons-full .btn {
+        flex: 1 !important;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.5rem;
+    }
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.4rem;
+    }
+    h4 {
+        font-size: 1.2rem;
+    }
+    h5 {
+        font-size: 1.1rem;
+    }
+    .display-4 {
+        font-size: 1.5rem;
+    }
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        display: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .table th, .table td {
+        padding: 0.4rem 0.2rem;
+        font-size: 0.75rem;
+    }
+    .btn-sm {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.7rem;
+    }
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        display: none;
+    }
+}

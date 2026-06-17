@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои пробники{% endblock %}
+
+{% block content %}
+{% if student %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">📊 Мои пробники</h4>
+            </div>
+            <div class="card-body">
+                <!-- Фильтры по предмету - адаптивные кнопки -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="d-flex flex-wrap gap-1">
+                            <a href="?subject=all&status={{ status_filter }}&month={{ month_filter }}" 
+                               class="btn {% if subject_filter == 'all' or not subject_filter %}btn-primary{% else %}btn-outline-primary{% endif %} flex-fill">
+                                Все ({{ total_probniks }})
+                            </a>
+                            <a href="?subject=math&status={{ status_filter }}&month={{ month_filter }}" 
+                               class="btn {% if subject_filter == 'math' %}btn-primary{% else %}btn-outline-primary{% endif %} flex-fill">
+                                🧮 Математика ({{ math_count }})
+                            </a>
+                            <a href="?subject=physics&status={{ status_filter }}&month={{ month_filter }}" 
+                               class="btn {% if subject_filter == 'physics' %}btn-primary{% else %}btn-outline-primary{% endif %} flex-fill">
+                                ⚡ Физика ({{ physics_count }})
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                <!-- Фильтры по месяцам - адаптивные кнопки с прокруткой -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex flex-nowrap overflow-auto pb-2" style="scrollbar-width: thin;">
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=all" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'all' or not month_filter %}active{% endif %}">
+                                Все месяцы
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=september" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'september' %}active{% endif %}">
+                                Сен
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=october" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'october' %}active{% endif %}">
+                                Окт
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=november" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'november' %}active{% endif %}">
+                                Ноя
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=december" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'december' %}active{% endif %}">
+                                Дек
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=january" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'january' %}active{% endif %}">
+                                Янв
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=february" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'february' %}active{% endif %}">
+                                Фев
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=march" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'march' %}active{% endif %}">
+                                Мар
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=april" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'april' %}active{% endif %}">
+                                Апр
+                            </a>
+                            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=may" 
+                               class="btn btn-outline-secondary me-1 flex-shrink-0 {% if month_filter == 'may' %}active{% endif %}">
+                                Май
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if probniks %}
+                <!-- Карточки для мобильных устройств -->
+                <div class="d-block d-md-none">
+                    {% regroup probniks by month as month_list %}
+                    
+                    {% for month in month_list %}
+                        {% if month.grouper %}
+                        <div class="mb-3">
+                            <h6 class="border-bottom pb-2">
+                                📅 
+                                {% if month.grouper == 'september' %}Сентябрь
+                                {% elif month.grouper == 'october' %}Октябрь
+                                {% elif month.grouper == 'november' %}Ноябрь
+                                {% elif month.grouper == 'december' %}Декабрь
+                                {% elif month.grouper == 'january' %}Январь
+                                {% elif month.grouper == 'february' %}Февраль
+                                {% elif month.grouper == 'march' %}Март
+                                {% elif month.grouper == 'april' %}Апрель
+                                {% elif month.grouper == 'may' %}Май
+                                {% else %}{{ month.grouper }}{% endif %}
+                                <span class="badge bg-primary float-end">{{ month.list|length }}</span>
+                            </h6>
+                            
+                            {% for probnik in month.list %}
+                            <div class="card mb-2 {% if probnik.is_overdue %}border-danger{% elif probnik.status == 'checked' %}border-success{% endif %}">
+                                <div class="card-body p-2">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <span class="badge {% if probnik.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %} me-1">
+                                                    {{ probnik.get_subject_display|slice:":4" }}
+                                                </span>
+                                                <strong>{{ probnik.title|truncatechars:20 }}</strong>
+                                            </div>
+                                            
+                                            <div class="small">
+                                                {% if probnik.deadline %}
+                                                    <span class="text-muted">До:</span>
+                                                    <span class="fw-bold {% if probnik.is_overdue %}text-danger{% endif %}">
+                                                        {{ probnik.deadline|date:"d.m" }}
+                                                    </span>
+                                                {% endif %}
+                                                
+                                                {% if probnik.status == 'checked' and probnik.score %}
+                                                    <span class="badge bg-info ms-2">{{ probnik.score }}/{{ probnik.max_score }}</span>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="mt-1">
+                                                {% if probnik.status == 'checked' %}
+                                                    <span class="badge bg-success">✅ Проверено</span>
+                                                {% elif probnik.has_student_files %}
+                                                    <span class="badge bg-success">✅ Сдано</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">⚠️ Не сдано</span>
+                                                {% endif %}
+                                                
+                                                {% if probnik.month %}
+                                                    <span class="badge bg-secondary">{{ probnik.get_month_display|truncatechars:5 }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <a href="{% url 'probnik_detail' probnik.id %}" class="btn btn-sm btn-outline-primary ms-2">
+                                            →
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for month in month_list %}
+                        {% if not month.grouper %}
+                        <div class="mb-3">
+                            <h6 class="border-bottom pb-2">
+                                📋 Другие пробники
+                                <span class="badge bg-secondary float-end">{{ month.list|length }}</span>
+                            </h6>
+                            
+                            {% for probnik in month.list %}
+                            <div class="card mb-2 {% if probnik.is_overdue %}border-danger{% elif probnik.status == 'checked' %}border-success{% endif %}">
+                                <div class="card-body p-2">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <span class="badge {% if probnik.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %} me-1">
+                                                    {{ probnik.get_subject_display|slice:":4" }}
+                                                </span>
+                                                <strong>{{ probnik.title|truncatechars:20 }}</strong>
+                                            </div>
+                                            
+                                            <div class="small">
+                                                {% if probnik.deadline %}
+                                                    <span class="text-muted">До:</span>
+                                                    <span class="fw-bold {% if probnik.is_overdue %}text-danger{% endif %}">
+                                                        {{ probnik.deadline|date:"d.m" }}
+                                                    </span>
+                                                {% endif %}
+                                                
+                                                {% if probnik.status == 'checked' and probnik.score %}
+                                                    <span class="badge bg-info ms-2">{{ probnik.score }}/{{ probnik.max_score }}</span>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="mt-1">
+                                                {% if probnik.status == 'checked' %}
+                                                    <span class="badge bg-success">✅ Проверено</span>
+                                                {% elif probnik.has_student_files %}
+                                                    <span class="badge bg-success">✅ Сдано</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">⚠️ Не сдано</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <a href="{% url 'probnik_detail' probnik.id %}" class="btn btn-sm btn-outline-primary ms-2">
+                                            →
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <!-- Таблица для планшетов и десктопов -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Предмет</th>
+                                <th>Дедлайн</th>
+                                <th>Статус</th>
+                                <th>Баллы</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for probnik in probniks %}
+                            <tr class="{% if probnik.is_overdue %}table-danger{% endif %}">
+                                <td><strong>{{ probnik.title|truncatechars:20 }}</strong></td>
+                                <td>
+                                    <span class="badge {% if probnik.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %}">
+                                        {{ probnik.get_subject_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if probnik.deadline %}
+                                        <span class="badge {% if probnik.is_overdue %}bg-danger{% elif probnik.get_deadline_status == 'urgent' %}bg-danger{% elif probnik.get_deadline_status == 'soon' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                            {{ probnik.deadline|date:"d.m" }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if probnik.status == 'in_progress' %}
+                                    <span class="badge bg-info">В работе</span>
+                                    {% elif probnik.status == 'checked' %}
+                                    <span class="badge bg-success">Проверен</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if probnik.score %}
+                                    <span class="badge bg-info">{{ probnik.score }}/{{ probnik.max_score }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'probnik_detail' probnik.id %}" class="btn btn-outline-primary">
+                                            👁️
+                                        </a>
+                                        {% if probnik.status == 'in_progress' %}
+                                        <a href="{% url 'delete_probnik' probnik.id %}" class="btn btn-outline-danger">
+                                            🗑️
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% else %}
+                <div class="text-center py-5">
+                    <h4>📊 Нет пробников</h4>
+                    <p class="text-muted">
+                        {% if subject_filter != 'all' %}
+                            Нет пробников по выбранному предмету
+                        {% elif month_filter != 'all' %}
+                            Нет пробников за выбранный месяц
+                        {% else %}
+                            Преподаватель еще не назначил вам пробники
+                        {% endif %}
+                    </p>
+                    {% if month_filter != 'all' or subject_filter != 'all' %}
+                    <a href="?subject=all&status=all&month=all" class="btn btn-outline-primary mt-3">
+                        Сбросить все фильтры
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Подсвечиваем активные фильтры при загрузке страницы
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Для месяцев
+        const monthParam = urlParams.get('month');
+        if (monthParam) {
+            const monthButtons = document.querySelectorAll('[href*="month="]');
+            monthButtons.forEach(button => {
+                if (button.href.includes(`month=${monthParam}`)) {
+                    button.classList.add('active');
+                }
+            });
+        } else {
+            // Если месяц не указан, выделяем "Все месяцы"
+            const allMonthsButton = document.querySelector('[href*="month=all"]');
+            if (allMonthsButton) {
+                allMonthsButton.classList.add('active');
+            }
+        }
+        
+        // Для предметов
+        const subjectParam = urlParams.get('subject');
+        if (subjectParam) {
+            const subjectButtons = document.querySelectorAll('[href*="subject="]');
+            subjectButtons.forEach(button => {
+                if (button.href.includes(`subject=${subjectParam}`)) {
+                    button.classList.add('active');
+                }
+            });
+        } else {
+            // Если предмет не указан, выделяем "Все"
+            const allSubjectsButton = document.querySelector('[href*="subject=all"]');
+            if (allSubjectsButton) {
+                allSubjectsButton.classList.add('active');
+            }
+        }
+        
+        // Для статуса
+        const statusParam = urlParams.get('status');
+        if (statusParam) {
+            const statusButtons = document.querySelectorAll('[href*="status="]');
+            statusButtons.forEach(button => {
+                if (button.href.includes(`status=${statusParam}`)) {
+                    button.classList.add('active');
+                }
+            });
+        } else {
+            // Если статус не указан, выделяем "Все"
+            const allStatusButton = document.querySelector('[href*="status=all"]');
+            if (allStatusButton) {
+                allStatusButton.classList.add('active');
+            }
+        }
+    });
+</script>
+
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к пробникам.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

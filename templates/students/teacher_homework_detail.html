@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ homework.title }}{% endblock %}
+
+{% block content %}
+{% if teacher %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center
+                {% if homework.status == 'checked' %}bg-success
+                {% elif homework.status == 'submitted' %}bg-warning
+                {% else %}bg-primary{% endif %} text-white">
+                <div>
+                    <h4 class="mb-0">📝 {{ homework.title }}</h4>
+                    <small>{{ homework.student }} | {{ homework.get_subject_display }}</small>
+                </div>
+                <div class="btn-group">
+                    <a href="{% url 'teacher_homework_delete' homework.id %}" class="btn btn-outline-light btn-sm">
+                        🗑️ Удалить
+                    </a>
+                    <a href="{% url 'teacher_homework_list' %}" class="btn btn-outline-light btn-sm">
+                        ← Назад
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                
+                <!-- Информация о задании -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p><strong>Ученик:</strong> {{ homework.student }}</p>
+                        <p><strong>Класс:</strong> {{ homework.student.class_name }}</p>
+                        <p><strong>Предмет:</strong> 
+                            <span class="badge {% if homework.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %} fs-6">
+                                {{ homework.get_subject_display }}
+                            </span>
+                        </p>
+                        <p><strong>Выдано:</strong> {{ homework.assigned_date|date:"d.m.Y" }}</p>
+                        <p><strong>Дедлайн:</strong> 
+                            <span class="{% if homework.is_overdue %}text-danger fw-bold{% endif %}">
+                                {{ homework.deadline|date:"d.m.Y"|default:"Не установлен" }}
+                                {% if homework.is_overdue %}
+                                <span class="badge bg-danger">Просрочено!</span>
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Статус:</strong> 
+                            <span class="badge 
+                                {% if homework.status == 'checked' %}bg-success
+                                {% elif homework.status == 'submitted' %}bg-warning
+                                {% elif homework.status == 'in_progress' %}bg-info
+                                {% else %}bg-secondary{% endif %} fs-6">
+                                {{ homework.get_status_display }}
+                            </span>
+                        </p>
+                        <p><strong>Назначил:</strong> {{ homework.assigned_by }}</p>
+                        {% if homework.submitted_date %}
+                        <p><strong>Отправлено на проверку:</strong> {{ homework.submitted_date|date:"d.m.Y" }}</p>
+                        {% endif %}
+                        {% if homework.checked_date %}
+                        <p><strong>Проверено:</strong> {{ homework.checked_date|date:"d.m.Y" }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Файлы преподавателя -->
+                {% if teacher_files %}
+                <div class="card mb-4">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">📎 Файлы преподавателя</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for file in teacher_files %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ file.description|default:"Файл задания" }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Загружено: {{ file.uploaded_at|date:"d.m.Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            📄 Скачать
+                                        </a>
+                                        {% if file.id %}
+                                        <form method="post" action="{% url 'teacher_delete_homework_file' file.id %}" 
+                                              style="display: inline;" onsubmit="return confirm('Удалить этот файл?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить файл">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Файлы ученика -->
+                {% if student_files %}
+                <div class="card mb-4">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0">📁 Работа ученика</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for file in student_files %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ file.description|default:"Файл ученика" }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Загружено: {{ file.uploaded_at|date:"d.m.Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            📄 Скачать
+                                        </a>
+                                        {% if file.id %}
+                                        <form method="post" action="{% url 'teacher_delete_homework_file' file.id %}" 
+                                              style="display: inline;" onsubmit="return confirm('Удалить этот файл?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить файл">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if homework.status == 'submitted' %}
+                        <div class="alert alert-info mt-3">
+                            <strong>⏳ Ожидает проверки</strong><br>
+                            Ученик отправил задание на проверку {{ homework.submitted_date|date:"d.m.Y" }}.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Отображение результатов, если задание уже проверено -->
+                {% if homework.status == 'checked' %}
+                <div class="card mb-4 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">📊 Результаты проверки</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                {% if homework.grade %}
+                                    {% if homework.grade == '5' %}
+                                        <div class="display-1 text-success">5</div>
+                                        <span class="badge bg-success fs-4">Отлично</span>
+                                    {% elif homework.grade == '4' %}
+                                        <div class="display-1 text-info">4</div>
+                                        <span class="badge bg-info fs-4">Хорошо</span>
+                                    {% elif homework.grade == '3' %}
+                                        <div class="display-1 text-warning">3</div>
+                                        <span class="badge bg-warning fs-4">Удовлетворительно</span>
+                                    {% elif homework.grade == '2' %}
+                                        <div class="display-1 text-danger">2</div>
+                                        <span class="badge bg-danger fs-4">Неудовлетворительно</span>
+                                    {% elif homework.grade == 'z' %}
+                                        <div class="display-1 text-success">✓</div>
+                                        <span class="badge bg-success fs-4">Зачтено</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                {% if homework.teacher_comment %}
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">💬 Комментарий преподавателя</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ homework.teacher_comment|linebreaks }}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p class="text-muted">Комментарий не добавлен</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Форма проверки (для заданий, отправленных на проверку) -->
+                {% if homework.status == 'submitted' or homework.status == 'in_progress' or homework.status == 'assigned' %}
+                <div class="card mb-4 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">✅ Проверить задание</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" id="check-homework-form">
+                            {% csrf_token %}
+                            
+                            {% if not student_files %}
+                            <div class="alert alert-warning">
+                                <strong>⚠️ Внимание!</strong> Ученик не загрузил файлы, но статус задания - "Отправлено на проверку". 
+                                Возможно, ученик удалил файлы после отправки. Вы можете всё равно проверить задание, поставив оценку и комментарий.
+                            </div>
+                            {% endif %}
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="grade" class="form-label">Оценка *</label>
+                                    <select class="form-control" id="grade" name="grade" required>
+                                        <option value="">-- Выберите оценку --</option>
+                                        <option value="5" {% if homework.grade == '5' %}selected{% endif %}>Отлично (5)</option>
+                                        <option value="4" {% if homework.grade == '4' %}selected{% endif %}>Хорошо (4)</option>
+                                        <option value="3" {% if homework.grade == '3' %}selected{% endif %}>Удовлетворительно (3)</option>
+                                        <option value="2" {% if homework.grade == '2' %}selected{% endif %}>Неудовлетворительно (2)</option>
+                                        <option value="z" {% if homework.grade == 'z' %}selected{% endif %}>Зачтено</option>
+                                    </select>
+                                    <div class="form-text">Оценка за домашнее задание</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="teacher_comment" class="form-label">Комментарий</label>
+                                <textarea class="form-control" id="teacher_comment" name="teacher_comment" 
+                                        rows="4" placeholder="Напишите комментарий к работе...">{{ homework.teacher_comment|default:'' }}</textarea>
+                                <div class="form-text">Подробный разбор ошибок и рекомендации (необязательно)</div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <strong>ℹ️ После проверки:</strong> Статус изменится на "Проверено", и ученик увидит результаты.
+                            </div>
+                            
+                            <button type="submit" name="check_homework" value="1" class="btn btn-success btn-lg">
+                                ✅ Завершить проверку
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                                
+                <!-- Добавление файлов (доступно всегда) -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">📤 Добавить материалы</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="files" class="form-label">Файлы (можно несколько)</label>
+                                <input type="file" class="form-control" id="files" name="files" multiple>
+                                <div class="form-text">PDF, DOC, DOCX, JPG, PNG до 5MB</div>
+                            </div>
+                            
+                            <button type="submit" name="add_file" value="1" class="btn btn-outline-primary">
+                                📎 Загрузить файлы
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Опасные действия -->
+                <div class="card mt-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">⚠️ Опасные действия</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <strong>Удаление задания</strong><br>
+                            Будьте осторожны! Удаление задания приведет к удалению всех связанных файлов.
+                        </div>
+                        <div class="text-center">
+                            <a href="{% url 'teacher_homework_delete' homework.id %}" class="btn btn-danger">
+                                🗑️ Удалить это задание
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Подтверждение перед отправкой формы проверки
+    const checkForm = document.getElementById('check-homework-form');
+    if (checkForm) {
+        checkForm.addEventListener('submit', function(e) {
+            const grade = document.getElementById('grade').value;
+            if (!grade) {
+                e.preventDefault();
+                alert('Пожалуйста, выберите оценку');
+                return false;
+            }
+            
+            {% if not student_files %}
+            if (!confirm('Ученик не загрузил файлы. Вы уверены, что хотите отметить задание как проверенное?')) {
+                e.preventDefault();
+                return false;
+            }
+            {% endif %}
+        });
+    }
+});
+</script>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

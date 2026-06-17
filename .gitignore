@@ -1,0 +1,49 @@
+cat > .gitignore << 'EOF'
+# Python virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+
+# Django
+db.sqlite3
+*.log
+staticfiles/
+collected_static/
+media/
+.DS_Store
+
+# Environment variables
+.env
+*.env
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# System
+Thumbs.db
+.DS_Store
+
+# Project specific
+logs/
+*.pid
+*.sock
+*.pid
+
+# Local settings
+local_settings.py
+*.local.py
+EOF

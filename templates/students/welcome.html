@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Добро пожаловать{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3 class="text-center mb-0">🎉 Добро пожаловать в Нейро-Школу!</h3>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h4>Привет, {{ student.first_name }}!</h4>
+                    <p class="lead">Твой личный кабинет готов к работе</p>
+                </div>
+                
+                <div class="alert alert-info">
+                    <h5 class="mb-3">📱 Твои данные для входа:</h5>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Логин:</h6>
+                                    <p class="fs-4"><strong>{{ username }}</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Пароль:</h6>
+                                    <p class="fs-4"><strong>{{ password }}</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p><strong>Ссылка для входа:</strong> <code>/students/login/</code></p>
+                        <p class="text-danger"><strong>Сохрани эти данные! Они понадобятся для входа на сайт.</strong></p>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>🎯 Что ты найдешь в личном кабинете:</h5>
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <h1>📊</h1>
+                                    <h6>Результаты пробников</h6>
+                                    <p class="small">Отслеживай свой прогресс по математике и физике</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <h1>📁</h1>
+                                    <h6>Учебные материалы</h6>
+                                    <p class="small">Все необходимые файлы для подготовки к экзаменам</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <h1>📅</h1>
+                                    <h6>Календарь экзаменов</h6>
+                                    <p class="small">Отсчет времени до ОГЭ/ЕГЭ и контрольных работ</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>📱 Как пользоваться:</h5>
+                    <ol>
+                        <li><strong>Сохрани логин и пароль</strong> в надежном месте</li>
+                        <li><strong>Перейди по ссылке</strong> на сайт Нейро-Школы</li>
+                        <li><strong>Введи свои данные</strong> на странице входа</li>
+                        <li><strong>Изучи личный кабинет</strong> - там есть все для твоей подготовки</li>
+                        <li><strong>Регулярно проверяй</strong> новые материалы и результаты</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-warning mt-4">
+                    <h5>👨‍🏫 Контакты для связи:</h5>
+                    <p>Если возникнут проблемы со входом или ты забудешь пароль, обратись к администратору:</p>
+                    <p><strong>Telegram:</strong> @neyro_shkola</p>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        🚀 Перейти к входу
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

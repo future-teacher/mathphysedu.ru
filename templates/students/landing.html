@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MathPhysEdu — Подготовка к ОГЭ и ЕГЭ{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+<style>
+/* Top navigation bar */
+.landing-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+}
+
+.landing-nav .nav-brand {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.landing-nav .nav-login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.landing-nav .nav-login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.landing-nav .nav-login-btn:active {
+    transform: translateY(0);
+}
+
+/* Push hero section down to account for fixed navbar */
+.hero-section {
+    padding-top: 80px;
+}
+
+@media (max-width: 768px) {
+    .landing-nav {
+        padding: 12px 20px;
+    }
+    .landing-nav .nav-brand {
+        font-size: 20px;
+    }
+    .landing-nav .nav-login-btn {
+        padding: 8px 18px;
+        font-size: 14px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Top Navigation -->
+<nav class="landing-nav">
+    <a href="{% url 'landing' %}" class="nav-brand">📐 MathPhysEdu</a>
+    <a href="{% url 'login' %}" class="nav-login-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+        Войти в личный кабинет
+    </a>
+</nav>
+
+<!-- Hero секция -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">📐 MathPhysEdu</h1>
+        <p class="hero-subtitle">
+            Персональная подготовка к ОГЭ и ЕГЭ по математике и физике<br>
+            с отслеживанием прогресса и индивидуальными материалами
+        </p>
+
+        <div class="hero-features">
+            <div class="hero-feature">
+                <div class="hero-feature-icon">📊</div>
+                <div class="hero-feature-title">Прогресс</div>
+                <div class="hero-feature-desc">Отслеживай результаты</div>
+            </div>
+            <div class="hero-feature">
+                <div class="hero-feature-icon">📁</div>
+                <div class="hero-feature-title">Материалы</div>
+                <div class="hero-feature-desc">Учебные файлы</div>
+            </div>
+            <div class="hero-feature">
+                <div class="hero-feature-icon">📅</div>
+                <div class="hero-feature-title">Дедлайны</div>
+                <div class="hero-feature-desc">Контроль сроков</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Секция "О нас" -->
+<div class="about-section">
+    <div class="container">
+        <h2 class="section-title">Почему выбирают нас?</h2>
+        <div class="about-cards">
+            <div class="about-card">
+                <div class="about-card-icon">🎯</div>
+                <h5>Индивидуальный подход</h5>
+                <p>Каждый ученик получает персональные задания и материалы, подобранные под его уровень подготовки.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card-icon">📈</div>
+                <h5>Отслеживание прогресса</h5>
+                <p>Наглядная статистика по пробникам и домашним заданиям помогает видеть реальный рост результатов.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card-icon">⏰</div>
+                <h5>Дедлайны и дисциплина</h5>
+                <p>Система дедлайнов приучает к регулярным занятиям и помогает не откладывать подготовку.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card-icon">💬</div>
+                <h5>Обратная связь</h5>
+                <p>Преподаватель проверяет работы и оставляет подробные комментарии по каждой задаче.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Футер -->
+<div class="landing-footer">
+    <div class="container">
+        <p class="mb-0">© {% now "Y" %} MathPhysEdu — Подготовка к ОГЭ и ЕГЭ по математике и физике</p>
+    </div>
+</div>
+{% endblock %}

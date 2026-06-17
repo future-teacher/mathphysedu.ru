@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title|default:"Создать пробник" }}{% endblock %}
+
+{% block content %}
+{% if teacher %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">📊 {{ title|default:"Создать пробник" }}</h4>
+                {% if probnik %}
+                <a href="{% url 'teacher_student_detail' probnik.student.id %}" class="btn btn-light btn-sm">
+                    ← Назад к ученику
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Пожалуйста, исправьте следующие ошибки:</strong>
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ field }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">📋 Основная информация</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_student" class="form-label">Ученик *</label>
+                                    <select name="student" id="id_student" class="form-control" required>
+                                        <option value="">-- Выберите ученика --</option>
+                                        {% for student in form.student.field.queryset %}
+                                        <option value="{{ student.id }}" {% if form.student.value|stringformat:"s" == student.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ student.first_name }} {{ student.last_name }} ({{ student.class_name }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if form.student.errors %}
+                                    <div class="text-danger">{{ form.student.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_subject" class="form-label">Предмет *</label>
+                                    <select name="subject" id="id_subject" class="form-control" required>
+                                        <option value="math" {% if form.subject.value == 'math' %}selected{% endif %}>Математика</option>
+                                        <option value="physics" {% if form.subject.value == 'physics' %}selected{% endif %}>Физика</option>
+                                    </select>
+                                    {% if form.subject.errors %}
+                                    <div class="text-danger">{{ form.subject.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_month" class="form-label">Месяц аттестации</label>
+                                    <select name="month" id="id_month" class="form-control">
+                                        <option value="">-- Выберите месяц --</option>
+                                        <option value="september" {% if form.month.value == 'september' %}selected{% endif %}>Сентябрь</option>
+                                        <option value="october" {% if form.month.value == 'october' %}selected{% endif %}>Октябрь</option>
+                                        <option value="november" {% if form.month.value == 'november' %}selected{% endif %}>Ноябрь</option>
+                                        <option value="december" {% if form.month.value == 'december' %}selected{% endif %}>Декабрь</option>
+                                        <option value="january" {% if form.month.value == 'january' %}selected{% endif %}>Январь</option>
+                                        <option value="february" {% if form.month.value == 'february' %}selected{% endif %}>Февраль</option>
+                                        <option value="march" {% if form.month.value == 'march' %}selected{% endif %}>Март</option>
+                                        <option value="april" {% if form.month.value == 'april' %}selected{% endif %}>Апрель</option>
+                                        <option value="may" {% if form.month.value == 'may' %}selected{% endif %}>Май</option>
+                                    </select>
+                                    <div class="form-text">Выберите месяц для ежемесячной аттестации</div>
+                                    {% if form.month.errors %}
+                                    <div class="text-danger">{{ form.month.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_status" class="form-label">Статус</label>
+                                    <select name="status" id="id_status" class="form-control">
+                                        <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>В работе</option>
+                                        <option value="checked" {% if form.status.value == 'checked' %}selected{% endif %}>Проверен</option>
+                                    </select>
+                                    {% if form.status.errors %}
+                                    <div class="text-danger">{{ form.status.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_title" class="form-label">Название пробника *</label>
+                                <input type="text" name="title" id="id_title" class="form-control" 
+                                       value="{{ form.title.value|default:'' }}" 
+                                       placeholder="Например: Пробник ОГЭ №1" required>
+                                <div class="form-text">Например: "Пробник ОГЭ №1" или "Итоговый пробник"</div>
+                                {% if form.title.errors %}
+                                <div class="text-danger">{{ form.title.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_deadline" class="form-label">Дедлайн</label>
+                                    <input type="date" name="deadline" id="id_deadline" class="form-control" 
+                                           value="{{ form.deadline.value|date:'Y-m-d'|default:'' }}">
+                                    <div class="form-text">Дата, до которой нужно написать пробник</div>
+                                    {% if form.deadline.errors %}
+                                    <div class="text-danger">{{ form.deadline.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">📎 Файлы пробника</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="files" class="form-label">Загрузить файлы пробника</label>
+                                <input type="file" class="form-control" id="files" name="files" multiple>
+                                <div class="form-text">Можно выбрать несколько файлов. Форматы: PDF, DOC, DOCX, JPG, PNG</div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <strong>💡 Совет:</strong> Загрузите файлы с заданиями пробника
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if probnik %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">🎯 Результаты</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_max_score" class="form-label">Максимальный балл</label>
+                                    <input type="number" name="max_score" id="id_max_score" class="form-control" 
+                                           value="{{ form.max_score.value|default:'100' }}" min="1">
+                                    <div class="form-text">Обычно 100 баллов</div>
+                                    {% if form.max_score.errors %}
+                                    <div class="text-danger">{{ form.max_score.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_score" class="form-label">Набранные баллы</label>
+                                    <input type="number" name="score" id="id_score" class="form-control" 
+                                           value="{{ form.score.value|default:'' }}" min="0">
+                                    <div class="form-text">Заполняется после проверки</div>
+                                    {% if form.score.errors %}
+                                    <div class="text-danger">{{ form.score.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_teacher_comment" class="form-label">Комментарий преподавателя</label>
+                                <textarea name="teacher_comment" id="id_teacher_comment" class="form-control" 
+                                          rows="3">{{ form.teacher_comment.value|default:'' }}</textarea>
+                                <div class="form-text">Комментарий к результатам пробника</div>
+                                {% if form.teacher_comment.errors %}
+                                <div class="text-danger">{{ form.teacher_comment.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        {% if probnik %}
+                        <a href="{% url 'teacher_student_detail' probnik.student.id %}" class="btn btn-secondary me-md-2">
+                            ← Отмена
+                        </a>
+                        {% else %}
+                        <a href="{% url 'teacher_student_list' %}" class="btn btn-secondary me-md-2">
+                            ← Назад
+                        </a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-warning">
+                            {% if probnik %}💾 Сохранить изменения{% else %}📤 Создать пробник{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('student');
+        
+        if (studentId) {
+            const studentSelect = document.getElementById('id_student');
+            if (studentSelect) {
+                studentSelect.value = studentId;
+            }
+        }
+        
+        const deadlineInput = document.getElementById('id_deadline');
+        if (deadlineInput && !deadlineInput.value) {
+            const today = new Date();
+            const weekLater = new Date(today);
+            weekLater.setDate(today.getDate() + 7);
+            const formattedDate = weekLater.toISOString().split('T')[0];
+            deadlineInput.value = formattedDate;
+        }
+        
+        const monthSelect = document.getElementById('id_month');
+        const titleInput = document.getElementById('id_title');
+        const subjectSelect = document.getElementById('id_subject');
+        
+        function updateTitle() {
+            if (monthSelect && titleInput && !titleInput.value) {
+                const selectedOption = monthSelect.options[monthSelect.selectedIndex];
+                if (selectedOption && selectedOption.value) {
+                    const monthText = selectedOption.text;
+                    const subjectText = subjectSelect.options[subjectSelect.selectedIndex]?.text || '';
+                    
+                    if (subjectText === 'Математика') {
+                        titleInput.value = `Аттестация по математике - ${monthText}`;
+                    } else if (subjectText === 'Физика') {
+                        titleInput.value = `Аттестация по физике - ${monthText}`;
+                    } else {
+                        titleInput.value = `Аттестация - ${monthText}`;
+                    }
+                }
+            }
+        }
+        
+        if (monthSelect) {
+            monthSelect.addEventListener('change', updateTitle);
+        }
+        
+        if (subjectSelect) {
+            subjectSelect.addEventListener('change', function() {
+                if (monthSelect && monthSelect.value) {
+                    updateTitle();
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    .form-control, .form-select {
+        margin-bottom: 5px;
+    }
+    .card-header.bg-light {
+        background-color: #f8f9fa !important;
+    }
+    .alert ul {
+        margin-bottom: 0;
+    }
+</style>
+
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Домашние задания{% endblock %}
+
+{% block content %}
+{% if teacher %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-success text-white">
+                <h4 class="mb-0">📝 Домашние задания</h4>
+                <a href="{% url 'teacher_homework_create' %}" class="btn btn-light btn-sm">
+                    + Новое
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="btn-group w-100" role="group">
+                            <a href="?subject=all&status={{ status_filter }}" 
+                               class="btn {% if subject_filter == 'all' or not subject_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                Все предметы
+                            </a>
+                            <a href="?subject=math&status={{ status_filter }}" 
+                               class="btn {% if subject_filter == 'math' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                🧮 Математика
+                            </a>
+                            <a href="?subject=physics&status={{ status_filter }}" 
+                               class="btn {% if subject_filter == 'physics' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                ⚡ Физика
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+
+                
+                {% if homework_list %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ученик</th>
+                                <th>Задание</th>
+                                <th>Предмет</th>
+                                <th>Дедлайн</th>
+                                <th>Статус сдачи</th>
+                                <th>Результат</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for homework in homework_list %}
+                            <tr class="
+                                {% if homework.is_overdue and homework.status != 'checked' %}table-danger
+                                {% elif homework.status == 'checked' %}table-success
+                                {% endif %}">
+                                <td>
+                                    <strong>{{ homework.student.first_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ homework.student.last_name }}</small>
+                                </td>
+                                <td>{{ homework.title|truncatechars:15 }}</td>
+                                <td>
+                                    <span class="badge {% if homework.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %}">
+                                        {{ homework.get_subject_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if homework.deadline %}
+                                        <span class="badge 
+                                            {% if homework.is_overdue and homework.status != 'checked' %}bg-danger
+                                            {% elif homework.get_deadline_status == 'urgent' and homework.status != 'checked' %}bg-danger
+                                            {% elif homework.get_deadline_status == 'soon' and homework.status != 'checked' %}bg-warning
+                                            {% elif homework.status == 'checked' %}bg-success
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ homework.deadline|date:"d.m" }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if homework.status == 'checked' %}
+                                        <span class="badge bg-success" title="Проверено">
+                                            ✅ Проверено
+                                        </span>
+                                    {% elif homework.has_student_files %}
+                                        <span class="badge bg-success" title="Решение отправлено">
+                                            ✅ Сдано ({{ homework.get_student_files_count }})
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning" title="Решение не отправлено">
+                                            ⚠️ Не сдано
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if homework.status == 'checked' %}
+                                        {% if homework.grade %}
+                                            <span class="badge 
+                                                {% if homework.grade == '5' %}bg-success
+                                                {% elif homework.grade == '4' %}bg-info
+                                                {% elif homework.grade == '3' %}bg-warning text-dark
+                                                {% elif homework.grade == '2' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ homework.get_grade_display }}
+                                            </span>
+                                        {% endif %}
+                                        {% if homework.teacher_comment %}
+                                            <span class="badge bg-light text-dark" title="{{ homework.teacher_comment }}">
+                                                💬
+                                            </span>
+                                        {% endif %}
+                                    {% elif homework.has_student_files %}
+                                        <span class="text-muted">Ожидает проверки</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'teacher_homework_detail' homework.id %}" 
+                                           class="btn btn-outline-primary">
+                                            👁️
+                                        </a>
+                                        <a href="{% url 'teacher_homework_delete' homework.id %}" 
+                                           class="btn btn-outline-danger">
+                                            🗑️
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if homework_list.has_other_pages %}
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if homework_list.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ homework_list.previous_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}">
+                                ←
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for i in homework_list.paginator.page_range %}
+                        <li class="page-item {% if homework_list.number == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}&subject={{ subject_filter }}&status={{ status_filter }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if homework_list.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ homework_list.next_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}">
+                                →
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                
+                {% else %}
+                <div class="text-center py-5">
+                    <h4>📝 Нет домашних заданий</h4>
+                    <p class="text-muted">Создайте первое домашнее задание</p>
+                    <a href="{% url 'teacher_homework_create' %}" class="btn btn-success">
+                        + Создать задание
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,819 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
+
+{% block content %}
+{% if teacher %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                <div>
+                    <h4 class="mb-0">👤 {{ student.first_name }} {{ student.last_name }}</h4>
+                    <small class="opacity-75">{{ student.class_name }} класс</small>
+                </div>
+                <div class="btn-group">
+                    <a href="{% url 'teacher_student_edit' student.id %}" class="btn btn-light">
+                        ✏️ Редактировать
+                    </a>
+                    <a href="{% url 'teacher_student_list' %}" class="btn btn-outline-light">
+                        ← Назад
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <!-- Левая колонка с информацией об ученике -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">📋 Информация</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Школа:</th>
+                                <td>{{ student.school|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Начало занятий:</th>
+                                <td>{{ student.start_date|date:"d.m.Y"|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Telegram ученика:</th>
+                                <td>
+                                    {% if student.telegram_username %}
+                                    <span class="badge bg-info">{{ student.telegram_username }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Telegram родителя:</th>
+                                <td>
+                                    {% if student.parent_telegram %}
+                                    <span class="badge bg-info">{{ student.parent_telegram }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Имя родителя:</th>
+                                <td>{{ student.parent_name|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Текущий уровень:</th>
+                                <td>{{ student.current_level|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Слабые темы:</th>
+                                <td>{{ student.weak_topics|default:"-"|truncatechars:50 }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">🎯 Направления</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for exam_type in student.get_exam_types_display %}
+                        <span class="badge bg-primary mb-1">{{ exam_type }}</span>
+                        {% empty %}
+                        <p class="text-muted mb-0">Направления не указаны</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">📅 Даты экзаменов</h5>
+                    </div>
+                    <div class="card-body">
+                        {% with active_exams=student.get_active_exam_dates %}
+                            {% if active_exams %}
+                                {% for exam_name, exam_date in active_exams %}
+                                <div class="alert {% if exam_date|timeuntil <= '30 days' %}alert-danger{% else %}alert-info{% endif %} mb-2 py-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ exam_name }}</strong><br>
+                                            <span class="small">{{ exam_date|date:"d.m.Y" }}</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge {% if exam_date|timeuntil <= '30 days' %}bg-danger{% else %}bg-primary{% endif %}">
+                                                {{ exam_date|timeuntil }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="row">
+                                    {% if student.exam_date_oge_math %}
+                                    <div class="col-md-6 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body py-2">
+                                                <strong>ОГЭ математика:</strong><br>
+                                                {{ student.exam_date_oge_math|date:"d.m.Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if student.exam_date_oge_physics %}
+                                    <div class="col-md-6 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body py-2">
+                                                <strong>ОГЭ физика:</strong><br>
+                                                {{ student.exam_date_oge_physics|date:"d.m.Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if student.exam_date_ege_math %}
+                                    <div class="col-md-6 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body py-2">
+                                                <strong>ЕГЭ математика:</strong><br>
+                                                {{ student.exam_date_ege_math|date:"d.m.Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if student.exam_date_ege_physics %}
+                                    <div class="col-md-6 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body py-2">
+                                                <strong>ЕГЭ физика:</strong><br>
+                                                {{ student.exam_date_ege_physics|date:"d.m.Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if not student.exam_date_oge_math and not student.exam_date_oge_physics and not student.exam_date_ege_math and not student.exam_date_ege_physics %}
+                                    <p class="text-muted mb-0">Даты экзаменов не назначены</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <a href="{% url 'teacher_homework_create' %}?student={{ student.id }}" 
+                           class="btn btn-warning w-100 mb-2">
+                            📝 Новое ДЗ
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'teacher_probnik_create' %}?student={{ student.id }}" 
+                           class="btn btn-success w-100 mb-2">
+                            📊 Новый пробник
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'teacher_studyfile_create' %}?student={{ student.id }}" 
+                           class="btn btn-info w-100 mb-2">
+                            📁 Загрузить файл
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- ДЗ по математике -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                        <h5 class="mb-0">🧮 ДЗ по математике</h5>
+                        <span class="badge bg-light text-dark">{{ math_homework|length }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if math_homework %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Задание</th>
+                                        <th>Дедлайн</th>
+                                        <th>Статус</th>
+                                        <th>Результат</th>
+                                        <th>Файлы</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for hw in math_homework %}
+                                    <tr class="{% if hw.is_overdue and hw.status != 'checked' %}table-danger{% elif hw.status == 'checked' %}table-success{% endif %}">
+                                        <td>
+                                            <strong>{{ hw.title|truncatechars:25 }}</strong>
+                                            {% if hw.status == 'checked' %}
+                                                <span class="badge bg-success ms-1" title="Проверено">✅</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hw.deadline %}
+                                                <span class="badge 
+                                                    {% if hw.is_overdue and hw.status != 'checked' %}bg-danger
+                                                    {% elif hw.get_deadline_status == 'urgent' and hw.status != 'checked' %}bg-danger
+                                                    {% elif hw.get_deadline_status == 'soon' and hw.status != 'checked' %}bg-warning
+                                                    {% elif hw.status == 'checked' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ hw.deadline|date:"d.m.Y" }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hw.status == 'checked' %}
+                                                <span class="badge bg-success">✅ Проверено</span>
+                                            {% elif hw.has_student_files %}
+                                                <span class="badge bg-success">✅ Сдано</span>
+                                            {% elif hw.status == 'assigned' %}
+                                                <span class="badge bg-secondary">📋 Назначено</span>
+                                            {% elif hw.status == 'in_progress' %}
+                                                <span class="badge bg-info">📝 В работе</span>
+                                            {% elif hw.status == 'submitted' %}
+                                                <span class="badge bg-warning">⏳ На проверке</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">⚠️ Не сдано</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hw.status == 'checked' %}
+                                                {% if hw.grade %}
+                                                    <span class="badge 
+                                                        {% if hw.grade == '5' %}bg-success
+                                                        {% elif hw.grade == '4' %}bg-info
+                                                        {% elif hw.grade == '3' %}bg-warning text-dark
+                                                        {% elif hw.grade == '2' %}bg-danger
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ hw.get_grade_display }}
+                                                    </span>
+                                                {% endif %}
+                                                {% if hw.teacher_comment %}
+                                                    <span class="badge bg-light text-dark" title="{{ hw.teacher_comment }}">
+                                                        💬
+                                                    </span>
+                                                {% endif %}
+                                            {% elif hw.has_student_files %}
+                                                <span class="text-muted">Ожидает</span>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hw.get_teacher_files_count > 0 %}
+                                                <span class="badge bg-info" title="Файлы преподавателя">
+                                                    📎 {{ hw.get_teacher_files_count }}
+                                                </span>
+                                            {% endif %}
+                                            {% if hw.get_student_files_count > 0 %}
+                                                <span class="badge bg-success" title="Файлы ученика">
+                                                    📁 {{ hw.get_student_files_count }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'teacher_homework_detail' hw.id %}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                👁️
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {% if math_homework|length > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'teacher_homework_list' %}?student={{ student.id }}&subject=math" 
+                               class="btn btn-sm btn-outline-primary">
+                                Все ДЗ по математике ({{ math_homework|length }})
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% else %}
+                        <p class="text-muted text-center py-3">Нет ДЗ по математике</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- ДЗ по физике -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-danger text-white">
+                        <h5 class="mb-0">⚡ ДЗ по физике</h5>
+                        <span class="badge bg-light text-dark">{{ physics_homework|length }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if physics_homework %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Задание</th>
+                                        <th>Дедлайн</th>
+                                        <th>Статус</th>
+                                        <th>Результат</th>
+                                        <th>Файлы</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for hw in physics_homework %}
+                                    <tr class="{% if hw.is_overdue and hw.status != 'checked' %}table-danger{% elif hw.status == 'checked' %}table-success{% endif %}">
+                                        <td>
+                                            <strong>{{ hw.title|truncatechars:25 }}</strong>
+                                            {% if hw.status == 'checked' %}
+                                                <span class="badge bg-success ms-1" title="Проверено">✅</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hw.deadline %}
+                                                <span class="badge 
+                                                    {% if hw.is_overdue and hw.status != 'checked' %}bg-danger
+                                                    {% elif hw.get_deadline_status == 'urgent' and hw.status != 'checked' %}bg-danger
+                                                    {% elif hw.get_deadline_status == 'soon' and hw.status != 'checked' %}bg-warning
+                                                    {% elif hw.status == 'checked' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ hw.deadline|date:"d.m.Y" }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hw.status == 'checked' %}
+                                                <span class="badge bg-success">✅ Проверено</span>
+                                            {% elif hw.has_student_files %}
+                                                <span class="badge bg-success">✅ Сдано</span>
+                                            {% elif hw.status == 'assigned' %}
+                                                <span class="badge bg-secondary">📋 Назначено</span>
+                                            {% elif hw.status == 'in_progress' %}
+                                                <span class="badge bg-info">📝 В работе</span>
+                                            {% elif hw.status == 'submitted' %}
+                                                <span class="badge bg-warning">⏳ На проверке</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">⚠️ Не сдано</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hw.status == 'checked' %}
+                                                {% if hw.grade %}
+                                                    <span class="badge 
+                                                        {% if hw.grade == '5' %}bg-success
+                                                        {% elif hw.grade == '4' %}bg-info
+                                                        {% elif hw.grade == '3' %}bg-warning text-dark
+                                                        {% elif hw.grade == '2' %}bg-danger
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ hw.get_grade_display }}
+                                                    </span>
+                                                {% endif %}
+                                                {% if hw.teacher_comment %}
+                                                    <span class="badge bg-light text-dark" title="{{ hw.teacher_comment }}">
+                                                        💬
+                                                    </span>
+                                                {% endif %}
+                                            {% elif hw.has_student_files %}
+                                                <span class="text-muted">Ожидает</span>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hw.get_teacher_files_count > 0 %}
+                                                <span class="badge bg-info" title="Файлы преподавателя">
+                                                    📎 {{ hw.get_teacher_files_count }}
+                                                </span>
+                                            {% endif %}
+                                            {% if hw.get_student_files_count > 0 %}
+                                                <span class="badge bg-success" title="Файлы ученика">
+                                                    📁 {{ hw.get_student_files_count }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'teacher_homework_detail' hw.id %}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                👁️
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {% if physics_homework|length > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'teacher_homework_list' %}?student={{ student.id }}&subject=physics" 
+                               class="btn btn-sm btn-outline-primary">
+                                Все ДЗ по физике ({{ physics_homework|length }})
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% else %}
+                        <p class="text-muted text-center py-3">Нет ДЗ по физике</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Пробники по математике -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                        <h5 class="mb-0">🧮 Пробники по математике</h5>
+                        <span class="badge bg-light text-dark">{{ math_probniks|length }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if math_probniks %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Название</th>
+                                        <th>Месяц</th>
+                                        <th>Дедлайн</th>
+                                        <th>Статус</th>
+                                        <th>Результат</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for probnik in math_probniks %}
+                                    <tr class="{% if probnik.is_overdue %}table-danger{% elif probnik.status == 'checked' %}table-success{% endif %}">
+                                        <td>
+                                            <strong>{{ probnik.title|truncatechars:40 }}</strong>
+                                            {% if probnik.status == 'checked' %}
+                                                <span class="badge bg-success ms-1" title="Проверено">✅</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if probnik.month %}
+                                                <span class="badge bg-secondary">{{ probnik.get_month_display|truncatechars:10 }}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if probnik.deadline %}
+                                                <span class="badge {% if probnik.is_overdue %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                    {{ probnik.deadline|date:"d.m" }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if probnik.status == 'checked' %}
+                                                <span class="badge bg-success">✅ Проверено</span>
+                                            {% elif probnik.has_student_files %}
+                                                <span class="badge bg-success">✅ Сдано</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">⚠️ Не сдано</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if probnik.status == 'checked' %}
+                                                <span class="badge bg-info">
+                                                    {{ probnik.score }}/{{ probnik.max_score }}
+                                                </span>
+                                                {% if probnik.grade %}
+                                                    <span class="badge 
+                                                        {% if probnik.grade == '5' %}bg-success
+                                                        {% elif probnik.grade == '4' %}bg-info
+                                                        {% elif probnik.grade == '3' %}bg-warning text-dark
+                                                        {% else %}bg-danger{% endif %}">
+                                                        {{ probnik.grade }}
+                                                    </span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'teacher_probnik_detail' probnik.id %}" 
+                                                   class="btn btn-outline-primary" title="Просмотр">
+                                                    👁️
+                                                </a>
+                                                <a href="{% url 'teacher_probnik_edit' probnik.id %}" 
+                                                   class="btn btn-outline-secondary" title="Редактировать">
+                                                    ✏️
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {% if math_probniks|length > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'teacher_probnik_list' %}?student={{ student.id }}&subject=math" 
+                               class="btn btn-sm btn-outline-primary">
+                                Все пробники по математике
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% else %}
+                        <p class="text-muted text-center py-3">Нет пробников по математике</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Пробники по физике -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-danger text-white">
+                        <h5 class="mb-0">⚡ Пробники по физике</h5>
+                        <span class="badge bg-light text-dark">{{ physics_probniks|length }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if physics_probniks %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Название</th>
+                                        <th>Месяц</th>
+                                        <th>Дедлайн</th>
+                                        <th>Статус</th>
+                                        <th>Результат</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for probnik in physics_probniks %}
+                                    <tr class="{% if probnik.is_overdue %}table-danger{% elif probnik.status == 'checked' %}table-success{% endif %}">
+                                        <td>
+                                            <strong>{{ probnik.title|truncatechars:40 }}</strong>
+                                            {% if probnik.status == 'checked' %}
+                                                <span class="badge bg-success ms-1" title="Проверено">✅</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if probnik.month %}
+                                                <span class="badge bg-secondary">{{ probnik.get_month_display|truncatechars:10 }}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if probnik.deadline %}
+                                                <span class="badge {% if probnik.is_overdue %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                    {{ probnik.deadline|date:"d.m" }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if probnik.status == 'checked' %}
+                                                <span class="badge bg-success">✅ Проверено</span>
+                                            {% elif probnik.has_student_files %}
+                                                <span class="badge bg-success">✅ Сдано</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">⚠️ Не сдано</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if probnik.status == 'checked' %}
+                                                <span class="badge bg-info">
+                                                    {{ probnik.score }}/{{ probnik.max_score }}
+                                                </span>
+                                                {% if probnik.grade %}
+                                                    <span class="badge 
+                                                        {% if probnik.grade == '5' %}bg-success
+                                                        {% elif probnik.grade == '4' %}bg-info
+                                                        {% elif probnik.grade == '3' %}bg-warning text-dark
+                                                        {% else %}bg-danger{% endif %}">
+                                                        {{ probnik.grade }}
+                                                    </span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'teacher_probnik_detail' probnik.id %}" 
+                                                   class="btn btn-outline-primary" title="Просмотр">
+                                                    👁️
+                                                </a>
+                                                <a href="{% url 'teacher_probnik_edit' probnik.id %}" 
+                                                   class="btn btn-outline-secondary" title="Редактировать">
+                                                    ✏️
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {% if physics_probniks|length > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'teacher_probnik_list' %}?student={{ student.id }}&subject=physics" 
+                               class="btn btn-sm btn-outline-primary">
+                                Все пробники по физике
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% else %}
+                        <p class="text-muted text-center py-3">Нет пробников по физике</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Учебные файлы -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">📁 Учебные файлы</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="studyFileTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="teacher-math-tab" data-bs-toggle="tab" data-bs-target="#teacher-math" type="button" role="tab">
+                                    🧮 Математика <span class="badge bg-primary">{{ math_files|length }}</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="teacher-physics-tab" data-bs-toggle="tab" data-bs-target="#teacher-physics" type="button" role="tab">
+                                    ⚡ Физика <span class="badge bg-danger">{{ physics_files|length }}</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="teacher-general-tab" data-bs-toggle="tab" data-bs-target="#teacher-general" type="button" role="tab">
+                                    📚 Общие <span class="badge bg-secondary">{{ general_files|length }}</span>
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content p-3">
+                            <div class="tab-pane active" id="teacher-math" role="tabpanel">
+                                {% if math_files %}
+                                    <div class="row">
+                                        {% for file in math_files %}
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ file.title|truncatechars:25 }}</h6>
+                                                    <p class="card-text text-muted small">{{ file.description|truncatechars:40 }}</p>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="badge bg-info">{{ file.get_file_type_display }}</span>
+                                                        <small class="text-muted">{{ file.uploaded_at|date:"d.m.Y" }}</small>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer bg-transparent d-flex justify-content-between">
+                                                    <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                        📄 Скачать
+                                                    </a>
+                                                    <form method="post" action="{% url 'teacher_delete_study_file' file.id %}" 
+                                                          onsubmit="return confirm('Удалить файл?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить файл">
+                                                            🗑️
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted text-center py-3">Нет файлов по математике</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="tab-pane" id="teacher-physics" role="tabpanel">
+                                {% if physics_files %}
+                                    <div class="row">
+                                        {% for file in physics_files %}
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ file.title|truncatechars:25 }}</h6>
+                                                    <p class="card-text text-muted small">{{ file.description|truncatechars:40 }}</p>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="badge bg-info">{{ file.get_file_type_display }}</span>
+                                                        <small class="text-muted">{{ file.uploaded_at|date:"d.m.Y" }}</small>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer bg-transparent d-flex justify-content-between">
+                                                    <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                        📄 Скачать
+                                                    </a>
+                                                    <form method="post" action="{% url 'teacher_delete_study_file' file.id %}" 
+                                                          onsubmit="return confirm('Удалить файл?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить файл">
+                                                            🗑️
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted text-center py-3">Нет файлов по физике</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="tab-pane" id="teacher-general" role="tabpanel">
+                                {% if general_files %}
+                                    <div class="row">
+                                        {% for file in general_files %}
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ file.title|truncatechars:25 }}</h6>
+                                                    <p class="card-text text-muted small">{{ file.description|truncatechars:40 }}</p>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="badge bg-info">{{ file.get_file_type_display }}</span>
+                                                        <small class="text-muted">{{ file.uploaded_at|date:"d.m.Y" }}</small>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer bg-transparent d-flex justify-content-between">
+                                                    <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                        📄 Скачать
+                                                    </a>
+                                                    <form method="post" action="{% url 'teacher_delete_study_file' file.id %}" 
+                                                          onsubmit="return confirm('Удалить файл?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить файл">
+                                                            🗑️
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted text-center py-3">Нет общих файлов</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <a href="{% url 'teacher_studyfile_create' %}?student={{ student.id }}" 
+                               class="btn btn-info">
+                                📁 Загрузить новый файл
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var firstTab = document.querySelector('#studyFileTab .nav-link.active');
+        if (firstTab) {
+            var tab = new bootstrap.Tab(firstTab);
+            tab.show();
+        }
+        
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

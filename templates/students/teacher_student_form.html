@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title|default:"Добавить ученика" }}{% endblock %}
+
+{% block content %}
+{% if teacher %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">{{ title|default:"Добавить ученика" }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">👤 Основная информация</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_first_name" class="form-label">Имя *</label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                    <div class="text-danger">{{ form.first_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_last_name" class="form-label">Фамилия *</label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                    <div class="text-danger">{{ form.last_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_class_name" class="form-label">Класс *</label>
+                                    {{ form.class_name }}
+                                    {% if form.class_name.errors %}
+                                    <div class="text-danger">{{ form.class_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_start_date" class="form-label">Дата начала занятий *</label>
+                                    {{ form.start_date }}
+                                    {% if form.start_date.errors %}
+                                    <div class="text-danger">{{ form.start_date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">📱 Контактная информация</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_telegram_username" class="form-label">Telegram ученика (@username) *</label>
+                                    {{ form.telegram_username }}
+                                    <div class="form-text">Например: @ivanov_student</div>
+                                    {% if form.telegram_username.errors %}
+                                    <div class="text-danger">{{ form.telegram_username.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_parent_telegram" class="form-label">Telegram родителя</label>
+                                    {{ form.parent_telegram }}
+                                    <div class="form-text">Например: @ivanov_mother</div>
+                                    {% if form.parent_telegram.errors %}
+                                    <div class="text-danger">{{ form.parent_telegram.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_parent_name" class="form-label">Имя родителя *</label>
+                                {{ form.parent_name }}
+                                {% if form.parent_name.errors %}
+                                <div class="text-danger">{{ form.parent_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_school" class="form-label">Школа *</label>
+                                {{ form.school }}
+                                {% if form.school.errors %}
+                                <div class="text-danger">{{ form.school.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">🎯 Учебная информация</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Направления подготовки *</label>
+                                <div class="border p-3 rounded">
+                                    {% for choice in form.exam_type_choices.field.choices %}
+                                    <div class="form-check">
+                                        <input type="checkbox" name="exam_type_choices" value="{{ choice.0 }}" 
+                                               id="id_exam_type_choices_{{ forloop.counter }}" 
+                                               class="form-check-input"
+                                               {% if choice.0 in form.exam_type_choices.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="id_exam_type_choices_{{ forloop.counter }}">
+                                            {{ choice.1 }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.exam_type_choices.errors %}
+                                <div class="text-danger">{{ form.exam_type_choices.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_current_level" class="form-label">Текущий уровень *</label>
+                                {{ form.current_level }}
+                                <div class="form-text">Например: Средний, Хороший, Отличный</div>
+                                {% if form.current_level.errors %}
+                                <div class="text-danger">{{ form.current_level.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_weak_topics" class="form-label">Слабые темы *</label>
+                                {{ form.weak_topics }}
+                                <div class="form-text">Перечислите темы, которые нужно подтянуть</div>
+                                {% if form.weak_topics.errors %}
+                                <div class="text-danger">{{ form.weak_topics.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">📅 Даты экзаменов</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <strong>ℹ️ Заполняйте даты только для выбранных направлений подготовки</strong>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_exam_date_oge_math" class="form-label">ОГЭ по математике</label>
+                                    <input type="date" name="exam_date_oge_math" id="id_exam_date_oge_math" 
+                                        class="form-control" value="{{ form.exam_date_oge_math.value|date:'Y-m-d' }}">
+                                    <div class="form-text">Дата экзамена ОГЭ по математике</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_exam_date_oge_physics" class="form-label">ОГЭ по физике</label>
+                                    <input type="date" name="exam_date_oge_physics" id="id_exam_date_oge_physics" 
+                                        class="form-control" value="{{ form.exam_date_oge_physics.value|date:'Y-m-d' }}">
+                                    <div class="form-text">Дата экзамена ОГЭ по физике</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_exam_date_ege_math" class="form-label">ЕГЭ по математике</label>
+                                    <input type="date" name="exam_date_ege_math" id="id_exam_date_ege_math" 
+                                        class="form-control" value="{{ form.exam_date_ege_math.value|date:'Y-m-d' }}">
+                                    <div class="form-text">Дата экзамена ЕГЭ по математике</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_exam_date_ege_physics" class="form-label">ЕГЭ по физике</label>
+                                    <input type="date" name="exam_date_ege_physics" id="id_exam_date_ege_physics" 
+                                        class="form-control" value="{{ form.exam_date_ege_physics.value|date:'Y-m-d' }}">
+                                    <div class="form-text">Дата экзамена ЕГЭ по физике</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#examDatesHelp">
+                                    📌 Показать типичные даты экзаменов
+                                </button>
+                                <div class="collapse mt-2" id="examDatesHelp">
+                                    <div class="card card-body bg-light">
+                                        <p class="mb-1"><strong>ОГЭ:</strong> обычно в конце мая - начале июня</p>
+                                        <p class="mb-1"><strong>ЕГЭ:</strong> обычно в конце мая - июне</p>
+                                        <p class="mb-0 small text-muted">Уточните точные даты на официальном сайте ФИПИ</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">🔐 Создание учетной записи</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" name="create_user" id="id_create_user" 
+                                           class="form-check-input" checked>
+                                    <label class="form-check-label" for="id_create_user">
+                                        Создать пользователя для ученика
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_username" class="form-label">Логин</label>
+                                    <input type="text" name="username" id="id_username" 
+                                           class="form-control" placeholder="Автоматически сгенерирован">
+                                    <div class="form-text">Если не указать, будет сгенерирован автоматически</div>
+                                    {% if form.username.errors %}
+                                    <div class="text-danger">{{ form.username.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_password" class="form-label">Пароль</label>
+                                    <input type="password" name="password" id="id_password" 
+                                           class="form-control" placeholder="Автоматически сгенерирован">
+                                    <div class="form-text">Если не указать, будет сгенерирован автоматически</div>
+                                    {% if form.password.errors %}
+                                    <div class="text-danger">{{ form.password.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">📝 Дополнительно</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="id_notes" class="form-label">Заметки</label>
+                                {{ form.notes }}
+                                <div class="form-text">Любые дополнительные заметки об ученике</div>
+                                {% if form.notes.errors %}
+                                <div class="text-danger">{{ form.notes.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'teacher_student_list' %}" class="btn btn-secondary me-md-2">
+                            ← Назад к списку
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if student %}Сохранить изменения{% else %}Создать ученика{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        margin-bottom: 5px;
+    }
+    .form-check {
+        margin-bottom: 8px;
+    }
+    .card-header.bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstName = document.getElementById('id_first_name');
+        const lastName = document.getElementById('id_last_name');
+        const username = document.getElementById('id_username');
+        
+        function generateUsername() {
+            if (firstName.value && lastName.value && (!username.value || username.value === '')) {
+                const generated = `${firstName.value.toLowerCase()}_${lastName.value.toLowerCase()}`;
+                username.value = generated;
+            }
+        }
+        
+        if (firstName) firstName.addEventListener('blur', generateUsername);
+        if (lastName) lastName.addEventListener('blur', generateUsername);
+        
+        const createUserCheckbox = document.getElementById('id_create_user');
+        if (createUserCheckbox) {
+            function toggleLoginFields() {
+                const isChecked = createUserCheckbox.checked;
+                if (username) username.disabled = !isChecked;
+                const passwordField = document.getElementById('id_password');
+                if (passwordField) passwordField.disabled = !isChecked;
+                
+                if (!isChecked) {
+                    if (username) username.value = '';
+                    if (passwordField) passwordField.value = '';
+                }
+            }
+            
+            createUserCheckbox.addEventListener('change', toggleLoginFields);
+            toggleLoginFields();
+        }
+    });
+</script>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

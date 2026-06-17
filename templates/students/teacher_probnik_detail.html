@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ probnik.title }}{% endblock %}
+
+{% block content %}
+{% if teacher %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-success text-white">
+                <div>
+                    <h4 class="mb-0">📊 {{ probnik.title }}</h4>
+                    <small>{{ probnik.student }} | {{ probnik.get_subject_display }}</small>
+                </div>
+                <div class="btn-group">
+                    <a href="{% url 'teacher_probnik_edit' probnik.id %}" class="btn btn-outline-light btn-sm">
+                        ✏️ Редактировать
+                    </a>
+                    <a href="{% url 'teacher_probnik_delete' probnik.id %}" class="btn btn-outline-light btn-sm">
+                        🗑️ Удалить
+                    </a>
+                    <a href="{% url 'teacher_probnik_list' %}" class="btn btn-outline-light btn-sm">
+                        ← Назад
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p><strong>Ученик:</strong> {{ probnik.student }}</p>
+                        <p><strong>Предмет:</strong> 
+                            <span class="badge {% if probnik.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %}">
+                                {{ probnik.get_subject_display }}
+                            </span>
+                        </p>
+                        <p><strong>Назначен:</strong> {{ probnik.assigned_date|date:"d.m.Y" }}</p>
+                        <p><strong>Дедлайн:</strong> 
+                            <span class="{% if probnik.is_overdue %}text-danger{% endif %}">
+                                {{ probnik.deadline|date:"d.m.Y"|default:"Не установлен" }}
+                                {% if probnik.is_overdue %}
+                                <span class="badge bg-danger">Просрочено!</span>
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Статус:</strong> 
+                            {% if probnik.status == 'in_progress' %}
+                            <span class="badge bg-info">В работе</span>
+                            {% elif probnik.status == 'checked' %}
+                            <span class="badge bg-success">Проверен</span>
+                            {% endif %}
+                        </p>
+                        {% if probnik.completed_date %}
+                        <p><strong>Сдано:</strong> {{ probnik.completed_date|date:"d.m.Y" }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if teacher_files %}
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">📎 Материалы пробника</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for file in teacher_files %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ file.description|default:"Файл" }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Загружено: {{ file.uploaded_at|date:"d.m.Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            📄 Скачать
+                                        </a>
+                                        <form method="post" action="{% url 'teacher_delete_probnik_file' file.id %}" 
+                                              style="display: inline;" onsubmit="return confirm('Удалить этот файл?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if student_files %}
+                <div class="card mb-4">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0">📁 Решения ученика</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for file in student_files %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ file.description|default:"Решение" }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Загружено: {{ file.uploaded_at|date:"d.m.Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            📄 Скачать
+                                        </a>
+                                        <form method="post" action="{% url 'teacher_delete_probnik_file' file.id %}" 
+                                              style="display: inline;" onsubmit="return confirm('Удалить этот файл?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if probnik.status == 'in_progress' %}
+                <div class="card mb-4 border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">✅ Проверка пробника</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if not student_files %}
+                        <div class="alert alert-warning">
+                            <strong>⚠️ Внимание!</strong> Ученик еще не загрузил решения. Проверять пока нечего.
+                        </div>
+                        {% endif %}
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="score" class="form-label">Баллы *</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="score" name="score" 
+                                               min="0" max="{{ probnik.max_score }}" step="1" 
+                                               value="{{ probnik.score|default:'' }}" required>
+                                        <span class="input-group-text">/ {{ probnik.max_score }}</span>
+                                    </div>
+                                    <div class="form-text">Введите количество набранных баллов</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="grade" class="form-label">Оценка</label>
+                                    <select class="form-control" id="grade" name="grade">
+                                        <option value="">-- Автоматически --</option>
+                                        <option value="5" {% if probnik.grade == '5' %}selected{% endif %}>Отлично (5)</option>
+                                        <option value="4" {% if probnik.grade == '4' %}selected{% endif %}>Хорошо (4)</option>
+                                        <option value="3" {% if probnik.grade == '3' %}selected{% endif %}>Удовлетворительно (3)</option>
+                                        <option value="2" {% if probnik.grade == '2' %}selected{% endif %}>Неудовлетворительно (2)</option>
+                                    </select>
+                                    <div class="form-text">Выберите оценку или оставьте пустым для автоматического расчета</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="teacher_comment" class="form-label">Комментарий преподавателя</label>
+                                <textarea class="form-control" id="teacher_comment" name="teacher_comment" 
+                                          rows="4" placeholder="Напишите разбор ошибок и рекомендации...">{{ probnik.teacher_comment|default:'' }}</textarea>
+                                <div class="form-text">Подробный разбор ошибок и рекомендации</div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <strong>ℹ️ После проверки:</strong> Статус изменится на "Проверен", и ученик увидит результаты.
+                            </div>
+                            
+                            <button type="submit" name="check_probnik" class="btn btn-primary btn-lg" 
+                                    {% if not student_files %}disabled{% endif %}>
+                                ✅ Завершить проверку
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if probnik.status == 'checked' %}
+                <div class="card mb-4 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">📊 Результаты проверки</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-md-4 text-center mb-3 mb-md-0">
+                                <div class="d-flex d-md-block align-items-center justify-content-center">
+                                    <div class="display-2 text-success me-3 me-md-0">
+                                        {{ probnik.score }}
+                                    </div>
+                                    <div class="fs-3 text-success">/{{ probnik.max_score }}</div>
+                                </div>
+                                <h2 class="d-none d-md-block {% if probnik.get_percentage >= 80 %}text-success{% elif probnik.get_percentage >= 60 %}text-info{% elif probnik.get_percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ probnik.get_percentage }}%
+                                </h2>
+                                <h4 class="d-block d-md-none {% if probnik.get_percentage >= 80 %}text-success{% elif probnik.get_percentage >= 60 %}text-info{% elif probnik.get_percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ probnik.get_percentage }}%
+                                </h4>
+                                {% if probnik.grade %}
+                                <div class="mt-2">
+                                    {% if probnik.grade == '5' %}
+                                        <span class="badge bg-success fs-5 d-inline d-md-none">Отлично</span>
+                                        <span class="badge bg-success fs-4 d-none d-md-inline">Отлично (5)</span>
+                                    {% elif probnik.grade == '4' %}
+                                        <span class="badge bg-info fs-5 d-inline d-md-none">Хорошо</span>
+                                        <span class="badge bg-info fs-4 d-none d-md-inline">Хорошо (4)</span>
+                                    {% elif probnik.grade == '3' %}
+                                        <span class="badge bg-warning text-dark fs-5 d-inline d-md-none">Удовл.</span>
+                                        <span class="badge bg-warning text-dark fs-4 d-none d-md-inline">Удовлетворительно (3)</span>
+                                    {% elif probnik.grade == '2' %}
+                                        <span class="badge bg-danger fs-5 d-inline d-md-none">Неуд.</span>
+                                        <span class="badge bg-danger fs-4 d-none d-md-inline">Неудовлетворительно (2)</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 col-md-8">
+                                {% if probnik.teacher_comment %}
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">💬 Комментарий преподавателя</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ probnik.teacher_comment|linebreaks }}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p class="text-muted">Комментарий не добавлен</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">📤 Добавить материалы</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="files" class="form-label">Файлы (PDF, DOC, DOCX, JPG, PNG)</label>
+                                <input type="file" class="form-control" id="files" name="files" multiple>
+                                <div class="form-text">Можно выбрать несколько файлов</div>
+                            </div>
+                            
+                            <button type="submit" name="add_file" class="btn btn-outline-primary">
+                                📎 Загрузить файлы
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scoreInput = document.getElementById('score');
+    const gradeSelect = document.getElementById('grade');
+    const maxScore = {{ probnik.max_score|default:100 }};
+    
+    if (scoreInput && gradeSelect) {
+        scoreInput.addEventListener('input', function() {
+            const score = parseInt(this.value);
+            if (!isNaN(score) && maxScore > 0) {
+                const percentage = (score / maxScore) * 100;
+                
+                if (percentage >= 85) {
+                    gradeSelect.value = '5';
+                } else if (percentage >= 70) {
+                    gradeSelect.value = '4';
+                } else if (percentage >= 50) {
+                    gradeSelect.value = '3';
+                } else if (percentage > 0) {
+                    gradeSelect.value = '2';
+                }
+            }
+        });
+    }
+});
+</script>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

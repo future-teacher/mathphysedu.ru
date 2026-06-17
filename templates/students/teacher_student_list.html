@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои ученики{% endblock %}
+
+{% block content %}
+{% if teacher %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">👤 Мои ученики</h4>
+                <a href="{% url 'teacher_student_create' %}" class="btn btn-success">
+                    + Добавить ученика
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="get" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" 
+                               placeholder="Поиск по имени, фамилии, классу..." 
+                               value="{{ search_query }}">
+                        <button class="btn btn-primary" type="submit">🔍 Поиск</button>
+                        {% if search_query %}
+                        <a href="{% url 'teacher_student_list' %}" class="btn btn-outline-secondary">
+                            Сбросить
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+                
+                {% if students %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Имя</th>
+                                <th>Класс</th>
+                                <th>Telegram</th>
+                                <th>Направления</th>
+                                <th>Дата начала</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>
+                                    <strong>{{ student.first_name }} {{ student.last_name }}</strong>
+                                </td>
+                                <td>{{ student.class_name }}</td>
+                                <td>
+                                    {% if student.telegram_username %}
+                                    <span class="badge bg-info">{{ student.telegram_username }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% for exam_type in student.get_exam_types_display|slice:":2" %}
+                                    <span class="badge bg-primary">{{ exam_type }}</span>
+                                    {% endfor %}
+                                    {% if student.get_exam_types_display|length > 2 %}
+                                    <span class="badge bg-secondary">+{{ student.get_exam_types_display|length|add:"-2" }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ student.start_date|date:"d.m.Y" }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'teacher_student_detail' student.id %}" 
+                                           class="btn btn-outline-primary">
+                                            Просмотр
+                                        </a>
+                                        <a href="{% url 'teacher_student_edit' student.id %}" 
+                                           class="btn btn-outline-secondary">
+                                            Редактировать
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <h4>📝 У вас пока нет учеников</h4>
+                    <p class="text-muted">Добавьте первого ученика, чтобы начать работу</p>
+                    <a href="{% url 'teacher_student_create' %}" class="btn btn-success btn-lg">
+                        + Добавить первого ученика
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <p>Обратитесь к администратору для получения прав.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

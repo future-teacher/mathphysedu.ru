@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузить учебный файл{% endblock %}
+
+{% block content %}
+{% if teacher %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">📁 Загрузить учебный файл</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">📋 Информация о файле</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_student" class="form-label">Ученик *</label>
+                                    {{ form.student }}
+                                    {% if form.student.errors %}
+                                    <div class="text-danger">{{ form.student.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_subject" class="form-label">Предмет *</label>
+                                    {{ form.subject }}
+                                    {% if form.subject.errors %}
+                                    <div class="text-danger">{{ form.subject.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_title" class="form-label">Название файла *</label>
+                                {{ form.title }}
+                                <div class="form-text">Например: "Формулы тригонометрии" или "Кинематика - теория"</div>
+                                {% if form.title.errors %}
+                                <div class="text-danger">{{ form.title.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">📝 Классификация</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_file_type" class="form-label">Тип файла *</label>
+                                    {{ form.file_type }}
+                                    {% if form.file_type.errors %}
+                                    <div class="text-danger">{{ form.file_type.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_description" class="form-label">Описание</label>
+                                {{ form.description }}
+                                <div class="form-text">Краткое описание содержания файла</div>
+                                {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">📤 Загрузка файла</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="id_file" class="form-label">Файл *</label>
+                                {{ form.file }}
+                                <div class="form-text">
+                                    Поддерживаемые форматы: PDF, DOC, DOCX, PPT, PPTX, JPG, PNG, ZIP
+                                </div>
+                                {% if form.file.errors %}
+                                <div class="text-danger">{{ form.file.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <strong>💡 Типы файлов:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li><strong>Теория</strong> - конспекты, формулы, правила</li>
+                                    <li><strong>Практика</strong> - задачи, упражнения, тесты</li>
+                                    <li><strong>Демоверсия</strong> - официальные демоверсии экзаменов</li>
+                                    <li><strong>Шаблон</strong> - шаблоны для оформления работ</li>
+                                    <li><strong>Другое</strong> - все остальные материалы</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'teacher_student_list' %}" class="btn btn-secondary me-md-2">
+                            ← Назад
+                        </a>
+                        <button type="submit" class="btn btn-info">
+                            📁 Загрузить файл
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('student');
+        const subject = urlParams.get('subject');
+        
+        if (studentId) {
+            const studentSelect = document.getElementById('id_student');
+            if (studentSelect) {
+                studentSelect.value = studentId;
+            }
+        }
+        
+        if (subject) {
+            const subjectSelect = document.getElementById('id_subject');
+            if (subjectSelect) {
+                subjectSelect.value = subject;
+            }
+        }
+        
+        const titleInput = document.getElementById('id_title');
+        const descriptionInput = document.getElementById('id_description');
+        
+        if (titleInput && descriptionInput) {
+            titleInput.addEventListener('blur', function() {
+                if (titleInput.value && !descriptionInput.value) {
+                    const subjectSelect = document.getElementById('id_subject');
+                    const fileTypeSelect = document.getElementById('id_file_type');
+                    
+                    let subjectText = '';
+                    let fileTypeText = '';
+                    
+                    if (subjectSelect) {
+                        const selectedOption = subjectSelect.options[subjectSelect.selectedIndex];
+                        subjectText = selectedOption.text;
+                    }
+                    
+                    if (fileTypeSelect) {
+                        const selectedOption = fileTypeSelect.options[fileTypeSelect.selectedIndex];
+                        fileTypeText = selectedOption.text.toLowerCase();
+                    }
+                    
+                    descriptionInput.value = `${fileTypeText} по предмету "${subjectText}": ${titleInput.value}`;
+                }
+            });
+        }
+    });
+</script>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
