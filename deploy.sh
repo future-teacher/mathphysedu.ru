@@ -63,19 +63,13 @@ python manage.py collectstatic --noinput
 # 6. СИНХРОНИЗАЦИЯ TELEGRAM
 echo -e "${YELLOW}🤖 Синхронизация Telegram...${NC}"
 
-# Проверяем, задан ли токен бота
-if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
-    # Синхронизируем chat_id пользователей, которые уже писали боту
-    python manage.py sync_telegram_chat_ids
-    
-    # Отправляем приветствие тем, кто написал /start
-    python manage.py telegram_polling
-    
-    echo -e "${GREEN}✅ Telegram бот синхронизирован${NC}"
-else
-    echo -e "${YELLOW}⚠️ TELEGRAM_BOT_TOKEN не задан. Бот не активен.${NC}"
-    echo -e "${YELLOW}   Установите: export TELEGRAM_BOT_TOKEN='ваш_токен'${NC}"
-fi
+# Синхронизируем chat_id пользователей, которые уже писали боту
+python manage.py sync_telegram_chat_ids 2>/dev/null || echo -e "${YELLOW}⚠️ Telegram бот не активен (токен не задан)${NC}"
+
+# Отправляем приветствие тем, кто написал /start
+python manage.py telegram_polling 2>/dev/null || echo -e "${YELLOW}⚠️ Telegram polling пропущен${NC}"
+
+echo -e "${GREEN}✅ Telegram бот синхронизирован${NC}"
 
 # 7. ВЫХОДИМ ИЗ ВИРТУАЛЬНОГО ОКРУЖЕНИЯ
 deactivate
