@@ -60,26 +60,15 @@ python manage.py migrate
 echo -e "${YELLOW}📁 Сбор статики...${NC}"
 python manage.py collectstatic --noinput
 
-# 6. СИНХРОНИЗАЦИЯ TELEGRAM
-echo -e "${YELLOW}🤖 Синхронизация Telegram...${NC}"
-
-# Синхронизируем chat_id пользователей, которые уже писали боту
-python manage.py sync_telegram_chat_ids 2>/dev/null || echo -e "${YELLOW}⚠️ Telegram бот не активен (токен не задан)${NC}"
-
-# Отправляем приветствие тем, кто написал /start
-python manage.py telegram_polling 2>/dev/null || echo -e "${YELLOW}⚠️ Telegram polling пропущен${NC}"
-
-echo -e "${GREEN}✅ Telegram бот синхронизирован${NC}"
-
-# 7. ВЫХОДИМ ИЗ ВИРТУАЛЬНОГО ОКРУЖЕНИЯ
+# 6. ВЫХОДИМ ИЗ ВИРТУАЛЬНОГО ОКРУЖЕНИЯ
 deactivate
 
-# 8. ОЧИЩАЕМ КЭШ
+# 7. ОЧИЩАЕМ КЭШ
 echo -e "${YELLOW}🧹 Очистка кэша...${NC}"
 find . -name "*.pyc" -delete 2>/dev/null
 find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null
 
-# 9. ПЕРЕЗАПУСКАЕМ GUNICORN
+# 8. ПЕРЕЗАПУСКАЕМ GUNICORN
 echo -e "${YELLOW}♻️ Перезапуск Gunicorn...${NC}"
 sudo systemctl restart gunicorn-mathphysedu
 
@@ -91,7 +80,7 @@ if [ $? -ne 0 ]; then
 fi
 echo -e "${GREEN}✅ Gunicorn перезапущен${NC}"
 
-# 10. ПРОВЕРЯЕМ РАБОТУ САЙТА
+# 9. ПРОВЕРЯЕМ РАБОТУ САЙТА
 echo -e "${YELLOW}🔍 Проверка работы сайта...${NC}"
 sleep 2
 
@@ -105,12 +94,12 @@ else
     sudo journalctl -u gunicorn-mathphysedu -n 20 --no-pager
 fi
 
-# 11. ПОСЛЕДНИЕ КОММИТЫ
+# 10. ПОСЛЕДНИЕ КОММИТЫ
 echo -e "${BLUE}========================================${NC}"
 echo -e "${GREEN}📋 Последние обновления:${NC}"
 git log --oneline -3
 
-# 12. ОТОБРАЖАЕМ ИТОГ
+# 11. ОТОБРАЖАЕМ ИТОГ
 echo -e "${BLUE}========================================${NC}"
 echo -e "${GREEN}✅ Обновление mathphysedu.ru завершено!${NC}"
 echo -e "${GREEN}🌐 Сайт: https://mathphysedu.ru${NC}"
