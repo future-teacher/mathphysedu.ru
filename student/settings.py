@@ -122,11 +122,14 @@ if not DEBUG:
 # TELEGRAM BOT SETTINGS
 # ========================
 # Получите токен у @BotFather в Telegram
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8450426977:AAFn3mwjW-hAxW0Sa5GuRTdAxdSDgkfzGnI')
+# Токен задаётся через переменную окружения TELEGRAM_BOT_TOKEN
+# На сервере: export TELEGRAM_BOT_TOKEN='ваш_токен'
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 # Включить/выключить уведомления в Telegram
 TELEGRAM_BOT_ENABLED = bool(TELEGRAM_BOT_TOKEN)
 
 
 # Базовый URL сайта для ссылок в уведомлениях (без слеша на конце)
+# На сервере: export BASE_URL='https://ваш-сайт.ru'
 BASE_URL = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')
