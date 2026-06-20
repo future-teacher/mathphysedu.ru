@@ -52,6 +52,9 @@ urlpatterns = [
     
     # Преподаватели - учебные файлы
     path('teacher/files/create/', teacher_views.study_file_create, name='teacher_studyfile_create'),
-    path('teacher/studyfile/<int:file_id>/delete/', teacher_views.delete_study_file, 
+    path('teacher/studyfile/<int:file_id>/delete/', teacher_views.delete_study_file,
          name='teacher_delete_study_file'),
+    
+    # Преподаватели - профиль
+    path('teacher/profile/', teacher_views.teacher_profile_edit, name='teacher_profile_edit'),
 ]

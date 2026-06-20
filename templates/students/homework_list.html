@@ -15,18 +15,22 @@
                 <div class="row mb-3">
                     <div class="col-12">
                         <div class="d-flex flex-wrap gap-1">
-                            <a href="?subject=all&status={{ status_filter }}" 
+                            <a href="?subject=all&status={{ status_filter }}"
                                class="btn {% if subject_filter == 'all' or not subject_filter %}btn-primary{% else %}btn-outline-primary{% endif %} flex-fill mb-1">
                                 Все ({{ total_homework }})
                             </a>
-                            <a href="?subject=math&status={{ status_filter }}" 
+                            {% if student.has_math %}
+                            <a href="?subject=math&status={{ status_filter }}"
                                class="btn {% if subject_filter == 'math' %}btn-primary{% else %}btn-outline-primary{% endif %} flex-fill mb-1">
                                 🧮 Математика ({{ math_count }})
                             </a>
-                            <a href="?subject=physics&status={{ status_filter }}" 
+                            {% endif %}
+                            {% if student.has_physics %}
+                            <a href="?subject=physics&status={{ status_filter }}"
                                class="btn {% if subject_filter == 'physics' %}btn-primary{% else %}btn-outline-primary{% endif %} flex-fill mb-1">
                                 ⚡ Физика ({{ physics_count }})
                             </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

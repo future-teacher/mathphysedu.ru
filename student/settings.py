@@ -117,3 +117,16 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# ========================
+# TELEGRAM BOT SETTINGS
+# ========================
+# Получите токен у @BotFather в Telegram
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8450426977:AAFn3mwjW-hAxW0Sa5GuRTdAxdSDgkfzGnI')
+
+# Включить/выключить уведомления в Telegram
+TELEGRAM_BOT_ENABLED = bool(TELEGRAM_BOT_TOKEN)
+
+
+# Базовый URL сайта для ссылок в уведомлениях (без слеша на конце)
+BASE_URL = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')

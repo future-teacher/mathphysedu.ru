@@ -11,6 +11,10 @@ class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='teacher_profile')
     phone = models.CharField(max_length=20, verbose_name='Телефон', blank=True)
     telegram = models.CharField(max_length=100, verbose_name='Telegram', blank=True)
+    telegram_chat_id = models.BigIntegerField(
+        null=True, blank=True, verbose_name='Telegram Chat ID',
+        help_text='Числовой ID чата для отправки уведомлений (заполняется автоматически)'
+    )
     bio = models.TextField(verbose_name='О преподавателе', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -41,8 +45,12 @@ class Student(models.Model):
     last_name = models.CharField(max_length=100, verbose_name='Фамилия')
     class_name = models.CharField(max_length=50, verbose_name='Класс')
     
-    telegram_username = models.CharField(max_length=100, verbose_name='Telegram @username', 
+    telegram_username = models.CharField(max_length=100, verbose_name='Telegram @username',
                                         help_text='Начинается с @')
+    telegram_chat_id = models.BigIntegerField(
+        null=True, blank=True, verbose_name='Telegram Chat ID',
+        help_text='Числовой ID чата ученика (заполняется автоматически после /start)'
+    )
     parent_telegram = models.CharField(max_length=100, verbose_name='Telegram родителя',
                                       blank=True, help_text='Начинается с @')
     parent_name = models.CharField(max_length=200, verbose_name='Имя родителя')
@@ -108,6 +116,16 @@ class Student(models.Model):
     def has_active_exams(self):
         """Проверить, есть ли активные экзамены"""
         return len(self.get_active_exam_dates()) > 0
+    
+    @property
+    def has_math(self):
+        """Проверить, занимается ли ученик математикой"""
+        return any(t in self.get_exam_types_list() for t in ['oge_math', 'ege_math'])
+    
+    @property
+    def has_physics(self):
+        """Проверить, занимается ли ученик физикой"""
+        return any(t in self.get_exam_types_list() for t in ['oge_physics', 'ege_physics'])
     
     class Meta:
         verbose_name = 'Ученик'

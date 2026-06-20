@@ -12,8 +12,22 @@
                 <h4 class="mb-0">👋 Привет, {{ student.first_name }}!</h4>
             </div>
             <div class="card-body">
+                {% if not student.telegram_username %}
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <div class="me-3" style="font-size: 2rem;">🤖</div>
+                    <div>
+                        <strong>Подключи Telegram-уведомления!</strong><br>
+                        Чтобы получать уведомления о новых домашних заданиях и проверках:
+                        <ol class="mb-0 mt-1">
+                            <li>Напиши боту <strong>@MathPhyseduBot</strong> и нажми /start</li>
+                            <li>Сообщи преподавателю свой @username, чтобы он добавил его в систему</li>
+                        </ol>
+                    </div>
+                </div>
+                {% endif %}
+                
                 <p class="motivation-quote">
-                    «{{ student.first_name }}, в этом кабинете мы шаг за шагом идём к результату. 
+                    «{{ student.first_name }}, в этом кабинете мы шаг за шагом идём к результату.
                     Здесь всё, что помогает тебе видеть прогресс и уверенно двигаться дальше.»
                 </p>
                 
@@ -96,16 +110,20 @@
             </div>
             <div class="card-body p-0">
                 <ul class="nav nav-tabs" id="subjectTab" role="tablist">
+                    {% if student.has_math %}
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="math-tab" data-bs-toggle="tab" data-bs-target="#math" type="button" role="tab">
                             🧮 Математика <span class="badge bg-primary">{{ math_files|length }}</span>
                         </button>
                     </li>
+                    {% endif %}
+                    {% if student.has_physics %}
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="physics-tab" data-bs-toggle="tab" data-bs-target="#physics" type="button" role="tab">
                             ⚡ Физика <span class="badge bg-danger">{{ physics_files|length }}</span>
                         </button>
                     </li>
+                    {% endif %}
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">
                             📚 Общие <span class="badge bg-secondary">{{ general_files|length }}</span>
@@ -195,6 +213,7 @@
 </div>
 
 <div class="row mt-3">
+    {% if student.has_math %}
     <div class="col-12 col-md-6 mb-3 mb-md-0">
         <div class="card h-100">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -322,15 +341,12 @@
                 </div>
                 {% endif %}
                 
-                <div class="p-2 border-top">
-                    <a href="{% url 'homework_list' %}?subject=math" class="btn btn-sm btn-outline-primary w-100">
-                        Все ДЗ по математике
-                    </a>
-                </div>
             </div>
         </div>
     </div>
+    {% endif %}
     
+    {% if student.has_physics %}
     <div class="col-12 col-md-6">
         <div class="card h-100">
             <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
@@ -458,17 +474,15 @@
                 </div>
                 {% endif %}
                 
-                <div class="p-2 border-top">
-                    <a href="{% url 'homework_list' %}?subject=physics" class="btn btn-sm btn-outline-primary w-100">
-                        Все ДЗ по физике
-                    </a>
-                </div>
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
+{% if student.has_math or student.has_physics %}
 <div class="row mt-3">
+    {% if student.has_math %}
     <div class="col-12 col-md-6 mb-3 mb-md-0">
         <div class="card">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -588,15 +602,12 @@
                 </div>
                 {% endif %}
                 
-                <div class="p-3 border-top">
-                    <a href="{% url 'probnik_list' %}?subject=math" class="btn btn-outline-primary w-100">
-                        Все пробники по математике
-                    </a>
-                </div>
             </div>
         </div>
     </div>
+    {% endif %}
     
+    {% if student.has_physics %}
     <div class="col-12 col-md-6">
         <div class="card">
             <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
@@ -716,15 +727,12 @@
                 </div>
                 {% endif %}
                 
-                <div class="p-3 border-top">
-                    <a href="{% url 'probnik_list' %}?subject=physics" class="btn btn-outline-primary w-100">
-                        Все пробники по физике
-                    </a>
-                </div>
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
+{% endif %}
 
 {% else %}
 <div class="row justify-content-center">

@@ -6,7 +6,14 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from .models import Teacher, Student, Homework, Probnik, ProbnikFile, StudyFile, HomeworkFile
-from .forms import StudentForm, HomeworkForm, ProbnikForm, StudyFileForm
+from .forms import StudentForm, HomeworkForm, ProbnikForm, StudyFileForm, TeacherProfileForm
+from .telegram_bot import (
+    notify_student_new_homework,
+    notify_student_homework_checked,
+    notify_student_new_probnik,
+    notify_student_probnik_checked,
+    notify_teacher_homework_submitted,
+)
 import random
 import string
 
@@ -315,6 +322,18 @@ def homework_create(request):
                     description=f"Материал к заданию '{homework.title}'"
                 )
             
+            # Отправляем уведомление ученику о новом ДЗ
+            notify_student_new_homework(homework)
+            
+            # Проверяем, указан ли Telegram у ученика
+            student = homework.student
+            if not student.telegram_username:
+                messages.warning(
+                    request,
+                    f'У ученика {student.first_name} {student.last_name} не указан Telegram. '
+                    f'Уведомление не будет отправлено.'
+                )
+            
             messages.success(request, f'Задание "{homework.title}" создано!')
             return redirect('teacher_dashboard')
         else:
@@ -427,6 +446,9 @@ def homework_detail(request, homework_id):
             homework.teacher_comment = teacher_comment
             homework.save()
             
+            # Отправляем уведомление ученику о проверке ДЗ
+            notify_student_homework_checked(homework)
+            
             grade_display = dict(homework._meta.get_field('grade').choices).get(homework.grade, '—')
             messages.success(request, f'✅ Домашнее задание проверено! Оценка: {grade_display}')
             
@@ -466,6 +488,18 @@ def teacher_probnik_create(request):
                     file_type='teacher',
                     uploaded_by=request.user,
                     description=f"Материалы пробника"
+                )
+            
+            # Отправляем уведомление ученику о новом пробнике
+            notify_student_new_probnik(probnik)
+            
+            # Проверяем, указан ли Telegram у ученика
+            student = probnik.student
+            if not student.telegram_username:
+                messages.warning(
+                    request,
+                    f'У ученика {student.first_name} {student.last_name} не указан Telegram. '
+                    f'Уведомление не будет отправлено.'
                 )
             
             messages.success(request, f'Пробник "{probnik.title}" успешно создан!')
@@ -569,9 +603,12 @@ def teacher_probnik_detail(request, probnik_id):
             probnik.status = 'checked'
             probnik.save()
             
+            # Отправляем уведомление ученику о проверке пробника
+            notify_student_probnik_checked(probnik)
+            
             grade_display = dict(probnik._meta.get_field('grade').choices).get(probnik.grade, '—')
             messages.success(
-                request, 
+                request,
                 f'✅ Пробник проверен! Оценка: {grade_display}, Баллы: {probnik.score}/{probnik.max_score}'
             )
             
@@ -789,3 +826,30 @@ def delete_study_file(request, file_id):
         messages.success(request, f'Файл "{file.title}" успешно удален из базы данных и файловой системы')
     
     return redirect('teacher_student_detail', student_id=student_id)
+
+
+@login_required
+@user_passes_test(is_teacher, login_url='/students/login/')
+def teacher_profile_edit(request):
+    """Редактирование профиля преподавателя"""
+    teacher = get_teacher_or_admin(request.user)
+    if not teacher:
+        messages.error(request, 'У вас нет прав преподавателя')
+        return redirect('login')
+    
+    if request.method == 'POST':
+        form = TeacherProfileForm(request.POST, instance=teacher)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '✅ Профиль успешно обновлён!')
+            return redirect('teacher_dashboard')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+    else:
+        form = TeacherProfileForm(instance=teacher)
+    
+    return render(request, 'students/teacher_profile_form.html', {
+        'teacher': teacher,
+        'form': form,
+        'title': 'Мой профиль',
+    })

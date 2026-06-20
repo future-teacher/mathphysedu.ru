@@ -189,6 +189,7 @@
                     </div>
                 </div>
                 
+                {% if student.has_math %}
                 <!-- ДЗ по математике -->
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
@@ -294,21 +295,14 @@
                             </table>
                         </div>
                         
-                        {% if math_homework|length > 5 %}
-                        <div class="text-center mt-3">
-                            <a href="{% url 'teacher_homework_list' %}?student={{ student.id }}&subject=math" 
-                               class="btn btn-sm btn-outline-primary">
-                                Все ДЗ по математике ({{ math_homework|length }})
-                            </a>
-                        </div>
-                        {% endif %}
-                        
                         {% else %}
                         <p class="text-muted text-center py-3">Нет ДЗ по математике</p>
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
                 
+                {% if student.has_physics %}
                 <!-- ДЗ по физике -->
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center bg-danger text-white">
@@ -414,21 +408,14 @@
                             </table>
                         </div>
                         
-                        {% if physics_homework|length > 5 %}
-                        <div class="text-center mt-3">
-                            <a href="{% url 'teacher_homework_list' %}?student={{ student.id }}&subject=physics" 
-                               class="btn btn-sm btn-outline-primary">
-                                Все ДЗ по физике ({{ physics_homework|length }})
-                            </a>
-                        </div>
-                        {% endif %}
-                        
                         {% else %}
                         <p class="text-muted text-center py-3">Нет ДЗ по физике</p>
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
                 
+                {% if student.has_math %}
                 <!-- Пробники по математике -->
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
@@ -519,21 +506,14 @@
                             </table>
                         </div>
                         
-                        {% if math_probniks|length > 5 %}
-                        <div class="text-center mt-3">
-                            <a href="{% url 'teacher_probnik_list' %}?student={{ student.id }}&subject=math" 
-                               class="btn btn-sm btn-outline-primary">
-                                Все пробники по математике
-                            </a>
-                        </div>
-                        {% endif %}
-                        
                         {% else %}
                         <p class="text-muted text-center py-3">Нет пробников по математике</p>
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
                 
+                {% if student.has_physics %}
                 <!-- Пробники по физике -->
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center bg-danger text-white">
@@ -624,20 +604,12 @@
                             </table>
                         </div>
                         
-                        {% if physics_probniks|length > 5 %}
-                        <div class="text-center mt-3">
-                            <a href="{% url 'teacher_probnik_list' %}?student={{ student.id }}&subject=physics" 
-                               class="btn btn-sm btn-outline-primary">
-                                Все пробники по физике
-                            </a>
-                        </div>
-                        {% endif %}
-                        
                         {% else %}
                         <p class="text-muted text-center py-3">Нет пробников по физике</p>
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
                 
                 <!-- Учебные файлы -->
                 <div class="card mb-4">
@@ -646,16 +618,20 @@
                     </div>
                     <div class="card-body">
                         <ul class="nav nav-tabs" id="studyFileTab" role="tablist">
+                            {% if student.has_math %}
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="teacher-math-tab" data-bs-toggle="tab" data-bs-target="#teacher-math" type="button" role="tab">
                                     🧮 Математика <span class="badge bg-primary">{{ math_files|length }}</span>
                                 </button>
                             </li>
+                            {% endif %}
+                            {% if student.has_physics %}
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="teacher-physics-tab" data-bs-toggle="tab" data-bs-target="#teacher-physics" type="button" role="tab">
                                     ⚡ Физика <span class="badge bg-danger">{{ physics_files|length }}</span>
                                 </button>
                             </li>
+                            {% endif %}
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="teacher-general-tab" data-bs-toggle="tab" data-bs-target="#teacher-general" type="button" role="tab">
                                     📚 Общие <span class="badge bg-secondary">{{ general_files|length }}</span>

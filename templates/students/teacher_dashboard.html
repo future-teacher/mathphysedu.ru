@@ -22,6 +22,21 @@
                     </div>
                 </div>
                 
+                {% if not teacher.telegram %}
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <div class="me-3" style="font-size: 2rem;">🤖</div>
+                    <div>
+                        <strong>Telegram бот не настроен!</strong><br>
+                        Чтобы получать уведомления о новых работах учеников:
+                        <ol class="mb-0 mt-1">
+                            <li>Перейдите в <a href="{% url 'teacher_profile_edit' %}" class="alert-link">⚙️ Мой профиль</a></li>
+                            <li>Заполните поле <strong>Telegram</strong> (ваш @username)</li>
+                            <li>Напишите боту <strong>@MathPhyseduBot</strong> и нажмите /start</li>
+                        </ol>
+                    </div>
+                </div>
+                {% endif %}
+                
                 <div class="row g-2 mb-4">                    
                     <div class="col-6 col-md-3">
                         <a href="{% url 'teacher_student_list' %}" class="btn btn-primary w-100">

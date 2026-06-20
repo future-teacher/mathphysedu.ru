@@ -6,6 +6,10 @@ from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Q
 from .models import Student, Probnik, ProbnikFile, StudyFile, Homework, HomeworkFile
+from .telegram_bot import (
+    notify_teacher_homework_submitted,
+    notify_teacher_probnik_submitted,
+)
 from django.core.paginator import Paginator
 
 
@@ -269,6 +273,10 @@ def homework_detail(request, homework_id):
                 homework.status = 'submitted'
                 homework.submitted_date = today
                 homework.save()
+                
+                # Отправляем уведомление преподавателю
+                notify_teacher_homework_submitted(homework)
+                
                 messages.success(request, '✅ Домашнее задание отправлено на проверку!')
             else:
                 messages.warning(request, 'Сначала загрузите файлы с решением.')
@@ -382,7 +390,10 @@ def probnik_detail(request, probnik_id):
             probnik.completed_date = today
             probnik.save()
             
-            messages.success(request, 
+            # Отправляем уведомление преподавателю
+            notify_teacher_probnik_submitted(probnik)
+            
+            messages.success(request,
                 '✅ Пробник отправлен на проверку! Преподаватель получил уведомление и скоро проверит работу.'
             )
             

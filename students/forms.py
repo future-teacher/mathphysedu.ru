@@ -282,3 +282,46 @@ class StudyFileForm(forms.ModelForm):
             'file': forms.FileInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Описание файла'}),
         }
+
+
+class TeacherProfileForm(forms.ModelForm):
+    """Форма редактирования профиля преподавателя"""
+
+    first_name = forms.CharField(
+        max_length=30, label='Имя',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    last_name = forms.CharField(
+        max_length=30, label='Фамилия',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    email = forms.EmailField(
+        required=False, label='Email',
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = Teacher
+        fields = ['phone', 'telegram', 'bio']
+        widgets = {
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+7 (999) 123-45-67'}),
+            'telegram': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '@username'}),
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'О себе...'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.user:
+            self.fields['first_name'].initial = self.instance.user.first_name
+            self.fields['last_name'].initial = self.instance.user.last_name
+            self.fields['email'].initial = self.instance.user.email
+
+    def save(self, commit=True):
+        teacher = super().save(commit=commit)
+        user = teacher.user
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.email = self.cleaned_data.get('email', '')
+        if commit:
+            user.save()
+        return teacher
