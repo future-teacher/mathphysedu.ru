@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-qwerty123'  # Замените на свой кл�
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['mathphysedu.ru', 'www.mathphysedu.ru', 'localhost', '127.0.0.1', '77.221.145.35']
 
 # Application definition
 INSTALLED_APPS = [
