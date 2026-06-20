@@ -22,6 +22,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+
 def _resolve_chat_id(recipient):
     """
     Определяет chat_id для отправки сообщения.
