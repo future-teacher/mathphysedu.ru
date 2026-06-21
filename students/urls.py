@@ -14,6 +14,7 @@ urlpatterns = [
     # Ученики
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.student_detail, name='student_detail'),
+    path('materials/', views.study_materials, name='study_materials'),
     
     # Домашние задания для учеников
     path('homework/', views.homework_list, name='homework_list'),

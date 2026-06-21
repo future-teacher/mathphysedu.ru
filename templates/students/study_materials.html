@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Учебные материалы{% endblock %}
+
+{% block content %}
+{% if student %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">📁 Учебные материалы</h4>
+            </div>
+            <div class="card-body p-0">
+                <ul class="nav nav-tabs" id="subjectTab" role="tablist">
+                    {% if student.has_math %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="math-tab" data-bs-toggle="tab" data-bs-target="#math" type="button" role="tab">
+                            🧮 Математика <span class="badge bg-primary">{{ math_files|length }}</span>
+                        </button>
+                    </li>
+                    {% endif %}
+                    {% if student.has_physics %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="physics-tab" data-bs-toggle="tab" data-bs-target="#physics" type="button" role="tab">
+                            ⚡ Физика <span class="badge bg-danger">{{ physics_files|length }}</span>
+                        </button>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if not student.has_math %}active{% endif %}" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">
+                            📚 Общие <span class="badge bg-secondary">{{ general_files|length }}</span>
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content p-3">
+                    <div class="tab-pane {% if student.has_math %}active{% endif %}" id="math" role="tabpanel">
+                        {% if math_files %}
+                            <div class="list-group list-group-flush">
+                                {% for file in math_files %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="me-2" style="flex: 1;">
+                                            <h6 class="mb-1 small">{{ file.title|truncatechars:30 }}</h6>
+                                            <small class="text-muted">
+                                                <span class="badge bg-info">{{ file.get_file_type_display }}</span>
+                                                {{ file.uploaded_at|date:"d.m.Y" }}
+                                            </small>
+                                        </div>
+                                        <a href="{{ file.file.url }}" class="btn btn-sm btn-primary" download>
+                                            📥 Скачать
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-center py-3 small">Нет материалов</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="tab-pane" id="physics" role="tabpanel">
+                        {% if physics_files %}
+                            <div class="list-group list-group-flush">
+                                {% for file in physics_files %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="me-2" style="flex: 1;">
+                                            <h6 class="mb-1 small">{{ file.title|truncatechars:30 }}</h6>
+                                            <small class="text-muted">
+                                                <span class="badge bg-info">{{ file.get_file_type_display }}</span>
+                                                {{ file.uploaded_at|date:"d.m.Y" }}
+                                            </small>
+                                        </div>
+                                        <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            📥 Скачать
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-center py-3 small">Нет материалов</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="tab-pane {% if not student.has_math %}active{% endif %}" id="general" role="tabpanel">
+                        {% if general_files %}
+                            <div class="list-group list-group-flush">
+                                {% for file in general_files %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="me-2" style="flex: 1;">
+                                            <h6 class="mb-1 small">{{ file.title|truncatechars:30 }}</h6>
+                                            <small class="text-muted">
+                                                <span class="badge bg-info">{{ file.get_file_type_display }}</span>
+                                                {{ file.uploaded_at|date:"d.m.Y" }}
+                                            </small>
+                                        </div>
+                                        <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            📥 Скачать
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-center py-3 small">Нет материалов</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступ ограничен</h4>
+            </div>
+            <div class="card-body text-center">
+                <p>У вас нет доступа к учебным материалам.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var firstTab = document.querySelector('#subjectTab .nav-link.active');
+        if (firstTab) {
+            var tab = new bootstrap.Tab(firstTab);
+            tab.show();
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

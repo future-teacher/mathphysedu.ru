@@ -119,11 +119,6 @@ def dashboard(request):
         status='checked'
     ).order_by('-assigned_date')[:5]
     
-    study_files = student.study_files.all()
-    math_files = study_files.filter(subject='math').order_by('-uploaded_at')
-    physics_files = study_files.filter(subject='physics').order_by('-uploaded_at')
-    general_files = study_files.filter(subject='general').order_by('-uploaded_at')
-    
     active_exams = []
     for exam_name, exam_date in student.get_active_exam_dates():
         if exam_date and exam_date >= today:
@@ -152,9 +147,6 @@ def dashboard(request):
         'math_completed_probniks': math_completed_probniks,
         'physics_active_probniks': physics_active_probniks,
         'physics_completed_probniks': physics_completed_probniks,
-        'math_files': math_files,
-        'physics_files': physics_files,
-        'general_files': general_files,
         'active_exams': active_exams,
         'today': today,
         'week_ago': week_ago,
@@ -171,63 +163,31 @@ def homework_list(request):
         return redirect('login')
     
     subject_filter = request.GET.get('subject', 'all')
-    status_filter = request.GET.get('status', 'all')
     
-    homework = student.homework.all()
+    # Домашние задания в работе (assigned, in_progress, submitted)
+    in_progress_homework = student.homework.filter(
+        status__in=['assigned', 'in_progress', 'submitted']
+    )
+    # Проверенные домашние задания
+    checked_homework = student.homework.filter(status='checked')
     
     if subject_filter != 'all':
-        homework = homework.filter(subject=subject_filter)
+        in_progress_homework = in_progress_homework.filter(subject=subject_filter)
+        checked_homework = checked_homework.filter(subject=subject_filter)
     
-    # Фильтр по статусу
-    if status_filter == 'assigned':
-        homework = homework.filter(status='assigned')
-    elif status_filter == 'in_progress':
-        homework = homework.filter(status='in_progress')
-    elif status_filter == 'submitted':
-        homework = homework.filter(status='submitted')
-    elif status_filter == 'checked':
-        homework = homework.filter(status='checked')
-    elif status_filter == 'overdue':
-        today = timezone.now().date()
-        homework = homework.filter(
-            status__in=['assigned', 'in_progress', 'submitted'],
-            deadline__lt=today
-        )
-    
-    homework = homework.order_by('-assigned_date')
-    
-    # Пагинация
-    paginator = Paginator(homework, 20)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    # Статистика
-    total_homework = student.homework.count()
-    assigned_count = student.homework.filter(status='assigned').count()
-    in_progress_count = student.homework.filter(status='in_progress').count()
-    submitted_count = student.homework.filter(status='submitted').count()
-    checked_count = student.homework.filter(status='checked').count()
+    in_progress_homework = in_progress_homework.order_by('-assigned_date')
+    checked_homework = checked_homework.order_by('-checked_date')
     
     today = timezone.now().date()
-    overdue_count = student.homework.filter(
-        status__in=['assigned', 'in_progress', 'submitted'],
-        deadline__lt=today
-    ).count()
     
     math_count = student.homework.filter(subject='math').count()
     physics_count = student.homework.filter(subject='physics').count()
     
     return render(request, 'students/homework_list.html', {
         'student': student,
-        'homework': page_obj,
+        'in_progress_homework': in_progress_homework,
+        'checked_homework': checked_homework,
         'subject_filter': subject_filter,
-        'status_filter': status_filter,
-        'total_homework': total_homework,
-        'assigned_count': assigned_count,
-        'in_progress_count': in_progress_count,
-        'submitted_count': submitted_count,
-        'checked_count': checked_count,
-        'overdue_count': overdue_count,
         'math_count': math_count,
         'physics_count': physics_count,
         'today': today,
@@ -301,50 +261,27 @@ def probnik_list(request):
         return redirect('login')
     
     subject_filter = request.GET.get('subject', 'all')
-    status_filter = request.GET.get('status', 'all')
-    month_filter = request.GET.get('month', 'all')
     
-    probniks = student.probniks.all()
+    # Активные пробники (в работе)
+    active_probniks = student.probniks.filter(status='in_progress')
+    # Проверенные пробники
+    completed_probniks = student.probniks.filter(status='checked')
     
     if subject_filter != 'all':
-        probniks = probniks.filter(subject=subject_filter)
+        active_probniks = active_probniks.filter(subject=subject_filter)
+        completed_probniks = completed_probniks.filter(subject=subject_filter)
     
-    if status_filter == 'active':
-        probniks = probniks.filter(status='in_progress')
-    elif status_filter == 'completed':
-        probniks = probniks.filter(status='checked')
-    elif status_filter == 'overdue':
-        probniks = probniks.filter(
-            status='in_progress',
-            deadline__lt=timezone.now().date()
-        )
-    
-    if month_filter != 'all' and month_filter:
-        probniks = probniks.filter(month=month_filter)
-    
-    probniks = probniks.order_by('-assigned_date')
-    
-    total_probniks = student.probniks.count()
-    active_count = student.probniks.filter(status='in_progress').count()
-    completed_count = student.probniks.filter(status='checked').count()
-    overdue_count = student.probniks.filter(
-        status='in_progress',
-        deadline__lt=timezone.now().date()
-    ).count()
+    active_probniks = active_probniks.order_by('deadline')
+    completed_probniks = completed_probniks.order_by('-assigned_date')
     
     math_count = student.probniks.filter(subject='math').count()
     physics_count = student.probniks.filter(subject='physics').count()
     
     return render(request, 'students/probnik_list.html', {
         'student': student,
-        'probniks': probniks,
+        'active_probniks': active_probniks,
+        'completed_probniks': completed_probniks,
         'subject_filter': subject_filter,
-        'status_filter': status_filter,
-        'month_filter': month_filter,
-        'total_probniks': total_probniks,
-        'active_count': active_count,
-        'completed_count': completed_count,
-        'overdue_count': overdue_count,
         'math_count': math_count,
         'physics_count': physics_count,
         'today': timezone.now().date(),
@@ -455,6 +392,28 @@ def student_detail(request):
         'student': student,
         'exam_date': exam_date,
         'exam_name': exam_name,
+    })
+
+
+@login_required
+def study_materials(request):
+    """Страница учебных материалов ученика"""
+    try:
+        student = request.user.student_profile
+    except Student.DoesNotExist:
+        messages.error(request, 'У вас нет доступа к учебным материалам')
+        return redirect('login')
+    
+    study_files = student.study_files.all()
+    math_files = study_files.filter(subject='math').order_by('-uploaded_at')
+    physics_files = study_files.filter(subject='physics').order_by('-uploaded_at')
+    general_files = study_files.filter(subject='general').order_by('-uploaded_at')
+    
+    return render(request, 'students/study_materials.html', {
+        'student': student,
+        'math_files': math_files,
+        'physics_files': physics_files,
+        'general_files': general_files,
     })
 
 
