@@ -58,4 +58,7 @@ urlpatterns = [
     
     # Преподаватели - профиль
     path('teacher/profile/', teacher_views.teacher_profile_edit, name='teacher_profile_edit'),
+    
+    # Telegram webhook (без CSRF — Telegram подписывает запросы токеном)
+    path('telegram/webhook/', views.telegram_webhook, name='telegram_webhook'),
 ]

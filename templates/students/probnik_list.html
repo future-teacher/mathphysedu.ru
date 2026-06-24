@@ -5,132 +5,186 @@
 {% block content %}
 {% if student %}
 <div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">📊 Мои пробники</h4>
-            </div>
-            <div class="card-body">
-                <!-- Фильтры по предмету -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="d-flex flex-wrap gap-1">
-                            {% if student.has_math %}
-                            <a href="?subject=math"
-                               class="btn {% if subject_filter == 'math' %}btn-primary{% else %}btn-outline-primary{% endif %} flex-fill mb-1">
-                                🧮 Математика ({{ math_count }})
-                            </a>
-                            {% endif %}
-                            {% if student.has_physics %}
-                            <a href="?subject=physics"
-                               class="btn {% if subject_filter == 'physics' %}btn-primary{% else %}btn-outline-primary{% endif %} flex-fill mb-1">
-                                ⚡ Физика ({{ physics_count }})
-                            </a>
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">📊 Мои пробники</h4>
+        </div>
+
+        <!-- Фильтры по предмету -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            {% if student.has_math %}
+            <a href="?subject=math"
+               class="btn {% if subject_filter == 'math' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
+                🧮 Математика <span class="badge bg-light text-dark ms-1">{{ math_count }}</span>
+            </a>
+            {% endif %}
+            {% if student.has_physics %}
+            <a href="?subject=physics"
+               class="btn {% if subject_filter == 'physics' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
+                ⚡ Физика <span class="badge bg-light text-dark ms-1">{{ physics_count }}</span>
+            </a>
+            {% endif %}
+            {% if student.has_math and student.has_physics %}
+            <a href="?subject=all"
+               class="btn {% if subject_filter == 'all' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
+                📋 Все
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Раздел: В работе -->
+        <div class="mb-5">
+            <h5 class="d-flex align-items-center gap-2 mb-3">
+                <span class="badge bg-warning rounded-pill px-3 py-2">📋 В работе</span>
+                <span class="badge bg-secondary rounded-pill">{{ active_probniks|length }}</span>
+            </h5>
+
+            {% if active_probniks %}
+            <div class="d-flex flex-wrap gap-3 justify-content-start">
+                {% for probnik in active_probniks %}
+                <a href="{% url 'probnik_detail' probnik.id %}" class="text-decoration-none">
+                    <div class="card probnik-card {% if probnik.subject == 'math' %}probnik-card-math{% else %}probnik-card-physics{% endif %} {% if probnik.is_overdue %}probnik-card-overdue{% endif %}">
+                        <!-- Индикатор статуса -->
+                        <div class="probnik-status-dot probnik-status-active"></div>
+
+                        <!-- Иконка предмета -->
+                        <div class="probnik-icon">
+                            {% if probnik.subject == 'math' %}
+                            <span class="probnik-icon-emoji">🧮</span>
+                            {% else %}
+                            <span class="probnik-icon-emoji">⚡</span>
                             {% endif %}
                         </div>
-                    </div>
-                </div>
 
-                <!-- Раздел: В работе -->
-                <div class="mb-4">
-                    <h5 class="border-bottom pb-2 mb-3">
-                        📋 В работе
-                        <span class="badge bg-warning float-end">{{ active_probniks|length }}</span>
-                    </h5>
-                    
-                    {% if active_probniks %}
-                    <div class="list-group list-group-flush">
-                        {% for probnik in active_probniks %}
-                        <a href="{% url 'probnik_detail' probnik.id %}" class="list-group-item list-group-item-action px-0">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="me-2" style="flex: 1;">
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <span class="badge {% if probnik.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %}">
-                                            {{ probnik.get_subject_display }}
-                                        </span>
-                                        <h6 class="mb-0">{{ probnik.title|truncatechars:40 }}</h6>
-                                    </div>
-                                    <div class="small">
-                                        {% if probnik.deadline %}
-                                            <span class="text-muted">До:</span>
-                                            <span class="fw-bold {% if probnik.is_overdue %}text-danger{% endif %}">
-                                                {{ probnik.deadline|date:"d.m.Y" }}
-                                            </span>
-                                            {% if probnik.is_overdue %}
-                                                <span class="badge bg-danger ms-1">Просрочено</span>
-                                            {% endif %}
-                                        {% endif %}
-                                        {% if probnik.month %}
-                                            <span class="badge bg-secondary ms-1">{{ probnik.get_month_display }}</span>
-                                        {% endif %}
-                                        {% if probnik.has_student_files %}
-                                            <span class="badge bg-success ms-1">✅ Сдано</span>
-                                        {% else %}
-                                            <span class="badge bg-warning ms-1">⚠️ Не сдано</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                        <!-- Название -->
+                        <div class="probnik-title">{{ probnik.title|truncatechars:28 }}</div>
+
+                        <!-- Месяц (если есть) -->
+                        {% if probnik.month %}
+                        <div class="probnik-month">{{ probnik.get_month_display }}</div>
+                        {% endif %}
+
+                        <!-- Мета-информация -->
+                        <div class="probnik-meta">
+                            {% if probnik.deadline %}
+                            <div class="probnik-meta-item {% if probnik.is_overdue %}probnik-meta-danger{% endif %}">
+                                <span>📅</span>
+                                <span>{{ probnik.deadline|date:"d.m" }}</span>
                             </div>
-                        </a>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <p class="text-muted text-center py-3">🎉 Нет пробников в работе</p>
-                    {% endif %}
-                </div>
-
-                <!-- Раздел: Проверенные -->
-                <div>
-                    <h5 class="border-bottom pb-2 mb-3">
-                        ✅ Проверенные
-                        <span class="badge bg-success float-end">{{ completed_probniks|length }}</span>
-                    </h5>
-                    
-                    {% if completed_probniks %}
-                    <div class="list-group list-group-flush">
-                        {% for probnik in completed_probniks %}
-                        <a href="{% url 'probnik_detail' probnik.id %}" class="list-group-item list-group-item-action px-0">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="me-2" style="flex: 1;">
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <span class="badge {% if probnik.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %}">
-                                            {{ probnik.get_subject_display }}
-                                        </span>
-                                        <h6 class="mb-0">{{ probnik.title|truncatechars:40 }}</h6>
-                                        <span class="badge 
-                                            {% if probnik.get_percentage >= 80 %}bg-success
-                                            {% elif probnik.get_percentage >= 60 %}bg-info
-                                            {% elif probnik.get_percentage >= 40 %}bg-warning
-                                            {% else %}bg-danger{% endif %}">
-                                            {{ probnik.get_percentage }}%
-                                        </span>
-                                    </div>
-                                    <div class="small">
-                                        <span class="text-muted">{{ probnik.score }}/{{ probnik.max_score }}</span>
-                                        {% if probnik.grade %}
-                                            <span class="badge 
-                                                {% if probnik.grade == '5' %}bg-success
-                                                {% elif probnik.grade == '4' %}bg-info
-                                                {% elif probnik.grade == '3' %}bg-warning text-dark
-                                                {% else %}bg-danger{% endif %} ms-1">
-                                                {{ probnik.grade }}
-                                            </span>
-                                        {% endif %}
-                                        {% if probnik.month %}
-                                            <span class="badge bg-secondary ms-1">{{ probnik.get_month_display }}</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                            {% endif %}
+                            <div class="probnik-meta-item">
+                                {% if probnik.has_student_files %}
+                                <span>✅</span>
+                                <span>Сдано</span>
+                                {% else %}
+                                <span>⚠️</span>
+                                <span>Не сдано</span>
+                                {% endif %}
                             </div>
-                        </a>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <p class="text-muted text-center py-3">Нет проверенных пробников</p>
-                    {% endif %}
-                </div>
+                        </div>
 
+                        <!-- Прогресс-бар -->
+                        <div class="probnik-progress-bar">
+                            <div class="probnik-progress-fill 
+                                {% if probnik.has_student_files %}probnik-progress-started
+                                {% else %}probnik-progress-assigned{% endif %}">
+                            </div>
+                        </div>
+
+                        <!-- Бейдж просрочки -->
+                        {% if probnik.is_overdue %}
+                        <div class="probnik-badge probnik-badge-overdue">Просрочено</div>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
             </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="display-6 mb-3">🎉</div>
+                <p class="text-muted mb-0">Нет пробников в работе</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Раздел: Проверенные -->
+        <div>
+            <h5 class="d-flex align-items-center gap-2 mb-3">
+                <span class="badge bg-success rounded-pill px-3 py-2">✅ Проверенные</span>
+                <span class="badge bg-secondary rounded-pill">{{ completed_probniks|length }}</span>
+            </h5>
+
+            {% if completed_probniks %}
+            <div class="d-flex flex-wrap gap-3 justify-content-start">
+                {% for probnik in completed_probniks %}
+                <a href="{% url 'probnik_detail' probnik.id %}" class="text-decoration-none">
+                    <div class="card probnik-card probnik-card-checked {% if probnik.subject == 'math' %}probnik-card-math{% else %}probnik-card-physics{% endif %}">
+                        <!-- Индикатор статуса -->
+                        <div class="probnik-status-dot probnik-status-checked"></div>
+
+                        <!-- Иконка предмета -->
+                        <div class="probnik-icon">
+                            {% if probnik.subject == 'math' %}
+                            <span class="probnik-icon-emoji">🧮</span>
+                            {% else %}
+                            <span class="probnik-icon-emoji">⚡</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Название -->
+                        <div class="probnik-title">{{ probnik.title|truncatechars:28 }}</div>
+
+                        <!-- Месяц (если есть) -->
+                        {% if probnik.month %}
+                        <div class="probnik-month">{{ probnik.get_month_display }}</div>
+                        {% endif %}
+
+                        <!-- Результат -->
+                        <div class="probnik-result">
+                            <div class="probnik-percentage 
+                                {% if probnik.get_percentage >= 80 %}probnik-percentage-high
+                                {% elif probnik.get_percentage >= 60 %}probnik-percentage-mid
+                                {% elif probnik.get_percentage >= 40 %}probnik-percentage-low
+                                {% else %}probnik-percentage-bad{% endif %}">
+                                {{ probnik.get_percentage }}%
+                            </div>
+                            <div class="probnik-score">{{ probnik.score }}/{{ probnik.max_score }}</div>
+                        </div>
+
+                        <!-- Оценка -->
+                        {% if probnik.grade %}
+                        <div class="probnik-grade 
+                            {% if probnik.grade == '5' %}probnik-grade-5
+                            {% elif probnik.grade == '4' %}probnik-grade-4
+                            {% elif probnik.grade == '3' %}probnik-grade-3
+                            {% else %}probnik-grade-2{% endif %}">
+                            {{ probnik.grade }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Мета -->
+                        <div class="probnik-meta">
+                            {% if probnik.teacher_comment %}
+                            <div class="probnik-meta-item" title="{{ probnik.teacher_comment }}">
+                                <span>💬</span>
+                                <span>комментарий</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Прогресс-бар (полный) -->
+                        <div class="probnik-progress-bar">
+                            <div class="probnik-progress-fill probnik-progress-checked"></div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <p class="text-muted mb-0">Нет проверенных пробников</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -150,4 +204,340 @@
     </div>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ===== Карточки пробников ===== */
+
+.probnik-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 10rem;
+    min-height: 15rem;
+    background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+    border-radius: 1rem;
+    padding: 1rem 0.75rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.probnik-card:hover {
+    border-color: #6366f1;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-0.5rem);
+}
+
+/* Математика — синий акцент */
+.probnik-card-math:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+/* Физика — красный акцент */
+.probnik-card-physics:hover {
+    border-color: #ef4444;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+/* Проверенные — зелёный акцент */
+.probnik-card-checked:hover {
+    border-color: #22c55e !important;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15) !important;
+}
+
+/* Просроченные */
+.probnik-card-overdue {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Индикатор статуса (точка) */
+.probnik-status-dot {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: #6b7280;
+    transition: all 0.3s ease;
+}
+
+.probnik-card:hover .probnik-status-dot {
+    animation: probnik-pulse 1.5s infinite;
+}
+
+.probnik-status-active {
+    background: #f59e0b;
+}
+
+.probnik-card:hover .probnik-status-active {
+    background: #fbbf24;
+}
+
+.probnik-status-checked {
+    background: #22c55e;
+}
+
+.probnik-card:hover .probnik-status-checked {
+    background: #4ade80;
+}
+
+/* Иконка предмета */
+.probnik-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(99, 102, 241, 0.12);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    margin-top: 0.25rem;
+}
+
+.probnik-card-math .probnik-icon {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.probnik-card-math:hover .probnik-icon {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.probnik-card-physics .probnik-icon {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.probnik-card-physics:hover .probnik-icon {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.probnik-card-checked .probnik-icon {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.probnik-card-checked:hover .probnik-icon {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.probnik-icon-emoji {
+    font-size: 1.5rem;
+}
+
+/* Название */
+.probnik-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    text-align: center;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.probnik-card-math:hover .probnik-title {
+    color: #60a5fa;
+}
+
+.probnik-card-physics:hover .probnik-title {
+    color: #f87171;
+}
+
+.probnik-card-checked:hover .probnik-title {
+    color: #4ade80;
+}
+
+/* Месяц */
+.probnik-month {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+}
+
+/* Результат */
+.probnik-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.probnik-percentage {
+    font-size: 1.3rem;
+    font-weight: 800;
+    transition: color 0.3s ease;
+}
+
+.probnik-percentage-high {
+    color: #4ade80;
+}
+
+.probnik-percentage-mid {
+    color: #60a5fa;
+}
+
+.probnik-percentage-low {
+    color: #facc15;
+}
+
+.probnik-percentage-bad {
+    color: #f87171;
+}
+
+.probnik-score {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Оценка */
+.probnik-grade {
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.1rem 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.probnik-grade-5 {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+.probnik-grade-4 {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.probnik-grade-3 {
+    background: rgba(234, 179, 8, 0.2);
+    color: #facc15;
+}
+
+.probnik-grade-2 {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+/* Мета-информация */
+.probnik-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    width: 100%;
+    padding: 0 0.25rem;
+}
+
+.probnik-meta-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    transition: opacity 0.3s ease;
+}
+
+.probnik-card:hover .probnik-meta-item {
+    opacity: 1;
+}
+
+.probnik-meta-danger {
+    color: #f87171 !important;
+    font-weight: 600;
+}
+
+/* Прогресс-бар */
+.probnik-progress-bar {
+    width: 80%;
+    height: 0.25rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: auto;
+}
+
+.probnik-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.probnik-progress-assigned {
+    width: 15%;
+    background: #6b7280;
+}
+
+.probnik-progress-started {
+    width: 50%;
+    background: #f59e0b;
+}
+
+.probnik-progress-checked {
+    width: 100%;
+    background: #22c55e;
+}
+
+/* Бейдж */
+.probnik-badge {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.probnik-badge-overdue {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+/* Анимация */
+@keyframes probnik-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 576px) {
+    .probnik-card {
+        width: 8.5rem;
+        min-height: 13rem;
+        padding: 0.75rem 0.5rem;
+    }
+    .probnik-icon {
+        width: 3rem;
+        height: 3rem;
+    }
+    .probnik-icon-emoji {
+        font-size: 1.25rem;
+    }
+    .probnik-title {
+        font-size: 0.7rem;
+    }
+    .probnik-percentage {
+        font-size: 1.1rem;
+    }
+}
+</style>
 {% endblock %}

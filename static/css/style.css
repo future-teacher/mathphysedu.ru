@@ -139,6 +139,142 @@ footer {
     font-style: normal;
 }
 
+/* ===== Студент карточки (для списка учеников преподавателя) ===== */
+
+.student-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.student-card {
+    width: 100%;
+    max-width: 260px;
+    height: 300px;
+    background: #3405a3;
+    border-radius: 15px;
+    box-shadow: 1px 5px 60px 0px #100a886b;
+    margin: 0 auto;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.student-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 1px 8px 70px 0px #100a88b0;
+}
+
+.student-card .card-border-top {
+    width: 60%;
+    height: 8px;
+    background: #6b64f3;
+    margin: 0 auto;
+    border-radius: 0px 0px 15px 15px;
+    flex-shrink: 0;
+}
+
+.student-card .img {
+    width: 70px;
+    height: 70px;
+    background: #6b64f3;
+    border-radius: 50%;
+    margin: 20px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+.student-card .student-name {
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    display: block;
+    padding: 10px 12px 0;
+    font-size: 16px;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+
+.student-card .student-class {
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+    display: block;
+    text-align: center;
+    padding: 3px 12px 0;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.student-card .exam-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    gap: 4px;
+    padding: 8px 12px 0;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.student-card .exam-badges .badge {
+    font-size: 0.65rem !important;
+    padding: 2px 6px !important;
+    background: rgba(107, 100, 243, 0.5) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+}
+
+.student-card .card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px 14px;
+    margin-top: auto;
+}
+
+.student-card .card-actions .btn-card {
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: none;
+    background: #6b64f3;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: background 0.15s ease;
+    cursor: pointer;
+}
+
+.student-card .card-actions .btn-card:hover {
+    background: #534bf3;
+}
+
+.student-card .card-actions .btn-card-outline {
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.student-card .card-actions .btn-card-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
 /* ===== Адаптивность ===== */
 @media (min-width: 992px) {
     .navbar-collapse {

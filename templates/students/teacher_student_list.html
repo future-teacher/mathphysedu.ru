@@ -1,99 +1,84 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Мои ученики{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
 
 {% block content %}
 {% if teacher %}
 <div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">👤 Мои ученики</h4>
-                <a href="{% url 'teacher_student_create' %}" class="btn btn-success">
-                    + Добавить ученика
-                </a>
-            </div>
-            <div class="card-body">
-                <form method="get" class="mb-4">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="search" 
-                               placeholder="Поиск по имени, фамилии, классу..." 
-                               value="{{ search_query }}">
-                        <button class="btn btn-primary" type="submit">🔍 Поиск</button>
-                        {% if search_query %}
-                        <a href="{% url 'teacher_student_list' %}" class="btn btn-outline-secondary">
-                            Сбросить
-                        </a>
-                        {% endif %}
-                    </div>
-                </form>
-                
-                {% if students %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Имя</th>
-                                <th>Класс</th>
-                                <th>Telegram</th>
-                                <th>Направления</th>
-                                <th>Дата начала</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for student in students %}
-                            <tr>
-                                <td>
-                                    <strong>{{ student.first_name }} {{ student.last_name }}</strong>
-                                </td>
-                                <td>{{ student.class_name }}</td>
-                                <td>
-                                    {% if student.telegram_username %}
-                                    <span class="badge bg-info">{{ student.telegram_username }}</span>
-                                    {% else %}
-                                    <span class="text-muted">-</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% for exam_type in student.get_exam_types_display|slice:":2" %}
-                                    <span class="badge bg-primary">{{ exam_type }}</span>
-                                    {% endfor %}
-                                    {% if student.get_exam_types_display|length > 2 %}
-                                    <span class="badge bg-secondary">+{{ student.get_exam_types_display|length|add:"-2" }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ student.start_date|date:"d.m.Y" }}</td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{% url 'teacher_student_detail' student.id %}" 
-                                           class="btn btn-outline-primary">
-                                            Просмотр
-                                        </a>
-                                        <a href="{% url 'teacher_student_edit' student.id %}" 
-                                           class="btn btn-outline-secondary">
-                                            Редактировать
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <h4>📝 У вас пока нет учеников</h4>
-                    <p class="text-muted">Добавьте первого ученика, чтобы начать работу</p>
-                    <a href="{% url 'teacher_student_create' %}" class="btn btn-success btn-lg">
-                        + Добавить первого ученика
-                    </a>
-                </div>
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">👤 Мои ученики</h4>
+            <a href="{% url 'teacher_student_create' %}" class="btn btn-success rounded-pill px-4">
+                + Добавить ученика
+            </a>
+        </div>
+
+        <form method="get" class="mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search"
+                       placeholder="Поиск по имени, фамилии, классу..."
+                       value="{{ search_query }}"
+                       style="border-radius: 999px 0 0 999px;">
+                <button class="btn btn-primary" type="submit" style="border-radius: 0 999px 999px 0;">🔍 Поиск</button>
+                {% if search_query %}
+                <a href="{% url 'teacher_student_list' %}" class="btn btn-outline-secondary rounded-pill ms-2">Сбросить</a>
                 {% endif %}
             </div>
+        </form>
+
+        {% if students %}
+        <div class="d-flex flex-wrap gap-3 justify-content-start">
+            {% for student in students %}
+            <div class="card tsl-student-card">
+                <div class="tsl-avatar">{{ student.first_name|first }}{{ student.last_name|first }}</div>
+                <div class="tsl-name">{{ student.first_name }} {{ student.last_name }}</div>
+                <div class="tsl-class">{{ student.class_name }} класс</div>
+
+                {% with exam_types=student.get_exam_types_display %}
+                {% if exam_types %}
+                <div class="tsl-exams">
+                    {% for exam_type in exam_types|slice:":3" %}
+                    <span class="tsl-exam-badge">{{ exam_type }}</span>
+                    {% endfor %}
+                    {% if exam_types|length > 3 %}
+                    <span class="tsl-exam-badge">+{{ exam_types|length|add:"-3" }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="tsl-actions">
+                    <a href="{% url 'teacher_student_detail' student.id %}" class="tsl-btn tsl-btn-primary">Просмотр</a>
+                    <a href="{% url 'teacher_student_edit' student.id %}" class="tsl-btn tsl-btn-outline">✏️</a>
+                </div>
+            </div>
+            {% endfor %}
         </div>
+        {% else %}
+        <div class="text-center py-5">
+            {% if search_query %}
+            <div class="display-6 mb-3">🔍</div>
+            <h4 class="text-muted">Ничего не найдено</h4>
+            <p class="text-muted">По запросу "{{ search_query }}" ничего не найдено</p>
+            <a href="{% url 'teacher_student_list' %}" class="btn btn-outline-secondary rounded-pill px-4">Сбросить поиск</a>
+            {% else %}
+            <div class="display-6 mb-3">👥</div>
+            <h4 class="text-muted">У вас пока нет учеников</h4>
+            <p class="text-muted">Добавьте первого ученика, чтобы начать работу</p>
+            <a href="{% url 'teacher_student_create' %}" class="btn btn-success rounded-pill px-4">
+                + Добавить первого ученика
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </div>
+
 {% else %}
 <div class="row justify-content-center">
     <div class="col-md-6">
@@ -110,4 +95,114 @@
     </div>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<style>
+/* ===== Карточки учеников (список) ===== */
+
+.tsl-student-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 11rem;
+    padding: 1.2rem 1rem;
+    border-radius: 1rem;
+    border: 2px solid transparent;
+    background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+    transition: all 0.3s ease;
+}
+
+.tsl-student-card:hover {
+    border-color: #6366f1;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-0.3rem);
+}
+
+.tsl-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    background: #6366f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+}
+
+.tsl-name {
+    font-weight: 600;
+    color: #e2e8f0;
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.tsl-class {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.tsl-exams {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.tsl-exam-badge {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+    background: rgba(99, 102, 241, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 0.4rem;
+    white-space: nowrap;
+}
+
+.tsl-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+}
+
+.tsl-btn {
+    padding: 0.35rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.tsl-btn-primary {
+    background: #6366f1;
+    color: white;
+    border: none;
+}
+
+.tsl-btn-primary:hover {
+    background: #4f46e5;
+}
+
+.tsl-btn-outline {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tsl-btn-outline:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+@media (max-width: 576px) {
+    .tsl-student-card {
+        width: 9rem;
+        padding: 1rem 0.75rem;
+    }
+}
+</style>
 {% endblock %}

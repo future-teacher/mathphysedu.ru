@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
@@ -5,10 +6,13 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, HttpResponseNotAllowed
 from .models import Student, Probnik, ProbnikFile, StudyFile, Homework, HomeworkFile
 from .telegram_bot import (
     notify_teacher_homework_submitted,
     notify_teacher_probnik_submitted,
+    process_single_update,
 )
 from django.core.paginator import Paginator
 
@@ -465,3 +469,28 @@ def delete_probnik_file(request, file_id):
         messages.success(request, 'Файл успешно удален из базы данных и файловой системы')
     
     return redirect('probnik_detail', probnik_id=probnik_id)
+
+
+@csrf_exempt
+def telegram_webhook(request):
+    """
+    Webhook endpoint для Telegram Bot API.
+    
+    Telegram отправляет POST-запрос с JSON-данными сюда,
+    когда пользователь пишет боту. Это позволяет отвечать
+    на /start мгновенно, без polling.
+    
+    URL: /students/telegram/webhook/
+    """
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    
+    try:
+        update_data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return HttpResponse('Invalid JSON', status=400)
+    
+    process_single_update(update_data)
+    
+    # Telegram ожидает ответ 200 OK
+    return HttpResponse('ok')

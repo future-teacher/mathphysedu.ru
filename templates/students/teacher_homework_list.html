@@ -5,179 +5,161 @@
 {% block content %}
 {% if teacher %}
 <div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center bg-success text-white">
-                <h4 class="mb-0">📝 Домашние задания</h4>
-                <a href="{% url 'teacher_homework_create' %}" class="btn btn-light btn-sm">
-                    + Новое
-                </a>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <div class="btn-group w-100" role="group">
-                            <a href="?subject=all&status={{ status_filter }}" 
-                               class="btn {% if subject_filter == 'all' or not subject_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                                Все предметы
-                            </a>
-                            <a href="?subject=math&status={{ status_filter }}" 
-                               class="btn {% if subject_filter == 'math' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                                🧮 Математика
-                            </a>
-                            <a href="?subject=physics&status={{ status_filter }}" 
-                               class="btn {% if subject_filter == 'physics' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                                ⚡ Физика
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">📝 Домашние задания</h4>
+            <a href="{% url 'teacher_homework_create' %}" class="btn btn-success rounded-pill px-4">
+                + Новое
+            </a>
+        </div>
 
-                
-                {% if homework_list %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Ученик</th>
-                                <th>Задание</th>
-                                <th>Предмет</th>
-                                <th>Дедлайн</th>
-                                <th>Статус сдачи</th>
-                                <th>Результат</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for homework in homework_list %}
-                            <tr class="
-                                {% if homework.is_overdue and homework.status != 'checked' %}table-danger
-                                {% elif homework.status == 'checked' %}table-success
-                                {% endif %}">
-                                <td>
-                                    <strong>{{ homework.student.first_name }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ homework.student.last_name }}</small>
-                                </td>
-                                <td>{{ homework.title|truncatechars:15 }}</td>
-                                <td>
-                                    <span class="badge {% if homework.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %}">
-                                        {{ homework.get_subject_display }}
-                                    </span>
-                                </td>
-                                <td>
-                                    {% if homework.deadline %}
-                                        <span class="badge 
-                                            {% if homework.is_overdue and homework.status != 'checked' %}bg-danger
-                                            {% elif homework.get_deadline_status == 'urgent' and homework.status != 'checked' %}bg-danger
-                                            {% elif homework.get_deadline_status == 'soon' and homework.status != 'checked' %}bg-warning
-                                            {% elif homework.status == 'checked' %}bg-success
-                                            {% else %}bg-secondary{% endif %}">
-                                            {{ homework.deadline|date:"d.m" }}
-                                        </span>
-                                    {% else %}
-                                        <span class="text-muted">-</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if homework.status == 'checked' %}
-                                        <span class="badge bg-success" title="Проверено">
-                                            ✅ Проверено
-                                        </span>
-                                    {% elif homework.has_student_files %}
-                                        <span class="badge bg-success" title="Решение отправлено">
-                                            ✅ Сдано ({{ homework.get_student_files_count }})
-                                        </span>
-                                    {% else %}
-                                        <span class="badge bg-warning" title="Решение не отправлено">
-                                            ⚠️ Не сдано
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if homework.status == 'checked' %}
-                                        {% if homework.grade %}
-                                            <span class="badge 
-                                                {% if homework.grade == '5' %}bg-success
-                                                {% elif homework.grade == '4' %}bg-info
-                                                {% elif homework.grade == '3' %}bg-warning text-dark
-                                                {% elif homework.grade == '2' %}bg-danger
-                                                {% else %}bg-secondary{% endif %}">
-                                                {{ homework.get_grade_display }}
-                                            </span>
-                                        {% endif %}
-                                        {% if homework.teacher_comment %}
-                                            <span class="badge bg-light text-dark" title="{{ homework.teacher_comment }}">
-                                                💬
-                                            </span>
-                                        {% endif %}
-                                    {% elif homework.has_student_files %}
-                                        <span class="text-muted">Ожидает проверки</span>
-                                    {% else %}
-                                        <span class="text-muted">—</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{% url 'teacher_homework_detail' homework.id %}" 
-                                           class="btn btn-outline-primary">
-                                            👁️
-                                        </a>
-                                        <a href="{% url 'teacher_homework_delete' homework.id %}" 
-                                           class="btn btn-outline-danger">
-                                            🗑️
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                {% if homework_list.has_other_pages %}
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        {% if homework_list.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ homework_list.previous_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}">
-                                ←
-                            </a>
-                        </li>
-                        {% endif %}
-                        
-                        {% for i in homework_list.paginator.page_range %}
-                        <li class="page-item {% if homework_list.number == i %}active{% endif %}">
-                            <a class="page-link" href="?page={{ i }}&subject={{ subject_filter }}&status={{ status_filter }}">{{ i }}</a>
-                        </li>
-                        {% endfor %}
-                        
-                        {% if homework_list.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ homework_list.next_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}">
-                                →
-                            </a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                {% endif %}
-                
-                {% else %}
-                <div class="text-center py-5">
-                    <h4>📝 Нет домашних заданий</h4>
-                    <p class="text-muted">Создайте первое домашнее задание</p>
-                    <a href="{% url 'teacher_homework_create' %}" class="btn btn-success">
-                        + Создать задание
-                    </a>
-                </div>
-                {% endif %}
+        <!-- Фильтры -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <a href="?subject=all&status={{ status_filter }}"
+               class="btn {% if subject_filter == 'all' or not subject_filter %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
+                📋 Все предметы
+            </a>
+            <a href="?subject=math&status={{ status_filter }}"
+               class="btn {% if subject_filter == 'math' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
+                🧮 Математика
+            </a>
+            <a href="?subject=physics&status={{ status_filter }}"
+               class="btn {% if subject_filter == 'physics' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
+                ⚡ Физика
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary rounded-pill px-4 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    📌 Статус
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=all">Все</a></li>
+                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=active">Активные</a></li>
+                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=checked">Проверенные</a></li>
+                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=overdue">Просроченные</a></li>
+                </ul>
             </div>
         </div>
+
+        {% if homework_list %}
+        <div class="d-flex flex-wrap gap-3 justify-content-start">
+            {% for homework in homework_list %}
+            <a href="{% url 'teacher_homework_detail' homework.id %}" class="text-decoration-none">
+                <div class="card thw-card 
+                    {% if homework.subject == 'math' %}thw-card-math{% else %}thw-card-physics{% endif %}
+                    {% if homework.is_overdue and homework.status != 'checked' %}thw-card-overdue{% endif %}
+                    {% if homework.status == 'checked' %}thw-card-checked{% endif %}">
+
+                    <!-- Индикатор статуса -->
+                    <div class="thw-status-dot 
+                        {% if homework.status == 'checked' %}thw-status-checked
+                        {% elif homework.has_student_files %}thw-status-submitted
+                        {% elif homework.status == 'in_progress' %}thw-status-progress
+                        {% else %}thw-status-assigned{% endif %}">
+                    </div>
+
+                    <!-- Иконка предмета -->
+                    <div class="thw-icon">
+                        {% if homework.subject == 'math' %}
+                        <span class="thw-icon-emoji">🧮</span>
+                        {% else %}
+                        <span class="thw-icon-emoji">⚡</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Ученик -->
+                    <div class="thw-student">{{ homework.student.first_name }} {{ homework.student.last_name }}</div>
+
+                    <!-- Название -->
+                    <div class="thw-title">{{ homework.title|truncatechars:25 }}</div>
+
+                    <!-- Мета -->
+                    <div class="thw-meta">
+                        {% if homework.deadline %}
+                        <div class="thw-meta-item {% if homework.is_overdue and homework.status != 'checked' %}thw-meta-danger{% endif %}">
+                            <span>📅</span>
+                            <span>{{ homework.deadline|date:"d.m" }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="thw-meta-item">
+                            {% if homework.status == 'checked' %}
+                            <span>✅</span>
+                            <span>Проверено</span>
+                            {% elif homework.has_student_files %}
+                            <span>✅</span>
+                            <span>Сдано ({{ homework.get_student_files_count }})</span>
+                            {% else %}
+                            <span>⚠️</span>
+                            <span>Не сдано</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Результат -->
+                    {% if homework.status == 'checked' and homework.grade %}
+                    <div class="thw-grade 
+                        {% if homework.grade == '5' %}thw-grade-5
+                        {% elif homework.grade == '4' %}thw-grade-4
+                        {% elif homework.grade == '3' %}thw-grade-3
+                        {% elif homework.grade == '2' %}thw-grade-2
+                        {% else %}thw-grade-z{% endif %}">
+                        {{ homework.get_grade_display }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Прогресс-бар -->
+                    <div class="thw-progress-bar">
+                        <div class="thw-progress-fill 
+                            {% if homework.status == 'checked' %}thw-progress-checked
+                            {% elif homework.has_student_files %}thw-progress-submitted
+                            {% elif homework.status == 'in_progress' %}thw-progress-started
+                            {% else %}thw-progress-assigned{% endif %}">
+                        </div>
+                    </div>
+
+                    <!-- Бейдж просрочки -->
+                    {% if homework.is_overdue and homework.status != 'checked' %}
+                    <div class="thw-badge thw-badge-overdue">Просрочено</div>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if homework_list.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if homework_list.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ homework_list.previous_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}">←</a>
+                </li>
+                {% endif %}
+                {% for i in homework_list.paginator.page_range %}
+                <li class="page-item {% if homework_list.number == i %}active{% endif %}">
+                    <a class="page-link" href="?page={{ i }}&subject={{ subject_filter }}&status={{ status_filter }}">{{ i }}</a>
+                </li>
+                {% endfor %}
+                {% if homework_list.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ homework_list.next_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}">→</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <div class="display-6 mb-3">📝</div>
+            <h4 class="text-muted">Нет домашних заданий</h4>
+            <p class="text-muted">Создайте первое домашнее задание</p>
+            <a href="{% url 'teacher_homework_create' %}" class="btn btn-success rounded-pill px-4">
+                + Создать задание
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
-
 
 {% else %}
 <div class="row justify-content-center">
@@ -194,4 +176,236 @@
     </div>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ===== Карточки ДЗ для преподавателя ===== */
+
+.thw-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 10.5rem;
+    min-height: 15rem;
+    background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+    border-radius: 1rem;
+    padding: 1rem 0.75rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.thw-card:hover {
+    border-color: #6366f1;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-0.5rem);
+}
+
+.thw-card-math:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+.thw-card-physics:hover {
+    border-color: #ef4444;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+.thw-card-checked:hover {
+    border-color: #22c55e !important;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15) !important;
+}
+
+.thw-card-overdue {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Индикатор статуса */
+.thw-status-dot {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: #6b7280;
+    transition: all 0.3s ease;
+}
+
+.thw-card:hover .thw-status-dot {
+    animation: thw-pulse 1.5s infinite;
+}
+
+.thw-status-assigned { background: #6b7280; }
+.thw-status-progress { background: #3b82f6; }
+.thw-card:hover .thw-status-progress { background: #60a5fa; }
+.thw-status-submitted { background: #f59e0b; }
+.thw-card:hover .thw-status-submitted { background: #fbbf24; }
+.thw-status-checked { background: #22c55e; }
+.thw-card:hover .thw-status-checked { background: #4ade80; }
+
+/* Иконка */
+.thw-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(99, 102, 241, 0.12);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    margin-top: 0.25rem;
+}
+
+.thw-card-math .thw-icon {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+.thw-card-math:hover .thw-icon {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.thw-card-physics .thw-icon {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+.thw-card-physics:hover .thw-icon {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.thw-card-checked .thw-icon {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+.thw-card-checked:hover .thw-icon {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.thw-icon-emoji { font-size: 1.5rem; }
+
+/* Ученик */
+.thw-student {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+}
+
+/* Название */
+.thw-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    text-align: center;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.thw-card-math:hover .thw-title { color: #60a5fa; }
+.thw-card-physics:hover .thw-title { color: #f87171; }
+.thw-card-checked:hover .thw-title { color: #4ade80; }
+
+/* Оценка */
+.thw-grade {
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.1rem 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.thw-grade-5 { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.thw-grade-4 { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.thw-grade-3 { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+.thw-grade-2 { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.thw-grade-z { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+
+/* Мета */
+.thw-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    width: 100%;
+    padding: 0 0.25rem;
+}
+
+.thw-meta-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    transition: opacity 0.3s ease;
+}
+
+.thw-card:hover .thw-meta-item { opacity: 1; }
+.thw-meta-danger { color: #f87171 !important; font-weight: 600; }
+
+/* Прогресс-бар */
+.thw-progress-bar {
+    width: 80%;
+    height: 0.25rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: auto;
+}
+
+.thw-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.thw-progress-assigned { width: 10%; background: #6b7280; }
+.thw-progress-started { width: 50%; background: #3b82f6; }
+.thw-progress-submitted { width: 75%; background: #f59e0b; }
+.thw-progress-checked { width: 100%; background: #22c55e; }
+
+/* Бейдж */
+.thw-badge {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.thw-badge-overdue { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+@keyframes thw-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@media (max-width: 576px) {
+    .thw-card {
+        width: 9rem;
+        min-height: 13rem;
+        padding: 0.75rem 0.5rem;
+    }
+    .thw-icon { width: 3rem; height: 3rem; }
+    .thw-icon-emoji { font-size: 1.25rem; }
+    .thw-title { font-size: 0.7rem; }
+}
+</style>
 {% endblock %}

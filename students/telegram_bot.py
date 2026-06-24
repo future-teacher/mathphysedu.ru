@@ -167,62 +167,48 @@ def _send_telegram_raw(token, chat_id, text, parse_mode='HTML'):
         return json.loads(e.read().decode('utf-8', errors='replace'))
 
 
-def process_updates():
+def process_single_update(update_data):
     """
-    Обрабатывает входящие сообщения от Telegram Bot API (polling).
-    
+    Обрабатывает одно входящее обновление от Telegram.
+
     - На команду /start отправляет приветственное сообщение с инструкцией
     - Сохраняет chat_id пользователей
-    
-    Запускается через management command:
-        python manage.py telegram_polling
+
+    Может быть вызвана как из polling, так и из webhook.
+
+    Args:
+        update_data: dict — одно обновление из Telegram API
+
+    Returns:
+        bool: True если обработано успешно
     """
     from students.models import Student, Teacher
-    
+
     token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
     if not token:
-        logger.warning('TELEGRAM_BOT_TOKEN not configured')
-        return
-    
+        return False
+
     base_url = getattr(settings, 'BASE_URL', 'http://127.0.0.1:8000')
-    
-    url = f'https://api.telegram.org/bot{token}/getUpdates'
-    req = urllib_request.Request(url)
-    
-    try:
-        with urllib_request.urlopen(req, timeout=15) as response:
-            data = json.loads(response.read().decode('utf-8'))
-    except Exception as e:
-        logger.error(f'Failed to get updates: {e}')
-        return
-    
-    if not data.get('ok'):
-        logger.error('Telegram API error: %s', data.get('description'))
-        return
-    
-    processed = 0
-    welcomed = 0
-    
-    for update in data.get('result', []):
-        msg = update.get('message', {})
-        chat = msg.get('chat', {})
-        chat_id = chat.get('id')
-        text = msg.get('text', '')
-        username = (msg.get('from', {}).get('username') or '').lower()
-        
-        if not chat_id or not username:
-            continue
-        
-        # Проверяем команду /start
-        if text.strip() == '/start':
-            # Отправляем приветствие
-            welcome_text = WELCOME_MESSAGE.format(base_url=base_url)
-            result = _send_telegram_raw(token, chat_id, welcome_text)
-            if result.get('ok'):
-                welcomed += 1
-                logger.info(f'Sent welcome to @{username} (chat_id={chat_id})')
-            
-            # Сохраняем chat_id в модели
+
+    msg = update_data.get('message', {})
+    chat = msg.get('chat', {})
+    chat_id = chat.get('id')
+    text = msg.get('text', '')
+    username = (msg.get('from', {}).get('username') or '').lower()
+
+    if not chat_id:
+        return False
+
+    # Проверяем команду /start
+    if text.strip() == '/start':
+        # Отправляем приветствие
+        welcome_text = WELCOME_MESSAGE.format(base_url=base_url)
+        result = _send_telegram_raw(token, chat_id, welcome_text)
+        if result.get('ok'):
+            logger.info(f'Sent welcome to @{username} (chat_id={chat_id})')
+
+        # Сохраняем chat_id в модели (если есть username)
+        if username:
             # Ищем преподавателя
             teacher = Teacher.objects.filter(telegram__iexact=f'@{username}').first()
             if teacher:
@@ -230,7 +216,7 @@ def process_updates():
                     teacher.telegram_chat_id = chat_id
                     teacher.save(update_fields=['telegram_chat_id'])
                     logger.info(f'Saved chat_id for teacher {teacher.user.username}')
-            
+
             # Ищем ученика
             student = Student.objects.filter(telegram_username__iexact=f'@{username}').first()
             if student:
@@ -238,10 +224,48 @@ def process_updates():
                     student.telegram_chat_id = chat_id
                     student.save(update_fields=['telegram_chat_id'])
                     logger.info(f'Saved chat_id for student {student.first_name} {student.last_name}')
-            
+
+        return True
+
+    return False
+
+
+def process_updates():
+    """
+    Обрабатывает входящие сообщения от Telegram Bot API (polling).
+
+    - На команду /start отправляет приветственное сообщение с инструкцией
+    - Сохраняет chat_id пользователей
+
+    Запускается через management command:
+        python manage.py telegram_polling
+    """
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+    if not token:
+        logger.warning('TELEGRAM_BOT_TOKEN not configured')
+        return
+
+    url = f'https://api.telegram.org/bot{token}/getUpdates'
+    req = urllib_request.Request(url)
+
+    try:
+        with urllib_request.urlopen(req, timeout=15) as response:
+            data = json.loads(response.read().decode('utf-8'))
+    except Exception as e:
+        logger.error(f'Failed to get updates: {e}')
+        return
+
+    if not data.get('ok'):
+        logger.error('Telegram API error: %s', data.get('description'))
+        return
+
+    processed = 0
+
+    for update in data.get('result', []):
+        if process_single_update(update):
             processed += 1
-    
-    logger.info(f'Processing complete. Processed: {processed}, Welcomed: {welcomed}')
+
+    logger.info(f'Polling complete. Processed: {processed}')
     return processed
 
 

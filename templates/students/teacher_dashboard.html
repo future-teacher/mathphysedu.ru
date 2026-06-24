@@ -3,191 +3,218 @@
 
 {% block title %}Дашборд преподавателя{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
 {% block content %}
 {% if teacher %}
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">👨‍🏫 Панель преподавателя</h4>
-                <a href="{% url 'teacher_student_create' %}" class="btn btn-light btn-sm">
-                    + Добавить ученика
-                </a>
+        <!-- Telegram предупреждение -->
+        {% if not teacher.telegram %}
+        <div class="alert alert-warning d-flex align-items-center mb-4" role="alert" style="border-radius: 1rem;">
+            <div class="me-3" style="font-size: 2rem;">🤖</div>
+            <div>
+                <strong>Telegram бот не настроен!</strong><br>
+                Чтобы получать уведомления о новых работах учеников:
+                <ol class="mb-0 mt-1">
+                    <li>Перейдите в <a href="{% url 'teacher_profile_edit' %}" class="alert-link">⚙️ Мой профиль</a></li>
+                    <li>Заполните поле <strong>Telegram</strong> (ваш @username)</li>
+                    <li>Напишите боту <strong>@MathPhyseduBot</strong> и нажмите /start</li>
+                </ol>
             </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h5>Здравствуйте, {{ teacher.user.get_full_name|default:teacher.user.username }}!</h5>
-                        <p class="text-muted">Добро пожаловать в панель управления</p>
-                    </div>
-                </div>
-                
-                {% if not teacher.telegram %}
-                <div class="alert alert-warning d-flex align-items-center" role="alert">
-                    <div class="me-3" style="font-size: 2rem;">🤖</div>
-                    <div>
-                        <strong>Telegram бот не настроен!</strong><br>
-                        Чтобы получать уведомления о новых работах учеников:
-                        <ol class="mb-0 mt-1">
-                            <li>Перейдите в <a href="{% url 'teacher_profile_edit' %}" class="alert-link">⚙️ Мой профиль</a></li>
-                            <li>Заполните поле <strong>Telegram</strong> (ваш @username)</li>
-                            <li>Напишите боту <strong>@MathPhyseduBot</strong> и нажмите /start</li>
-                        </ol>
-                    </div>
+        </div>
+        {% endif %}
+
+        <!-- Статистика -->
+        <div class="d-flex flex-wrap gap-3 mb-4">
+            <div class="card td-stat-card td-stat-blue">
+                <div class="td-stat-icon">👥</div>
+                <div class="td-stat-value">{{ total_students }}</div>
+                <div class="td-stat-label">Учеников</div>
+            </div>
+            <div class="card td-stat-card td-stat-indigo">
+                <div class="td-stat-icon">📝</div>
+                <div class="td-stat-value">{{ active_homework }}</div>
+                <div class="td-stat-label">Активных ДЗ</div>
+            </div>
+            <div class="card td-stat-card td-stat-red">
+                <div class="td-stat-icon">⏰</div>
+                <div class="td-stat-value">{{ overdue_homework }}</div>
+                <div class="td-stat-label">Просрочено ДЗ</div>
+            </div>
+            <div class="card td-stat-card td-stat-green">
+                <div class="td-stat-icon">📊</div>
+                <div class="td-stat-value">{{ active_probniks }}</div>
+                <div class="td-stat-label">Пробников в работе</div>
+            </div>
+            <div class="card td-stat-card td-stat-teal">
+                <div class="td-stat-icon">✅</div>
+                <div class="td-stat-value">{{ to_check_probniks }}</div>
+                <div class="td-stat-label">Проверено пробников</div>
+            </div>
+        </div>
+
+        <!-- Мои ученики -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">👥 Мои ученики</h5>
+            <a href="{% url 'teacher_student_list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                Все ученики →
+            </a>
+        </div>
+
+        <form method="get" class="mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search"
+                       placeholder="Поиск по имени, фамилии, классу..."
+                       value="{{ search_query }}"
+                       style="border-radius: 999px 0 0 999px;">
+                <button class="btn btn-primary" type="submit" style="border-radius: 0 999px 999px 0;">🔍 Поиск</button>
+                {% if search_query %}
+                <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary rounded-pill ms-2">Сбросить</a>
+                {% endif %}
+            </div>
+        </form>
+
+        {% if students %}
+        <div class="d-flex flex-wrap gap-3 justify-content-start mb-4">
+            {% for student in students %}
+            <div class="card td-student-card">
+                <div class="td-student-avatar">{{ student.first_name|first }}{{ student.last_name|first }}</div>
+                <div class="td-student-name">{{ student.first_name }} {{ student.last_name }}</div>
+                <div class="td-student-class">{{ student.class_name }} класс</div>
+
+                {% with exam_types=student.get_exam_types_display %}
+                {% if exam_types %}
+                <div class="td-student-exams">
+                    {% for exam_type in exam_types|slice:":3" %}
+                    <span class="td-exam-badge">{{ exam_type }}</span>
+                    {% endfor %}
+                    {% if exam_types|length > 3 %}
+                    <span class="td-exam-badge">+{{ exam_types|length|add:"-3" }}</span>
+                    {% endif %}
                 </div>
                 {% endif %}
-                
-                <div class="row g-2 mb-4">                    
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'teacher_student_list' %}" class="btn btn-primary w-100">
-                            👥 Все ученики
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'teacher_homework_create' %}" class="btn btn-warning w-100">
-                            📝 Создать ДЗ
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'teacher_probnik_create' %}" class="btn btn-success w-100">
-                            📊 Создать пробник
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="{% url 'teacher_studyfile_create' %}" class="btn btn-info w-100">
-                            📁 Загрузить файл
-                        </a>
-                    </div> 
+                {% endwith %}
+
+                <div class="td-student-actions">
+                    <a href="{% url 'teacher_student_detail' student.id %}" class="td-btn td-btn-primary">Просмотр</a>
+                    <a href="{% url 'teacher_student_edit' student.id %}" class="td-btn td-btn-outline">✏️</a>
                 </div>
-                
-                <div class="row g-2 mb-4">
-                    <div class="col-6 col-md-3">
-                        <div class="card text-center bg-light">
-                            <div class="card-body py-3">
-                                <h3 class="mb-0">{{ total_students }}</h3>
-                                <small class="text-muted">Учеников</small>
-                            </div>
-                        </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if total_students > 10 %}
+        <div class="text-center mt-3">
+            <a href="{% url 'teacher_student_list' %}" class="btn btn-outline-primary rounded-pill px-4">
+                Показать всех учеников ({{ total_students }})
+            </a>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            {% if search_query %}
+            <p class="text-muted">Ничего не найдено по запросу "{{ search_query }}"</p>
+            {% else %}
+            <div class="display-6 mb-3">👥</div>
+            <h4 class="text-muted">У вас пока нет учеников</h4>
+            <a href="{% url 'teacher_student_create' %}" class="btn btn-success rounded-pill px-4 mt-2">
+                + Добавить первого ученика
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Недавняя активность -->
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="card td-activity-card">
+                    <div class="td-activity-header">
+                        <span>📝 Последние ДЗ</span>
+                        <a href="{% url 'teacher_homework_list' %}" class="td-activity-link">Все →</a>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card text-center bg-light">
-                            <div class="card-body py-3">
-                                <h3 class="mb-0">{{ active_homework }}</h3>
-                                <small class="text-muted">Активных ДЗ</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card text-center bg-light">
-                            <div class="card-body py-3">
-                                <h3 class="mb-0">{{ active_probniks }}</h3>
-                                <small class="text-muted">Активных пробников</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card text-center bg-light">
-                            <div class="card-body py-3">
-                                <h3 class="mb-0">{{ to_check_probniks }}</h3>
-                                <small class="text-muted">Проверенные пробники</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card mb-4">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                        <h5 class="mb-0">👥 Мои ученики</h5>
-                        <a href="{% url 'teacher_student_list' %}" class="btn btn-sm btn-outline-primary">
-                            Все ученики →
-                        </a>
-                    </div>
-                    <div class="card-body">
-                        <form method="get" class="mb-3">
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="search" 
-                                       placeholder="Поиск по имени, фамилии, классу..." 
-                                       value="{{ search_query }}">
-                                <button class="btn btn-primary" type="submit">🔍 Поиск</button>
-                                {% if search_query %}
-                                <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary">
-                                    Сбросить
-                                </a>
-                                {% endif %}
-                            </div>
-                        </form>
-                        
-                        {% if students %}
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Ученик</th>
-                                        <th>Класс</th>
-                                        <th class="d-none d-sm-table-cell">Telegram</th>
-                                        <th class="d-none d-md-table-cell">Направления</th>
-                                        <th>Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for student in students %}
-                                    <tr>
-                                        <td>
-                                            <strong>{{ student.first_name }} {{ student.last_name }}</strong>
-                                        </td>
-                                        <td>{{ student.class_name }}</td>
-                                        <td class="d-none d-sm-table-cell">
-                                            {% if student.telegram_username %}
-                                            <span class="badge bg-info">{{ student.telegram_username }}</span>
-                                            {% else %}
-                                            <span class="text-muted">-</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="d-none d-md-table-cell">
-                                            {% for exam_type in student.get_exam_types_display|slice:":2" %}
-                                            <span class="badge bg-primary">{{ exam_type }}</span>
-                                            {% endfor %}
-                                            {% if student.get_exam_types_display|length > 2 %}
-                                            <span class="badge bg-secondary">+{{ student.get_exam_types_display|length|add:"-2" }}</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="{% url 'teacher_student_detail' student.id %}" 
-                                                   class="btn btn-outline-primary" title="Просмотр">
-                                                    👁️
-                                                </a>
-                                                <a href="{% url 'teacher_student_edit' student.id %}" 
-                                                   class="btn btn-outline-secondary" title="Редактировать">
-                                                    ✏️
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        {% if total_students > 10 %}
-                        <div class="text-center mt-3">
-                            <a href="{% url 'teacher_student_list' %}" class="btn btn-outline-primary">
-                                Показать всех учеников ({{ total_students }})
+                    <div class="td-activity-body">
+                        {% if recent_homework %}
+                            {% for hw in recent_homework %}
+                            <a href="{% url 'teacher_homework_detail' hw.id %}" class="td-activity-item">
+                                <div class="td-activity-item-icon {% if hw.subject == 'math' %}td-activity-math{% else %}td-activity-physics{% endif %}">
+                                    {% if hw.subject == 'math' %}🧮{% else %}⚡{% endif %}
+                                </div>
+                                <div class="td-activity-item-content">
+                                    <div class="td-activity-item-title">{{ hw.title|truncatechars:20 }}</div>
+                                    <div class="td-activity-item-meta">{{ hw.student.first_name }} · {{ hw.assigned_date|date:"d.m" }}</div>
+                                </div>
+                                <div class="td-activity-item-status 
+                                    {% if hw.status == 'checked' %}td-activity-status-done
+                                    {% elif hw.has_student_files %}td-activity-status-wait
+                                    {% else %}td-activity-status-new{% endif %}">
+                                    {{ hw.get_status_display }}
+                                </div>
                             </a>
-                        </div>
-                        {% endif %}
-                        
+                            {% endfor %}
                         {% else %}
-                        <div class="text-center py-4">
-                            {% if search_query %}
-                            <p class="text-muted">Ничего не найдено по запросу "{{ search_query }}"</p>
-                            {% else %}
-                            <p class="text-muted">У вас пока нет учеников</p>
-                            <a href="{% url 'teacher_student_create' %}" class="btn btn-success">
-                                + Добавить первого ученика
+                            <p class="text-muted text-center py-3 mb-0">Нет ДЗ</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card td-activity-card">
+                    <div class="td-activity-header">
+                        <span>📊 Последние пробники</span>
+                        <a href="{% url 'teacher_probnik_list' %}" class="td-activity-link">Все →</a>
+                    </div>
+                    <div class="td-activity-body">
+                        {% if recent_probniks %}
+                            {% for probnik in recent_probniks %}
+                            <a href="{% url 'teacher_probnik_detail' probnik.id %}" class="td-activity-item">
+                                <div class="td-activity-item-icon {% if probnik.subject == 'math' %}td-activity-math{% else %}td-activity-physics{% endif %}">
+                                    {% if probnik.subject == 'math' %}🧮{% else %}⚡{% endif %}
+                                </div>
+                                <div class="td-activity-item-content">
+                                    <div class="td-activity-item-title">{{ probnik.title|truncatechars:20 }}</div>
+                                    <div class="td-activity-item-meta">{{ probnik.student.first_name }} · {{ probnik.assigned_date|date:"d.m" }}</div>
+                                </div>
+                                <div class="td-activity-item-status 
+                                    {% if probnik.status == 'checked' %}td-activity-status-done
+                                    {% else %}td-activity-status-wait{% endif %}">
+                                    {{ probnik.get_status_display }}
+                                </div>
                             </a>
-                            {% endif %}
-                        </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center py-3 mb-0">Нет пробников</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card td-activity-card">
+                    <div class="td-activity-header">
+                        <span>📁 Последние файлы</span>
+                        <a href="{% url 'teacher_studyfile_create' %}" class="td-activity-link">+ Новый</a>
+                    </div>
+                    <div class="td-activity-body">
+                        {% if recent_files %}
+                            {% for file in recent_files %}
+                            <div class="td-activity-item">
+                                <div class="td-activity-item-icon td-activity-file">
+                                    📄
+                                </div>
+                                <div class="td-activity-item-content">
+                                    <div class="td-activity-item-title">{{ file.title|truncatechars:20 }}</div>
+                                    <div class="td-activity-item-meta">{{ file.student.first_name }} · {{ file.uploaded_at|date:"d.m" }}</div>
+                                </div>
+                                <a href="{{ file.file.url }}" class="td-activity-item-download" target="_blank">📥</a>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center py-3 mb-0">Нет файлов</p>
                         {% endif %}
                     </div>
                 </div>
@@ -195,6 +222,7 @@
         </div>
     </div>
 </div>
+
 {% else %}
 <div class="row justify-content-center">
     <div class="col-md-6">
@@ -210,4 +238,298 @@
     </div>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<style>
+/* ===== Дашборд преподавателя — тёмные карточки ===== */
+
+/* Статистика */
+.td-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 8rem;
+    padding: 1.2rem 1.5rem;
+    border-radius: 1rem;
+    border: 2px solid transparent;
+    background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+    transition: all 0.3s ease;
+    margin-bottom: 0;
+}
+
+.td-stat-card:hover {
+    transform: translateY(-0.3rem);
+}
+
+.td-stat-icon {
+    font-size: 1.8rem;
+}
+
+.td-stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #e2e8f0;
+}
+
+.td-stat-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.td-stat-blue { border-color: rgba(59, 130, 246, 0.3); }
+.td-stat-blue:hover { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
+.td-stat-indigo { border-color: rgba(99, 102, 241, 0.3); }
+.td-stat-indigo:hover { border-color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.15); }
+.td-stat-red { border-color: rgba(239, 68, 68, 0.3); }
+.td-stat-red:hover { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); }
+.td-stat-green { border-color: rgba(34, 197, 94, 0.3); }
+.td-stat-green:hover { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.15); }
+.td-stat-teal { border-color: rgba(20, 184, 166, 0.3); }
+.td-stat-teal:hover { border-color: #14b8a6; box-shadow: 0 0 20px rgba(20, 184, 166, 0.15); }
+
+/* Карточка ученика */
+.td-student-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 11rem;
+    padding: 1.2rem 1rem;
+    border-radius: 1rem;
+    border: 2px solid transparent;
+    background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+    transition: all 0.3s ease;
+}
+
+.td-student-card:hover {
+    border-color: #6366f1;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-0.3rem);
+}
+
+.td-student-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    background: #6366f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+}
+
+.td-student-name {
+    font-weight: 600;
+    color: #e2e8f0;
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.td-student-class {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.td-student-exams {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.td-exam-badge {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+    background: rgba(99, 102, 241, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 0.4rem;
+    white-space: nowrap;
+}
+
+.td-student-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+}
+
+.td-btn {
+    padding: 0.35rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.td-btn-primary {
+    background: #6366f1;
+    color: white;
+    border: none;
+}
+
+.td-btn-primary:hover {
+    background: #4f46e5;
+}
+
+.td-btn-outline {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.td-btn-outline:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+/* Активность */
+.td-activity-card {
+    background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+    border: 2px solid transparent;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.td-activity-card:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.td-activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-weight: 600;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+}
+
+.td-activity-link {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    font-weight: 400;
+}
+
+.td-activity-link:hover {
+    color: #818cf8;
+}
+
+.td-activity-body {
+    padding: 0.5rem;
+}
+
+.td-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem;
+    border-radius: 0.6rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s ease;
+}
+
+.td-activity-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.td-activity-item-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.td-activity-math {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.td-activity-physics {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.td-activity-file {
+    background: rgba(99, 102, 241, 0.15);
+}
+
+.td-activity-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.td-activity-item-title {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.td-activity-item-meta {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.td-activity-item-status {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.td-activity-status-done {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+.td-activity-status-wait {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.td-activity-status-new {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.td-activity-item-download {
+    font-size: 1rem;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.4);
+    transition: color 0.15s ease;
+}
+
+.td-activity-item-download:hover {
+    color: #818cf8;
+}
+
+@media (max-width: 576px) {
+    .td-stat-card {
+        min-width: 6rem;
+        padding: 1rem;
+    }
+    .td-stat-value {
+        font-size: 1.4rem;
+    }
+    .td-student-card {
+        width: 9rem;
+    }
+}
+</style>
 {% endblock %}
