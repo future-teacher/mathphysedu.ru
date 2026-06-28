@@ -223,11 +223,19 @@
                         ← Назад к списку заданий
                     </a>
                     
-                    {% if homework.status == 'checked' and homework.grade == '2' %}
-                    <a href="#" class="btn btn-warning" onclick="alert('Обратитесь к преподавателю для обсуждения ошибок');">
-                        💬 Нужна помощь
-                    </a>
-                    {% endif %}
+                    <div>
+                        {% if homework.status == 'checked' %}
+                        <a href="{% url 'toggle_homework_hidden' homework.id %}" class="btn btn-outline-secondary me-2">
+                            {% if homework.is_hidden %}👁️ Показать{% else %}🙈 Скрыть{% endif %}
+                        </a>
+                        {% endif %}
+                        
+                        {% if homework.status == 'checked' and homework.grade == '2' %}
+                        <a href="#" class="btn btn-warning" onclick="alert('Обратитесь к преподавателю для обсуждения ошибок');">
+                            💬 Нужна помощь
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
                 
             </div>

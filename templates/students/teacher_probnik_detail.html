@@ -16,6 +16,9 @@
                     <a href="{% url 'teacher_probnik_edit' probnik.id %}" class="btn btn-outline-light btn-sm">
                         ✏️ Редактировать
                     </a>
+                    <a href="{% url 'teacher_toggle_probnik_hidden' probnik.id %}" class="btn btn-outline-light btn-sm">
+                        {% if probnik.is_hidden %}👁️{% else %}🙈{% endif %}
+                    </a>
                     <a href="{% url 'teacher_probnik_delete' probnik.id %}" class="btn btn-outline-light btn-sm">
                         🗑️ Удалить
                     </a>

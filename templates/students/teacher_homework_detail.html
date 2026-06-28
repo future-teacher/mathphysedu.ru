@@ -275,6 +275,11 @@
                                 🗑️ Удалить это задание
                             </a>
                         </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'teacher_toggle_homework_hidden' homework.id %}" class="btn btn-outline-secondary">
+                                {% if homework.is_hidden %}👁️ Показать в списке{% else %}🙈 Скрыть из списка{% endif %}
+                            </a>
+                        </div>
                     </div>
                 </div>
                 

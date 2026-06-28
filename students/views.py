@@ -170,10 +170,11 @@ def homework_list(request):
     
     # Домашние задания в работе (assigned, in_progress)
     in_progress_homework = student.homework.filter(
-        status__in=['assigned', 'in_progress']
+        status__in=['assigned', 'in_progress'],
+        is_hidden=False
     )
     # Проверенные домашние задания
-    checked_homework = student.homework.filter(status='checked')
+    checked_homework = student.homework.filter(status='checked', is_hidden=False)
     
     if subject_filter != 'all':
         in_progress_homework = in_progress_homework.filter(subject=subject_filter)
@@ -256,9 +257,9 @@ def probnik_list(request):
     subject_filter = request.GET.get('subject', 'all')
     
     # Активные пробники (в работе)
-    active_probniks = student.probniks.filter(status='in_progress')
+    active_probniks = student.probniks.filter(status='in_progress', is_hidden=False)
     # Проверенные пробники
-    completed_probniks = student.probniks.filter(status='checked')
+    completed_probniks = student.probniks.filter(status='checked', is_hidden=False)
     
     if subject_filter != 'all':
         active_probniks = active_probniks.filter(subject=subject_filter)
@@ -267,8 +268,8 @@ def probnik_list(request):
     active_probniks = active_probniks.order_by('deadline')
     completed_probniks = completed_probniks.order_by('-assigned_date')
     
-    math_count = student.probniks.filter(subject='math').count()
-    physics_count = student.probniks.filter(subject='physics').count()
+    math_count = student.probniks.filter(subject='math', is_hidden=False).count()
+    physics_count = student.probniks.filter(subject='physics', is_hidden=False).count()
     
     return render(request, 'students/probnik_list.html', {
         'student': student,
@@ -458,6 +459,48 @@ def delete_probnik_file(request, file_id):
         messages.success(request, 'Файл успешно удален из базы данных и файловой системы')
     
     return redirect('probnik_detail', probnik_id=probnik_id)
+
+
+@login_required
+def toggle_homework_hidden(request, homework_id):
+    """Скрыть/показать домашнее задание (для ученика)"""
+    try:
+        student = request.user.student_profile
+    except Student.DoesNotExist:
+        messages.error(request, 'У вас нет доступа')
+        return redirect('login')
+    
+    homework = get_object_or_404(Homework, id=homework_id, student=student)
+    homework.is_hidden = not homework.is_hidden
+    homework.save()
+    
+    if homework.is_hidden:
+        messages.success(request, f'Задание "{homework.title}" скрыто из списка.')
+    else:
+        messages.success(request, f'Задание "{homework.title}" снова отображается в списке.')
+    
+    return redirect('homework_detail', homework_id=homework.id)
+
+
+@login_required
+def toggle_probnik_hidden(request, probnik_id):
+    """Скрыть/показать пробник (для ученика)"""
+    try:
+        student = request.user.student_profile
+    except Student.DoesNotExist:
+        messages.error(request, 'У вас нет доступа')
+        return redirect('login')
+    
+    probnik = get_object_or_404(Probnik, id=probnik_id, student=student)
+    probnik.is_hidden = not probnik.is_hidden
+    probnik.save()
+    
+    if probnik.is_hidden:
+        messages.success(request, f'Пробник "{probnik.title}" скрыт из списка.')
+    else:
+        messages.success(request, f'Пробник "{probnik.title}" снова отображается в списке.')
+    
+    return redirect('probnik_detail', probnik_id=probnik.id)
 
 
 @csrf_exempt

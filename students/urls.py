@@ -20,12 +20,14 @@ urlpatterns = [
     path('homework/', views.homework_list, name='homework_list'),
     path('homework/<int:homework_id>/', views.homework_detail, name='homework_detail'),
     path('homework/file/<int:file_id>/delete/', views.delete_homework_file, name='delete_homework_file'),
+    path('homework/<int:homework_id>/toggle-hidden/', views.toggle_homework_hidden, name='toggle_homework_hidden'),
     
     # Пробники для учеников
     path('probniks/', views.probnik_list, name='probnik_list'),
     path('probnik/<int:probnik_id>/', views.probnik_detail, name='probnik_detail'),
     path('probnik/<int:probnik_id>/delete/', views.delete_probnik, name='delete_probnik'),
     path('probnik/file/<int:file_id>/delete/', views.delete_probnik_file, name='delete_probnik_file'),
+    path('probnik/<int:probnik_id>/toggle-hidden/', views.toggle_probnik_hidden, name='toggle_probnik_hidden'),
     
     # Преподаватели - основное
     path('teacher/dashboard/', teacher_views.teacher_dashboard, name='teacher_dashboard'),
@@ -39,8 +41,10 @@ urlpatterns = [
     path('teacher/homework/create/', teacher_views.homework_create, name='teacher_homework_create'),
     path('teacher/homework/<int:homework_id>/', teacher_views.homework_detail, name='teacher_homework_detail'),
     path('teacher/homework/<int:homework_id>/delete/', teacher_views.homework_delete, name='teacher_homework_delete'),
-    path('teacher/homework/file/<int:file_id>/delete/', teacher_views.delete_teacher_homework_file, 
+    path('teacher/homework/file/<int:file_id>/delete/', teacher_views.delete_teacher_homework_file,
          name='teacher_delete_homework_file'),
+    path('teacher/homework/<int:homework_id>/toggle-hidden/', teacher_views.toggle_homework_hidden,
+         name='teacher_toggle_homework_hidden'),
     
     # Преподаватели - пробники
     path('teacher/probniks/', teacher_views.teacher_probnik_list, name='teacher_probnik_list'),
@@ -48,8 +52,10 @@ urlpatterns = [
     path('teacher/probnik/<int:probnik_id>/', teacher_views.teacher_probnik_detail, name='teacher_probnik_detail'),
     path('teacher/probnik/<int:probnik_id>/edit/', teacher_views.teacher_probnik_edit, name='teacher_probnik_edit'),
     path('teacher/probnik/<int:probnik_id>/delete/', teacher_views.teacher_probnik_delete, name='teacher_probnik_delete'),
-    path('teacher/probnik/file/<int:file_id>/delete/', teacher_views.delete_teacher_probnik_file, 
+    path('teacher/probnik/file/<int:file_id>/delete/', teacher_views.delete_teacher_probnik_file,
          name='teacher_delete_probnik_file'),
+    path('teacher/probnik/<int:probnik_id>/toggle-hidden/', teacher_views.toggle_probnik_hidden,
+         name='teacher_toggle_probnik_hidden'),
     
     # Преподаватели - учебные файлы
     path('teacher/files/create/', teacher_views.study_file_create, name='teacher_studyfile_create'),
