@@ -555,7 +555,7 @@ def notify_student_probnik_checked(probnik) -> bool:
 
 def notify_teacher_homework_submitted(homework) -> bool:
     """
-    Уведомляет преподавателя о том, что ученик отправил ДЗ на проверку.
+    Уведомляет преподавателя о том, что ученик загрузил/обновил файлы ДЗ.
 
     Args:
         homework: экземпляр модели Homework
@@ -568,7 +568,7 @@ def notify_teacher_homework_submitted(homework) -> bool:
     subject_display = homework.get_subject_display()
 
     text = (
-        f"👨‍🎓 <b>Ученик отправил ДЗ на проверку!</b>\n\n"
+        f"👨‍🎓 <b>Ученик добавил файлы к ДЗ!</b>\n\n"
         f"<b>Ученик:</b> {student.first_name} {student.last_name}\n"
         f"<b>Предмет:</b> {subject_display}\n"
         f"<b>Название:</b> {homework.title}\n"

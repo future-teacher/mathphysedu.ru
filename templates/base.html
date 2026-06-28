@@ -291,9 +291,6 @@
                 <a href="{% url 'study_materials' %}" {% if request.resolver_match.url_name == 'study_materials' %}class="active"{% endif %}>
                     <span class="icon">📁</span> Учебные материалы
                 </a>
-                <a href="{% url 'student_detail' %}" {% if request.resolver_match.url_name == 'student_detail' %}class="active"{% endif %}>
-                    <span class="icon">👤</span> Профиль
-                </a>
                 {% endwith %}
 
             {% elif user.teacher_profile %}
