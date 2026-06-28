@@ -301,9 +301,6 @@
                 <a href="{% url 'teacher_dashboard' %}" {% if request.resolver_match.url_name == 'teacher_dashboard' %}class="active"{% endif %}>
                     <span class="icon">🏠</span> Главная
                 </a>
-                <a href="{% url 'teacher_student_list' %}" {% if request.resolver_match.url_name == 'teacher_student_list' or request.resolver_match.url_name == 'teacher_student_detail' %}class="active"{% endif %}>
-                    <span class="icon">👥</span> Все ученики
-                </a>
                 <a href="{% url 'teacher_homework_list' %}" {% if request.resolver_match.url_name == 'teacher_homework_list' or request.resolver_match.url_name == 'teacher_homework_detail' or request.resolver_match.url_name == 'teacher_homework_create' %}class="active"{% endif %}>
                     <span class="icon">📝</span> Домашние задания
                 </a>

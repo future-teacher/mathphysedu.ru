@@ -9,7 +9,6 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center
                 {% if homework.status == 'checked' %}bg-success
-                {% elif homework.status == 'submitted' %}bg-warning
                 {% else %}bg-primary{% endif %} text-white">
                 <div>
                     <h4 class="mb-0">📝 {{ homework.title }}</h4>
@@ -47,19 +46,15 @@
                         </p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Статус:</strong> 
-                            <span class="badge 
+                        <p><strong>Статус:</strong>
+                            <span class="badge
                                 {% if homework.status == 'checked' %}bg-success
-                                {% elif homework.status == 'submitted' %}bg-warning
                                 {% elif homework.status == 'in_progress' %}bg-info
                                 {% else %}bg-secondary{% endif %} fs-6">
                                 {{ homework.get_status_display }}
                             </span>
                         </p>
                         <p><strong>Назначил:</strong> {{ homework.assigned_by }}</p>
-                        {% if homework.submitted_date %}
-                        <p><strong>Отправлено на проверку:</strong> {{ homework.submitted_date|date:"d.m.Y" }}</p>
-                        {% endif %}
                         {% if homework.checked_date %}
                         <p><strong>Проверено:</strong> {{ homework.checked_date|date:"d.m.Y" }}</p>
                         {% endif %}
@@ -142,13 +137,6 @@
                             </div>
                             {% endfor %}
                         </div>
-                        
-                        {% if homework.status == 'submitted' %}
-                        <div class="alert alert-info mt-3">
-                            <strong>⏳ Ожидает проверки</strong><br>
-                            Ученик отправил задание на проверку {{ homework.submitted_date|date:"d.m.Y" }}.
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
                 {% endif %}
@@ -200,8 +188,8 @@
                 </div>
                 {% endif %}
                 
-                <!-- Форма проверки (для заданий, отправленных на проверку) -->
-                {% if homework.status == 'submitted' or homework.status == 'in_progress' or homework.status == 'assigned' %}
+                <!-- Форма проверки (для заданий, которые ещё не проверены) -->
+                {% if homework.status != 'checked' %}
                 <div class="card mb-4 border-success">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0">✅ Проверить задание</h5>
@@ -212,8 +200,7 @@
                             
                             {% if not student_files %}
                             <div class="alert alert-warning">
-                                <strong>⚠️ Внимание!</strong> Ученик не загрузил файлы, но статус задания - "Отправлено на проверку". 
-                                Возможно, ученик удалил файлы после отправки. Вы можете всё равно проверить задание, поставив оценку и комментарий.
+                                <strong>⚠️ Внимание!</strong> Ученик не загрузил файлы. Вы можете проверить задание, поставив оценку и комментарий.
                             </div>
                             {% endif %}
                             
@@ -234,7 +221,7 @@
                             
                             <div class="mb-3">
                                 <label for="teacher_comment" class="form-label">Комментарий</label>
-                                <textarea class="form-control" id="teacher_comment" name="teacher_comment" 
+                                <textarea class="form-control" id="teacher_comment" name="teacher_comment"
                                         rows="4" placeholder="Напишите комментарий к работе...">{{ homework.teacher_comment|default:'' }}</textarea>
                                 <div class="form-text">Подробный разбор ошибок и рекомендации (необязательно)</div>
                             </div>

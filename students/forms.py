@@ -212,12 +212,11 @@ class ProbnikForm(forms.ModelForm):
     
     class Meta:
         model = Probnik
-        fields = ['student', 'title', 'subject', 'month', 'deadline', 'max_score', 'status', 'score', 'teacher_comment']
+        fields = ['student', 'title', 'subject', 'deadline', 'max_score', 'status', 'score', 'teacher_comment']
         widgets = {
             'student': forms.Select(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Название пробника'}),
             'subject': forms.Select(attrs={'class': 'form-control'}),
-            'month': forms.Select(attrs={'class': 'form-control'}),
             'deadline': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'max_score': forms.NumberInput(attrs={'class': 'form-control', 'value': 100}),
             'status': forms.Select(attrs={'class': 'form-control'}),
@@ -229,9 +228,6 @@ class ProbnikForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         self.fields['max_score'].required = False
-        self.fields['month'].required = False
-        self.fields['month'].label = 'Месяц аттестации'
-        self.fields['month'].empty_label = '-- Выберите месяц --'
         
         if not self.instance.pk:
             self.fields['deadline'].initial = timezone.now().date() + timezone.timedelta(days=7)

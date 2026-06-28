@@ -168,9 +168,9 @@ def homework_list(request):
     
     subject_filter = request.GET.get('subject', 'all')
     
-    # Домашние задания в работе (assigned, in_progress, submitted)
+    # Домашние задания в работе (assigned, in_progress)
     in_progress_homework = student.homework.filter(
-        status__in=['assigned', 'in_progress', 'submitted']
+        status__in=['assigned', 'in_progress']
     )
     # Проверенные домашние задания
     checked_homework = student.homework.filter(status='checked')
@@ -229,21 +229,10 @@ def homework_detail(request, homework_id):
                 homework.status = 'in_progress'
                 homework.save()
             
-            messages.success(request, 'Файлы успешно загружены!')
-            return redirect('homework_detail', homework_id=homework.id)
-        
-        elif 'submit_homework' in request.POST:
-            if homework.files.filter(file_type='student').exists():
-                homework.status = 'submitted'
-                homework.submitted_date = today
-                homework.save()
-                
-                # Отправляем уведомление преподавателю
-                notify_teacher_homework_submitted(homework)
-                
-                messages.success(request, '✅ Домашнее задание отправлено на проверку!')
-            else:
-                messages.warning(request, 'Сначала загрузите файлы с решением.')
+            # Отправляем уведомление преподавателю о загруженных файлах
+            notify_teacher_homework_submitted(homework)
+            
+            messages.success(request, 'Файлы успешно загружены! Преподаватель получил уведомление.')
             return redirect('homework_detail', homework_id=homework.id)
     
     return render(request, 'students/homework_detail.html', {
@@ -439,7 +428,7 @@ def delete_homework_file(request, file_id):
         # Проверяем, остались ли еще файлы ученика
         homework = file.homework
         if not homework.files.filter(file_type='student').exists():
-            if homework.status == 'in_progress' or homework.status == 'submitted':
+            if homework.status == 'in_progress':
                 homework.status = 'assigned'
                 homework.save()
         

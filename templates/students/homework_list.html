@@ -45,7 +45,7 @@
                 <a href="{% url 'homework_detail' hw.id %}" class="text-decoration-none">
                     <div class="card hw-card {% if hw.subject == 'math' %}hw-card-math{% else %}hw-card-physics{% endif %} {% if hw.is_overdue %}hw-card-overdue{% endif %}">
                         <!-- Индикатор статуса (верхняя точка) -->
-                        <div class="hw-status-dot {% if hw.status == 'submitted' %}hw-status-submitted{% elif hw.status == 'in_progress' %}hw-status-progress{% else %}hw-status-assigned{% endif %}"></div>
+                        <div class="hw-status-dot {% if hw.status == 'in_progress' %}hw-status-progress{% else %}hw-status-assigned{% endif %}"></div>
 
                         <!-- Иконка предмета -->
                         <div class="hw-icon">
@@ -68,9 +68,7 @@
                             </div>
                             {% endif %}
                             <div class="hw-meta-item">
-                                {% if hw.status == 'submitted' %}
-                                <span>⏳</span>
-                                {% elif hw.has_student_files %}
+                                {% if hw.has_student_files %}
                                 <span>✅</span>
                                 {% else %}
                                 <span>📄</span>
@@ -81,9 +79,8 @@
 
                         <!-- Прогресс-бар -->
                         <div class="hw-progress-bar">
-                            <div class="hw-progress-fill 
-                                {% if hw.status == 'submitted' %}hw-progress-submitted
-                                {% elif hw.has_student_files %}hw-progress-started
+                            <div class="hw-progress-fill
+                                {% if hw.has_student_files %}hw-progress-started
                                 {% else %}hw-progress-assigned{% endif %}">
                             </div>
                         </div>
@@ -267,14 +264,6 @@
     background: #60a5fa;
 }
 
-.hw-status-submitted {
-    background: #f59e0b;
-}
-
-.hw-card:hover .hw-status-submitted {
-    background: #fbbf24;
-}
-
 .hw-status-checked {
     background: #22c55e;
 }
@@ -441,11 +430,6 @@
 .hw-progress-started {
     width: 50%;
     background: #3b82f6;
-}
-
-.hw-progress-submitted {
-    width: 75%;
-    background: #f59e0b;
 }
 
 .hw-progress-checked {

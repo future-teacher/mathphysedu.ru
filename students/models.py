@@ -144,7 +144,6 @@ class Homework(models.Model):
     STATUS_CHOICES = [
         ('assigned', 'Назначено'),
         ('in_progress', 'В работе'),
-        ('submitted', 'Отправлено на проверку'),
         ('checked', 'Проверено'),
     ]
     
@@ -228,7 +227,6 @@ class Homework(models.Model):
         status_colors = {
             'assigned': 'secondary',
             'in_progress': 'info',
-            'submitted': 'warning',
             'checked': 'success',
         }
         return {
@@ -340,9 +338,6 @@ class Probnik(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        month_display = self.get_month_display() if self.month else ''
-        if month_display:
-            return f"{self.title} ({month_display}) - {self.student}"
         return f"{self.title} - {self.student}"
     
     def is_overdue(self):

@@ -242,8 +242,6 @@
                                                 <span class="badge bg-secondary">📋 Назначено</span>
                                             {% elif hw.status == 'in_progress' %}
                                                 <span class="badge bg-info">📝 В работе</span>
-                                            {% elif hw.status == 'submitted' %}
-                                                <span class="badge bg-warning">⏳ На проверке</span>
                                             {% else %}
                                                 <span class="badge bg-warning">⚠️ Не сдано</span>
                                             {% endif %}
@@ -355,8 +353,6 @@
                                                 <span class="badge bg-secondary">📋 Назначено</span>
                                             {% elif hw.status == 'in_progress' %}
                                                 <span class="badge bg-info">📝 В работе</span>
-                                            {% elif hw.status == 'submitted' %}
-                                                <span class="badge bg-warning">⏳ На проверке</span>
                                             {% else %}
                                                 <span class="badge bg-warning">⚠️ Не сдано</span>
                                             {% endif %}
@@ -429,7 +425,6 @@
                                 <thead>
                                     <tr>
                                         <th>Название</th>
-                                        <th>Месяц</th>
                                         <th>Дедлайн</th>
                                         <th>Статус</th>
                                         <th>Результат</th>
@@ -443,13 +438,6 @@
                                             <strong>{{ probnik.title|truncatechars:40 }}</strong>
                                             {% if probnik.status == 'checked' %}
                                                 <span class="badge bg-success ms-1" title="Проверено">✅</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if probnik.month %}
-                                                <span class="badge bg-secondary">{{ probnik.get_month_display|truncatechars:10 }}</span>
-                                            {% else %}
-                                                <span class="text-muted">-</span>
                                             {% endif %}
                                         </td>
                                         <td>
@@ -527,7 +515,6 @@
                                 <thead>
                                     <tr>
                                         <th>Название</th>
-                                        <th>Месяц</th>
                                         <th>Дедлайн</th>
                                         <th>Статус</th>
                                         <th>Результат</th>
@@ -541,13 +528,6 @@
                                             <strong>{{ probnik.title|truncatechars:40 }}</strong>
                                             {% if probnik.status == 'checked' %}
                                                 <span class="badge bg-success ms-1" title="Проверено">✅</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if probnik.month %}
-                                                <span class="badge bg-secondary">{{ probnik.get_month_display|truncatechars:10 }}</span>
-                                            {% else %}
-                                                <span class="text-muted">-</span>
                                             {% endif %}
                                         </td>
                                         <td>

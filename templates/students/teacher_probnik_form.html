@@ -66,25 +66,6 @@
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_month" class="form-label">Месяц аттестации</label>
-                                    <select name="month" id="id_month" class="form-control">
-                                        <option value="">-- Выберите месяц --</option>
-                                        <option value="september" {% if form.month.value == 'september' %}selected{% endif %}>Сентябрь</option>
-                                        <option value="october" {% if form.month.value == 'october' %}selected{% endif %}>Октябрь</option>
-                                        <option value="november" {% if form.month.value == 'november' %}selected{% endif %}>Ноябрь</option>
-                                        <option value="december" {% if form.month.value == 'december' %}selected{% endif %}>Декабрь</option>
-                                        <option value="january" {% if form.month.value == 'january' %}selected{% endif %}>Январь</option>
-                                        <option value="february" {% if form.month.value == 'february' %}selected{% endif %}>Февраль</option>
-                                        <option value="march" {% if form.month.value == 'march' %}selected{% endif %}>Март</option>
-                                        <option value="april" {% if form.month.value == 'april' %}selected{% endif %}>Апрель</option>
-                                        <option value="may" {% if form.month.value == 'may' %}selected{% endif %}>Май</option>
-                                    </select>
-                                    <div class="form-text">Выберите месяц для ежемесячной аттестации</div>
-                                    {% if form.month.errors %}
-                                    <div class="text-danger">{{ form.month.errors }}</div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 mb-3">
                                     <label for="id_status" class="form-label">Статус</label>
                                     <select name="status" id="id_status" class="form-control">
                                         <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>В работе</option>
@@ -219,39 +200,6 @@
             deadlineInput.value = formattedDate;
         }
         
-        const monthSelect = document.getElementById('id_month');
-        const titleInput = document.getElementById('id_title');
-        const subjectSelect = document.getElementById('id_subject');
-        
-        function updateTitle() {
-            if (monthSelect && titleInput && !titleInput.value) {
-                const selectedOption = monthSelect.options[monthSelect.selectedIndex];
-                if (selectedOption && selectedOption.value) {
-                    const monthText = selectedOption.text;
-                    const subjectText = subjectSelect.options[subjectSelect.selectedIndex]?.text || '';
-                    
-                    if (subjectText === 'Математика') {
-                        titleInput.value = `Аттестация по математике - ${monthText}`;
-                    } else if (subjectText === 'Физика') {
-                        titleInput.value = `Аттестация по физике - ${monthText}`;
-                    } else {
-                        titleInput.value = `Аттестация - ${monthText}`;
-                    }
-                }
-            }
-        }
-        
-        if (monthSelect) {
-            monthSelect.addEventListener('change', updateTitle);
-        }
-        
-        if (subjectSelect) {
-            subjectSelect.addEventListener('change', function() {
-                if (monthSelect && monthSelect.value) {
-                    updateTitle();
-                }
-            });
-        }
     });
 </script>
 

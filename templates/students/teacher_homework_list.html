@@ -50,9 +50,9 @@
                     {% if homework.status == 'checked' %}thw-card-checked{% endif %}">
 
                     <!-- Индикатор статуса -->
-                    <div class="thw-status-dot 
+                    <div class="thw-status-dot
                         {% if homework.status == 'checked' %}thw-status-checked
-                        {% elif homework.has_student_files %}thw-status-submitted
+                        {% elif homework.has_student_files %}thw-status-progress
                         {% elif homework.status == 'in_progress' %}thw-status-progress
                         {% else %}thw-status-assigned{% endif %}">
                     </div>
@@ -108,9 +108,9 @@
 
                     <!-- Прогресс-бар -->
                     <div class="thw-progress-bar">
-                        <div class="thw-progress-fill 
+                        <div class="thw-progress-fill
                             {% if homework.status == 'checked' %}thw-progress-checked
-                            {% elif homework.has_student_files %}thw-progress-submitted
+                            {% elif homework.has_student_files %}thw-progress-started
                             {% elif homework.status == 'in_progress' %}thw-progress-started
                             {% else %}thw-progress-assigned{% endif %}">
                         </div>
@@ -243,8 +243,6 @@
 .thw-status-assigned { background: #6b7280; }
 .thw-status-progress { background: #3b82f6; }
 .thw-card:hover .thw-status-progress { background: #60a5fa; }
-.thw-status-submitted { background: #f59e0b; }
-.thw-card:hover .thw-status-submitted { background: #fbbf24; }
 .thw-status-checked { background: #22c55e; }
 .thw-card:hover .thw-status-checked { background: #4ade80; }
 
@@ -374,7 +372,6 @@
 
 .thw-progress-assigned { width: 10%; background: #6b7280; }
 .thw-progress-started { width: 50%; background: #3b82f6; }
-.thw-progress-submitted { width: 75%; background: #f59e0b; }
 .thw-progress-checked { width: 100%; background: #22c55e; }
 
 /* Бейдж */

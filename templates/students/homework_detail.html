@@ -9,7 +9,6 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center
                 {% if homework.status == 'checked' %}bg-success
-                {% elif homework.status == 'submitted' %}bg-warning
                 {% else %}bg-primary{% endif %} text-white">
                 <div>
                     <h4 class="mb-0">📝 {{ homework.title }}</h4>
@@ -41,17 +40,13 @@
                     </div>
                     <div class="col-md-6">
                         <p><strong>Статус:</strong> 
-                            <span class="badge 
+                            <span class="badge
                                 {% if homework.status == 'checked' %}bg-success
-                                {% elif homework.status == 'submitted' %}bg-warning
                                 {% elif homework.status == 'in_progress' %}bg-info
                                 {% else %}bg-secondary{% endif %} fs-6">
                                 {{ homework.get_status_display }}
                             </span>
                         </p>
-                        {% if homework.submitted_date %}
-                        <p><strong>Отправлено:</strong> {{ homework.submitted_date|date:"d.m.Y" }}</p>
-                        {% endif %}
                         {% if homework.checked_date %}
                         <p><strong>Проверено:</strong> {{ homework.checked_date|date:"d.m.Y" }}</p>
                         {% endif %}
@@ -167,8 +162,8 @@
                                     <a href="{{ file.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
                                         📄 Скачать
                                     </a>
-                                    {% if homework.status != 'submitted' and homework.status != 'checked' %}
-                                    <form method="post" action="{% url 'delete_homework_file' file.id %}" 
+                                    {% if homework.status != 'checked' %}
+                                    <form method="post" action="{% url 'delete_homework_file' file.id %}"
                                           style="display: inline;" onsubmit="return confirm('Удалить этот файл? Это действие нельзя отменить.');">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить файл">
@@ -184,69 +179,40 @@
                 </div>
                 {% endif %}
                 
-                <!-- Форма загрузки и отправки (только если задание не проверено) -->
+                <!-- Форма загрузки файлов (только если задание не проверено) -->
                 {% if homework.status != 'checked' %}
                 <div class="card mb-4">
-                    <div class="card-header {% if homework.status == 'submitted' %}bg-warning{% else %}bg-primary{% endif %} text-white">
-                        <h5 class="mb-0">
-                            {% if homework.status == 'submitted' %}
-                                ⏳ Задание отправлено на проверку
-                            {% else %}
-                                📤 Загрузить решение
-                            {% endif %}
-                        </h5>
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">📤 Загрузить решение</h5>
                     </div>
                     <div class="card-body">
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             
-                            {% if homework.status == 'submitted' %}
-                                <div class="alert alert-info">
-                                    <strong>✅ Задание отправлено на проверку!</strong><br>
-                                    Преподаватель скоро проверит вашу работу.
-                                </div>
-                                
-                                {% if student_files %}
-                                <div class="alert alert-warning">
-                                    <strong>⚠️ Внимание!</strong><br>
-                                    После отправки на проверку нельзя добавлять или удалять файлы.
-                                    Если нужно изменить решение, обратитесь к преподавателю.
-                                </div>
-                                {% endif %}
-                                
-                            {% elif homework.status == 'assigned' or homework.status == 'in_progress' %}
-                                <div class="alert {% if homework.is_overdue %}alert-danger{% else %}alert-info{% endif %}">
-                                    <strong>Срок сдачи:</strong> 
-                                    {% if homework.deadline %}
-                                        {% if homework.is_overdue %}
-                                            Задание просрочено! Сдайте как можно скорее.
-                                        {% else %}
-                                            Осталось времени: <strong>{{ homework.deadline|timeuntil }}</strong>
-                                        {% endif %}
+                            <div class="alert {% if homework.is_overdue %}alert-danger{% else %}alert-info{% endif %}">
+                                <strong>Срок сдачи:</strong>
+                                {% if homework.deadline %}
+                                    {% if homework.is_overdue %}
+                                        Задание просрочено! Сдайте как можно скорее.
                                     {% else %}
-                                        Дедлайн не установлен. Сдайте задание в удобное время.
+                                        Осталось времени: <strong>{{ homework.deadline|timeuntil }}</strong>
                                     {% endif %}
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="student_files" class="form-label">Выберите файлы для загрузки:</label>
-                                    <input type="file" class="form-control" id="student_files" name="student_files" multiple>
-                                    <div class="form-text">Можно выбрать несколько файлов (PDF, DOC, DOCX, JPG, PNG)</div>
-                                </div>
-                                
-                                <div class="d-grid gap-2">
-                                    <button type="submit" name="upload_files" class="btn btn-primary">
-                                        📎 Загрузить файлы
-                                    </button>
-                                    
-                                    {% if student_files %}
-                                    <button type="submit" name="submit_homework" class="btn btn-success" 
-                                            onclick="return confirm('Отправить задание на проверку? После отправки вы не сможете редактировать файлы.');">
-                                        ✅ Отправить на проверку
-                                    </button>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
+                                {% else %}
+                                    Дедлайн не установлен. Сдайте задание в удобное время.
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="student_files" class="form-label">Выберите файлы для загрузки:</label>
+                                <input type="file" class="form-control" id="student_files" name="student_files" multiple>
+                                <div class="form-text">Можно выбрать несколько файлов (PDF, DOC, DOCX, JPG, PNG)</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" name="upload_files" class="btn btn-primary">
+                                    📎 Загрузить файлы
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

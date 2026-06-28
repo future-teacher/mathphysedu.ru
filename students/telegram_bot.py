@@ -143,8 +143,7 @@ WELCOME_MESSAGE = (
     "📌 <b>Как работать с домашними заданиями:</b>\n"
     "1. Получи уведомление о новом задании\n"
     "2. Зайди в личный кабинет на сайте и загрузи решение\n"
-    "3. Нажми <b>«Отправить на проверку»</b>\n"
-    "4. Жди результат — мы оповестим тебя в этом боте!\n\n"
+    "3. Жди результат — мы оповестим тебя в этом боте!\n\n"
     "🔗 <a href=\"{base_url}/students/dashboard/\">Перейти в личный кабинет</a>\n\n"
     "Успехов в учёбе! 🚀"
 )
@@ -456,15 +455,12 @@ def notify_student_new_probnik(probnik) -> bool:
     deadline_str = (
         probnik.deadline.strftime('%d.%m.%Y') if probnik.deadline else 'Не указан'
     )
-    month_display = probnik.get_month_display() if probnik.month else ''
 
     text = (
         f"📝 <b>Новый пробник!</b>\n\n"
         f"<b>Предмет:</b> {subject_display}\n"
         f"<b>Название:</b> {probnik.title}\n"
     )
-    if month_display:
-        text += f"<b>Месяц:</b> {month_display}\n"
     text += (
         f"<b>Дедлайн:</b> {deadline_str}\n"
         f"<b>Макс. балл:</b> {probnik.max_score}\n\n"

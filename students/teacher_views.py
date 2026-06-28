@@ -477,7 +477,6 @@ def teacher_probnik_create(request):
         if form.is_valid():
             probnik = form.save(commit=False)
             probnik.assigned_by = teacher
-            probnik.month = form.cleaned_data.get('month')
             probnik.save()
             
             files = request.FILES.getlist('files')
@@ -549,10 +548,6 @@ def teacher_probnik_list(request):
             status='in_progress',
             deadline__lt=today
         )
-    
-    month_filter = request.GET.get('month', 'all')
-    if month_filter != 'all' and month_filter:
-        probniks = probniks.filter(month=month_filter)
     
     paginator = Paginator(probniks, 50)
     page_number = request.GET.get('page')

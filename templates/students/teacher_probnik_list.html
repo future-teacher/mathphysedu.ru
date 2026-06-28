@@ -15,15 +15,15 @@
 
         <!-- Фильтры по предмету -->
         <div class="d-flex flex-wrap gap-2 mb-3">
-            <a href="?subject=all&status={{ status_filter }}&month={{ request.GET.month }}"
+            <a href="?subject=all&status={{ status_filter }}"
                class="btn {% if subject_filter == 'all' or not subject_filter %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
                 📋 Все предметы
             </a>
-            <a href="?subject=math&status={{ status_filter }}&month={{ request.GET.month }}"
+            <a href="?subject=math&status={{ status_filter }}"
                class="btn {% if subject_filter == 'math' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
                 🧮 Математика
             </a>
-            <a href="?subject=physics&status={{ status_filter }}&month={{ request.GET.month }}"
+            <a href="?subject=physics&status={{ status_filter }}"
                class="btn {% if subject_filter == 'physics' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
                 ⚡ Физика
             </a>
@@ -32,234 +32,98 @@
                     📌 Статус
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=all&month={{ request.GET.month }}">Все</a></li>
-                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=active&month={{ request.GET.month }}">В работе</a></li>
-                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=checked&month={{ request.GET.month }}">Проверенные</a></li>
-                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=overdue&month={{ request.GET.month }}">Просроченные</a></li>
+                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=all">Все</a></li>
+                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=active">В работе</a></li>
+                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=checked">Проверенные</a></li>
+                    <li><a class="dropdown-item" href="?subject={{ subject_filter }}&status=overdue">Просроченные</a></li>
                 </ul>
             </div>
         </div>
 
-        <!-- Фильтры по месяцу -->
-        <div class="d-flex flex-wrap gap-1 mb-4">
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=all"
-               class="btn btn-sm {% if request.GET.month == 'all' or not request.GET.month %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">
-                Все месяцы
-            </a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=september"
-               class="btn btn-sm {% if request.GET.month == 'september' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Сент</a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=october"
-               class="btn btn-sm {% if request.GET.month == 'october' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Окт</a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=november"
-               class="btn btn-sm {% if request.GET.month == 'november' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Нояб</a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=december"
-               class="btn btn-sm {% if request.GET.month == 'december' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Дек</a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=january"
-               class="btn btn-sm {% if request.GET.month == 'january' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Янв</a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=february"
-               class="btn btn-sm {% if request.GET.month == 'february' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Фев</a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=march"
-               class="btn btn-sm {% if request.GET.month == 'march' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Мар</a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=april"
-               class="btn btn-sm {% if request.GET.month == 'april' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Апр</a>
-            <a href="?subject={{ subject_filter }}&status={{ status_filter }}&month=may"
-               class="btn btn-sm {% if request.GET.month == 'may' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Май</a>
-        </div>
-
         {% if probniks %}
-        {% regroup probniks by month as month_list %}
+        <div class="d-flex flex-wrap gap-3 justify-content-start">
+            {% for probnik in probniks %}
+            <a href="{% url 'teacher_probnik_detail' probnik.id %}" class="text-decoration-none">
+                <div class="card tp-card
+                    {% if probnik.subject == 'math' %}tp-card-math{% else %}tp-card-physics{% endif %}
+                    {% if probnik.is_overdue %}tp-card-overdue{% endif %}
+                    {% if probnik.status == 'checked' %}tp-card-checked{% endif %}">
 
-        {% for month in month_list %}
-        {% if month.grouper %}
-        <div class="mb-5">
-            <h5 class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-secondary rounded-pill px-3 py-2">
-                    📅 
-                    {% if month.grouper == 'september' %}Сентябрь
-                    {% elif month.grouper == 'october' %}Октябрь
-                    {% elif month.grouper == 'november' %}Ноябрь
-                    {% elif month.grouper == 'december' %}Декабрь
-                    {% elif month.grouper == 'january' %}Январь
-                    {% elif month.grouper == 'february' %}Февраль
-                    {% elif month.grouper == 'march' %}Март
-                    {% elif month.grouper == 'april' %}Апрель
-                    {% elif month.grouper == 'may' %}Май
-                    {% else %}{{ month.grouper }}{% endif %}
-                </span>
-                <span class="badge bg-secondary rounded-pill">{{ month.list|length }}</span>
-            </h5>
+                    <!-- Индикатор статуса -->
+                    <div class="tp-status-dot
+                        {% if probnik.status == 'checked' %}tp-status-checked
+                        {% else %}tp-status-active{% endif %}">
+                    </div>
 
-            <div class="d-flex flex-wrap gap-3 justify-content-start">
-                {% for probnik in month.list %}
-                <a href="{% url 'teacher_probnik_detail' probnik.id %}" class="text-decoration-none">
-                    <div class="card tp-card 
-                        {% if probnik.subject == 'math' %}tp-card-math{% else %}tp-card-physics{% endif %}
-                        {% if probnik.is_overdue %}tp-card-overdue{% endif %}
-                        {% if probnik.status == 'checked' %}tp-card-checked{% endif %}">
-
-                        <!-- Индикатор статуса -->
-                        <div class="tp-status-dot 
-                            {% if probnik.status == 'checked' %}tp-status-checked
-                            {% else %}tp-status-active{% endif %}">
-                        </div>
-
-                        <!-- Иконка -->
-                        <div class="tp-icon">
-                            {% if probnik.subject == 'math' %}
-                            <span class="tp-icon-emoji">🧮</span>
-                            {% else %}
-                            <span class="tp-icon-emoji">⚡</span>
-                            {% endif %}
-                        </div>
-
-                        <!-- Ученик -->
-                        <div class="tp-student">{{ probnik.student.first_name }} {{ probnik.student.last_name }}</div>
-
-                        <!-- Название -->
-                        <div class="tp-title">{{ probnik.title|truncatechars:25 }}</div>
-
-                        <!-- Мета -->
-                        <div class="tp-meta">
-                            {% if probnik.deadline %}
-                            <div class="tp-meta-item {% if probnik.is_overdue %}tp-meta-danger{% endif %}">
-                                <span>📅</span>
-                                <span>{{ probnik.deadline|date:"d.m" }}</span>
-                            </div>
-                            {% endif %}
-                            <div class="tp-meta-item">
-                                {% if probnik.status == 'checked' %}
-                                <span>✅</span>
-                                <span>Проверен</span>
-                                {% elif probnik.has_student_files %}
-                                <span>✅</span>
-                                <span>Сдано</span>
-                                {% else %}
-                                <span>⚠️</span>
-                                <span>Не сдано</span>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Результат -->
-                        {% if probnik.status == 'checked' %}
-                        <div class="tp-result">
-                            <span class="tp-score">{{ probnik.score }}/{{ probnik.max_score }}</span>
-                            {% if probnik.grade %}
-                            <span class="tp-grade 
-                                {% if probnik.grade == '5' %}tp-grade-5
-                                {% elif probnik.grade == '4' %}tp-grade-4
-                                {% elif probnik.grade == '3' %}tp-grade-3
-                                {% else %}tp-grade-2{% endif %}">
-                                {{ probnik.grade }}
-                            </span>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-
-                        <!-- Прогресс-бар -->
-                        <div class="tp-progress-bar">
-                            <div class="tp-progress-fill 
-                                {% if probnik.status == 'checked' %}tp-progress-checked
-                                {% elif probnik.has_student_files %}tp-progress-started
-                                {% else %}tp-progress-assigned{% endif %}">
-                            </div>
-                        </div>
-
-                        {% if probnik.is_overdue %}
-                        <div class="tp-badge tp-badge-overdue">Просрочено</div>
+                    <!-- Иконка -->
+                    <div class="tp-icon">
+                        {% if probnik.subject == 'math' %}
+                        <span class="tp-icon-emoji">🧮</span>
+                        {% else %}
+                        <span class="tp-icon-emoji">⚡</span>
                         {% endif %}
                     </div>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-        {% endfor %}
 
-        <!-- Пробники без месяца -->
-        {% for month in month_list %}
-        {% if not month.grouper %}
-        <div class="mb-5">
-            <h5 class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-secondary rounded-pill px-3 py-2">📋 Другие</span>
-                <span class="badge bg-secondary rounded-pill">{{ month.list|length }}</span>
-            </h5>
+                    <!-- Ученик -->
+                    <div class="tp-student">{{ probnik.student.first_name }} {{ probnik.student.last_name }}</div>
 
-            <div class="d-flex flex-wrap gap-3 justify-content-start">
-                {% for probnik in month.list %}
-                <a href="{% url 'teacher_probnik_detail' probnik.id %}" class="text-decoration-none">
-                    <div class="card tp-card 
-                        {% if probnik.subject == 'math' %}tp-card-math{% else %}tp-card-physics{% endif %}
-                        {% if probnik.is_overdue %}tp-card-overdue{% endif %}
-                        {% if probnik.status == 'checked' %}tp-card-checked{% endif %}">
+                    <!-- Название -->
+                    <div class="tp-title">{{ probnik.title|truncatechars:25 }}</div>
 
-                        <div class="tp-status-dot 
-                            {% if probnik.status == 'checked' %}tp-status-checked
-                            {% else %}tp-status-active{% endif %}">
-                        </div>
-
-                        <div class="tp-icon">
-                            {% if probnik.subject == 'math' %}
-                            <span class="tp-icon-emoji">🧮</span>
-                            {% else %}
-                            <span class="tp-icon-emoji">⚡</span>
-                            {% endif %}
-                        </div>
-
-                        <div class="tp-student">{{ probnik.student.first_name }} {{ probnik.student.last_name }}</div>
-                        <div class="tp-title">{{ probnik.title|truncatechars:25 }}</div>
-
-                        <div class="tp-meta">
-                            {% if probnik.deadline %}
-                            <div class="tp-meta-item {% if probnik.is_overdue %}tp-meta-danger{% endif %}">
-                                <span>📅</span>
-                                <span>{{ probnik.deadline|date:"d.m" }}</span>
-                            </div>
-                            {% endif %}
-                            <div class="tp-meta-item">
-                                {% if probnik.status == 'checked' %}
-                                <span>✅</span><span>Проверен</span>
-                                {% elif probnik.has_student_files %}
-                                <span>✅</span><span>Сдано</span>
-                                {% else %}
-                                <span>⚠️</span><span>Не сдано</span>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        {% if probnik.status == 'checked' %}
-                        <div class="tp-result">
-                            <span class="tp-score">{{ probnik.score }}/{{ probnik.max_score }}</span>
-                            {% if probnik.grade %}
-                            <span class="tp-grade 
-                                {% if probnik.grade == '5' %}tp-grade-5
-                                {% elif probnik.grade == '4' %}tp-grade-4
-                                {% elif probnik.grade == '3' %}tp-grade-3
-                                {% else %}tp-grade-2{% endif %}">
-                                {{ probnik.grade }}
-                            </span>
-                            {% endif %}
+                    <!-- Мета -->
+                    <div class="tp-meta">
+                        {% if probnik.deadline %}
+                        <div class="tp-meta-item {% if probnik.is_overdue %}tp-meta-danger{% endif %}">
+                            <span>📅</span>
+                            <span>{{ probnik.deadline|date:"d.m" }}</span>
                         </div>
                         {% endif %}
-
-                        <div class="tp-progress-bar">
-                            <div class="tp-progress-fill 
-                                {% if probnik.status == 'checked' %}tp-progress-checked
-                                {% elif probnik.has_student_files %}tp-progress-started
-                                {% else %}tp-progress-assigned{% endif %}">
-                            </div>
+                        <div class="tp-meta-item">
+                            {% if probnik.status == 'checked' %}
+                            <span>✅</span>
+                            <span>Проверен</span>
+                            {% elif probnik.has_student_files %}
+                            <span>✅</span>
+                            <span>Сдано</span>
+                            {% else %}
+                            <span>⚠️</span>
+                            <span>Не сдано</span>
+                            {% endif %}
                         </div>
+                    </div>
 
-                        {% if probnik.is_overdue %}
-                        <div class="tp-badge tp-badge-overdue">Просрочено</div>
+                    <!-- Результат -->
+                    {% if probnik.status == 'checked' %}
+                    <div class="tp-result">
+                        <span class="tp-score">{{ probnik.score }}/{{ probnik.max_score }}</span>
+                        {% if probnik.grade %}
+                        <span class="tp-grade
+                            {% if probnik.grade == '5' %}tp-grade-5
+                            {% elif probnik.grade == '4' %}tp-grade-4
+                            {% elif probnik.grade == '3' %}tp-grade-3
+                            {% else %}tp-grade-2{% endif %}">
+                            {{ probnik.grade }}
+                        </span>
                         {% endif %}
                     </div>
-                </a>
-                {% endfor %}
-            </div>
+                    {% endif %}
+
+                    <!-- Прогресс-бар -->
+                    <div class="tp-progress-bar">
+                        <div class="tp-progress-fill
+                            {% if probnik.status == 'checked' %}tp-progress-checked
+                            {% elif probnik.has_student_files %}tp-progress-started
+                            {% else %}tp-progress-assigned{% endif %}">
+                        </div>
+                    </div>
+
+                    {% if probnik.is_overdue %}
+                    <div class="tp-badge tp-badge-overdue">Просрочено</div>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
         </div>
-        {% endif %}
-        {% endfor %}
 
         <!-- Пагинация -->
         {% if probniks.has_other_pages %}
@@ -267,17 +131,17 @@
             <ul class="pagination justify-content-center">
                 {% if probniks.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ probniks.previous_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}&month={{ request.GET.month }}">←</a>
+                    <a class="page-link" href="?page={{ probniks.previous_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}">←</a>
                 </li>
                 {% endif %}
                 {% for i in probniks.paginator.page_range %}
                 <li class="page-item {% if probniks.number == i %}active{% endif %}">
-                    <a class="page-link" href="?page={{ i }}&subject={{ subject_filter }}&status={{ status_filter }}&month={{ request.GET.month }}">{{ i }}</a>
+                    <a class="page-link" href="?page={{ i }}&subject={{ subject_filter }}&status={{ status_filter }}">{{ i }}</a>
                 </li>
                 {% endfor %}
                 {% if probniks.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ probniks.next_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}&month={{ request.GET.month }}">→</a>
+                    <a class="page-link" href="?page={{ probniks.next_page_number }}&subject={{ subject_filter }}&status={{ status_filter }}">→</a>
                 </li>
                 {% endif %}
             </ul>
