@@ -255,16 +255,10 @@
                 </div>
                 {% endif %}
                 
-                <div class="mt-4 d-flex justify-content-between">
+                <div class="mt-4">
                     <a href="{% url 'probnik_list' %}" class="btn btn-primary">
                         ← Назад к списку пробников
                     </a>
-                    
-                    {% if probnik.status == 'checked' %}
-                    <a href="{% url 'toggle_probnik_hidden' probnik.id %}" class="btn btn-outline-secondary">
-                        {% if probnik.is_hidden %}👁️ Показать{% else %}🙈 Скрыть{% endif %}
-                    </a>
-                    {% endif %}
                 </div>
                 
             </div>

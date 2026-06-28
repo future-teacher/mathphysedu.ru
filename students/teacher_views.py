@@ -362,15 +362,15 @@ def homework_list(request):
         return redirect('login')
     
     if request.user.is_staff or request.user.is_superuser:
-        homework_list = Homework.objects.filter(is_hidden=False).order_by('-assigned_date')
+        homework_list = Homework.objects.all().order_by('-assigned_date')
     else:
-        homework_list = Homework.objects.filter(assigned_by=teacher, is_hidden=False).order_by('-assigned_date')
+        homework_list = Homework.objects.filter(assigned_by=teacher).order_by('-assigned_date')
     
     subject_filter = request.GET.get('subject', 'all')
     if subject_filter != 'all':
         homework_list = homework_list.filter(subject=subject_filter)
     
-    status_filter = request.GET.get('status', 'all')
+    status_filter = request.GET.get('status', 'active')
     today = timezone.now().date()
     
     if status_filter == 'active':
@@ -529,15 +529,15 @@ def teacher_probnik_list(request):
         return redirect('login')
     
     if request.user.is_staff or request.user.is_superuser:
-        probniks = Probnik.objects.filter(is_hidden=False).order_by('-assigned_date')
+        probniks = Probnik.objects.all().order_by('-assigned_date')
     else:
-        probniks = Probnik.objects.filter(assigned_by=teacher, is_hidden=False).order_by('-assigned_date')
+        probniks = Probnik.objects.filter(assigned_by=teacher).order_by('-assigned_date')
     
     subject_filter = request.GET.get('subject', 'all')
     if subject_filter != 'all':
         probniks = probniks.filter(subject=subject_filter)
     
-    status_filter = request.GET.get('status', 'all')
+    status_filter = request.GET.get('status', 'active')
     today = timezone.now().date()
     if status_filter == 'active':
         probniks = probniks.filter(status='in_progress')
@@ -848,53 +848,3 @@ def teacher_profile_edit(request):
         'form': form,
         'title': 'Мой профиль',
     })
-
-
-@login_required
-@user_passes_test(is_teacher, login_url='/students/login/')
-def toggle_homework_hidden(request, homework_id):
-    """Скрыть/показать домашнее задание (для учителя)"""
-    teacher = get_teacher_or_admin(request.user)
-    if not teacher:
-        messages.error(request, 'У вас нет прав преподавателя')
-        return redirect('login')
-    
-    if request.user.is_staff or request.user.is_superuser:
-        homework = get_object_or_404(Homework, id=homework_id)
-    else:
-        homework = get_object_or_404(Homework, id=homework_id, assigned_by=teacher)
-    
-    homework.is_hidden = not homework.is_hidden
-    homework.save()
-    
-    if homework.is_hidden:
-        messages.success(request, f'Задание "{homework.title}" скрыто из списка.')
-    else:
-        messages.success(request, f'Задание "{homework.title}" снова отображается в списке.')
-    
-    return redirect('teacher_homework_detail', homework_id=homework.id)
-
-
-@login_required
-@user_passes_test(is_teacher, login_url='/students/login/')
-def toggle_probnik_hidden(request, probnik_id):
-    """Скрыть/показать пробник (для учителя)"""
-    teacher = get_teacher_or_admin(request.user)
-    if not teacher:
-        messages.error(request, 'У вас нет прав преподавателя')
-        return redirect('login')
-    
-    if request.user.is_staff or request.user.is_superuser:
-        probnik = get_object_or_404(Probnik, id=probnik_id)
-    else:
-        probnik = get_object_or_404(Probnik, id=probnik_id, assigned_by=teacher)
-    
-    probnik.is_hidden = not probnik.is_hidden
-    probnik.save()
-    
-    if probnik.is_hidden:
-        messages.success(request, f'Пробник "{probnik.title}" скрыт из списка.')
-    else:
-        messages.success(request, f'Пробник "{probnik.title}" снова отображается в списке.')
-    
-    return redirect('teacher_probnik_detail', probnik_id=probnik.id)
