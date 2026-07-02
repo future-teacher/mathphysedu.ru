@@ -99,10 +99,14 @@
                 <h4 class="mb-0">👋 Привет, {{ student.first_name }}!</h4>
             </div>
             <div class="card-body">
-                <p class="motivation-quote">
-                    «{{ student.first_name }}, в этом кабинете мы шаг за шагом идём к результату.
-                    Здесь всё, что помогает тебе видеть прогресс и уверенно двигаться дальше.»
-                </p>
+                <!-- Ссылка на Google таблицу -->
+                {% if student.google_sheet_url %}
+                <div class="mt-3 mb-4">
+                    <a href="{{ student.google_sheet_url }}" target="_blank" class="btn btn-success btn-lg w-100">
+                        📊 Открыть таблицу успеваемости
+                    </a>
+                </div>
+                {% endif %}
 
                 <!-- Напоминания о незакрытых заданиях -->
                 {% if math_homework or physics_homework or math_active_probniks or physics_active_probniks or math_overdue or physics_overdue %}

@@ -238,6 +238,22 @@
                     
                     <div class="card mb-4">
                         <div class="card-header bg-light">
+                            <h5 class="mb-0">📊 Google таблица</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="id_google_sheet_url" class="form-label">Ссылка на Google таблицу</label>
+                                {{ form.google_sheet_url }}
+                                <div class="form-text">Ссылка на Google таблицу с успеваемостью ученика (будет доступна ученику на главной странице)</div>
+                                {% if form.google_sheet_url.errors %}
+                                <div class="text-danger">{{ form.google_sheet_url.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
                             <h5 class="mb-0">📝 Дополнительно</h5>
                         </div>
                         <div class="card-body">

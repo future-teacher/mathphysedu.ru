@@ -74,6 +74,13 @@ class Student(models.Model):
     exam_date_ege_math = models.DateField(null=True, blank=True, verbose_name='Дата ЕГЭ по математике')
     exam_date_ege_physics = models.DateField(null=True, blank=True, verbose_name='Дата ЕГЭ по физике')
     
+    google_sheet_url = models.URLField(
+        max_length=500,
+        verbose_name='Ссылка на Google таблицу',
+        blank=True,
+        help_text='Ссылка на Google таблицу с успеваемостью ученика'
+    )
+    
     notes = models.TextField(verbose_name='Заметки', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
