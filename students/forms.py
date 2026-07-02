@@ -213,7 +213,7 @@ class ProbnikForm(forms.ModelForm):
     
     class Meta:
         model = Probnik
-        fields = ['student', 'title', 'subject', 'deadline', 'max_score', 'status', 'score', 'teacher_comment']
+        fields = ['student', 'title', 'subject', 'deadline', 'max_score', 'status', 'score', 'teacher_comment', 'is_hidden']
         widgets = {
             'student': forms.Select(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Название пробника'}),
@@ -223,6 +223,7 @@ class ProbnikForm(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-control'}),
             'score': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
             'teacher_comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Комментарий к работе'}),
+            'is_hidden': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
     
     def __init__(self, *args, **kwargs):

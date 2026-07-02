@@ -341,6 +341,12 @@ class Probnik(models.Model):
     )
     teacher_comment = models.TextField(verbose_name='Комментарий преподавателя', blank=True)
     
+    is_hidden = models.BooleanField(
+        default=False,
+        verbose_name='Скрыть от ученика',
+        help_text='Если включено, пробник не будет отображаться у ученика'
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

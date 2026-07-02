@@ -105,22 +105,26 @@ def dashboard(request):
     
     math_active_probniks = student.probniks.filter(
         subject='math',
-        status='in_progress'
+        status='in_progress',
+        is_hidden=False
     ).order_by('deadline')
     
     math_completed_probniks = student.probniks.filter(
         subject='math',
-        status='checked'
+        status='checked',
+        is_hidden=False
     ).order_by('-assigned_date')[:5]
     
     physics_active_probniks = student.probniks.filter(
         subject='physics',
-        status='in_progress'
+        status='in_progress',
+        is_hidden=False
     ).order_by('deadline')
     
     physics_completed_probniks = student.probniks.filter(
         subject='physics',
-        status='checked'
+        status='checked',
+        is_hidden=False
     ).order_by('-assigned_date')[:5]
     
     active_exams = []
@@ -256,9 +260,9 @@ def probnik_list(request):
     subject_filter = request.GET.get('subject', 'all')
     
     # Активные пробники (в работе)
-    active_probniks = student.probniks.filter(status='in_progress')
+    active_probniks = student.probniks.filter(status='in_progress', is_hidden=False)
     # Проверенные пробники
-    completed_probniks = student.probniks.filter(status='checked')
+    completed_probniks = student.probniks.filter(status='checked', is_hidden=False)
     
     if subject_filter != 'all':
         active_probniks = active_probniks.filter(subject=subject_filter)
@@ -267,8 +271,8 @@ def probnik_list(request):
     active_probniks = active_probniks.order_by('deadline')
     completed_probniks = completed_probniks.order_by('-assigned_date')
     
-    math_count = student.probniks.filter(subject='math').count()
-    physics_count = student.probniks.filter(subject='physics').count()
+    math_count = student.probniks.filter(subject='math', is_hidden=False).count()
+    physics_count = student.probniks.filter(subject='physics', is_hidden=False).count()
     
     return render(request, 'students/probnik_list.html', {
         'student': student,
@@ -290,7 +294,7 @@ def probnik_detail(request, probnik_id):
         messages.error(request, 'У вас нет доступа к пробникам')
         return redirect('login')
     
-    probnik = get_object_or_404(Probnik, id=probnik_id, student=student)
+    probnik = get_object_or_404(Probnik, id=probnik_id, student=student, is_hidden=False)
     
     teacher_files = probnik.files.filter(file_type='teacher')
     student_files = probnik.files.filter(file_type='student')
