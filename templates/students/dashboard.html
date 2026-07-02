@@ -173,6 +173,157 @@
                     </div>
                 </div>
                 {% endif %}
+                
+                <!-- Проверенные ДЗ и пробники (сворачиваемые блоки) -->
+                {% if math_checked_homework or physics_checked_homework or math_completed_probniks or physics_completed_probniks %}
+                <div class="mt-4">
+                    <h6 class="mb-3">✅ Проверенное</h6>
+                    
+                    {% if math_checked_homework %}
+                    <div class="mb-2">
+                        <button class="btn btn-outline-primary w-100 text-start d-flex justify-content-between align-items-center"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#checkedMathHomework"
+                                aria-expanded="false">
+                            <span>🧮 Проверенные ДЗ по математике</span>
+                            <span class="badge bg-primary rounded-pill">{{ math_checked_homework|length }}</span>
+                        </button>
+                        <div class="collapse mt-1" id="checkedMathHomework">
+                            <div class="list-group">
+                                {% for hw in math_checked_homework %}
+                                <a href="{% url 'homework_detail' hw.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ hw.title|truncatechars:30 }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ hw.assigned_date|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        {% if hw.grade %}
+                                        <span class="badge
+                                            {% if hw.grade == '5' %}bg-success
+                                            {% elif hw.grade == '4' %}bg-info
+                                            {% elif hw.grade == '3' %}bg-warning text-dark
+                                            {% elif hw.grade == '2' %}bg-danger
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ hw.get_grade_display }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if physics_checked_homework %}
+                    <div class="mb-2">
+                        <button class="btn btn-outline-danger w-100 text-start d-flex justify-content-between align-items-center"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#checkedPhysicsHomework"
+                                aria-expanded="false">
+                            <span>⚡ Проверенные ДЗ по физике</span>
+                            <span class="badge bg-danger rounded-pill">{{ physics_checked_homework|length }}</span>
+                        </button>
+                        <div class="collapse mt-1" id="checkedPhysicsHomework">
+                            <div class="list-group">
+                                {% for hw in physics_checked_homework %}
+                                <a href="{% url 'homework_detail' hw.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ hw.title|truncatechars:30 }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ hw.assigned_date|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        {% if hw.grade %}
+                                        <span class="badge
+                                            {% if hw.grade == '5' %}bg-success
+                                            {% elif hw.grade == '4' %}bg-info
+                                            {% elif hw.grade == '3' %}bg-warning text-dark
+                                            {% elif hw.grade == '2' %}bg-danger
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ hw.get_grade_display }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if math_completed_probniks %}
+                    <div class="mb-2">
+                        <button class="btn btn-outline-primary w-100 text-start d-flex justify-content-between align-items-center"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#checkedMathProbniks"
+                                aria-expanded="false">
+                            <span>🧮 Проверенные пробники по математике</span>
+                            <span class="badge bg-primary rounded-pill">{{ math_completed_probniks|length }}</span>
+                        </button>
+                        <div class="collapse mt-1" id="checkedMathProbniks">
+                            <div class="list-group">
+                                {% for probnik in math_completed_probniks %}
+                                <a href="{% url 'probnik_detail' probnik.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ probnik.title|truncatechars:30 }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ probnik.assigned_date|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-info">{{ probnik.score }}/{{ probnik.max_score }}</span>
+                                        {% if probnik.grade %}
+                                        <span class="badge
+                                            {% if probnik.grade == '5' %}bg-success
+                                            {% elif probnik.grade == '4' %}bg-info
+                                            {% elif probnik.grade == '3' %}bg-warning text-dark
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ probnik.grade }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if physics_completed_probniks %}
+                    <div class="mb-2">
+                        <button class="btn btn-outline-danger w-100 text-start d-flex justify-content-between align-items-center"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#checkedPhysicsProbniks"
+                                aria-expanded="false">
+                            <span>⚡ Проверенные пробники по физике</span>
+                            <span class="badge bg-danger rounded-pill">{{ physics_completed_probniks|length }}</span>
+                        </button>
+                        <div class="collapse mt-1" id="checkedPhysicsProbniks">
+                            <div class="list-group">
+                                {% for probnik in physics_completed_probniks %}
+                                <a href="{% url 'probnik_detail' probnik.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ probnik.title|truncatechars:30 }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ probnik.assigned_date|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-info">{{ probnik.score }}/{{ probnik.max_score }}</span>
+                                        {% if probnik.grade %}
+                                        <span class="badge
+                                            {% if probnik.grade == '5' %}bg-success
+                                            {% elif probnik.grade == '4' %}bg-info
+                                            {% elif probnik.grade == '3' %}bg-warning text-dark
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ probnik.grade }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
