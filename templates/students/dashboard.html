@@ -64,17 +64,17 @@
     }
 
     .card-math {
-        background-color: #0d6efd;
+        background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
         color: #fff;
     }
 
     .card-physics {
-        background-color: #dc3545;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
         color: #fff;
     }
 
     .card-overdue {
-        background-color: #212529;
+        background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
         color: #fff;
     }
 
@@ -82,10 +82,93 @@
         transform: scale(1.05);
         z-index: 1;
         color: #fff;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
     .reminder-cards:hover > .reminder-card:not(:hover) {
         filter: blur(3px);
+    }
+
+    /* Трекер экзаменов */
+    .exam-timer-card {
+        background: linear-gradient(145deg, #1a1a2e 0%, #2a2a4e 100%);
+        border: 2px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .exam-timer-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+        animation: pulse-rotate 10s linear infinite;
+    }
+
+    @keyframes pulse-rotate {
+        0% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(180deg) scale(1.2); }
+        100% { transform: rotate(360deg) scale(1); }
+    }
+
+    .exam-timer-number {
+        font-size: 5rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        position: relative;
+        z-index: 1;
+    }
+
+    .exam-timer-label {
+        position: relative;
+        z-index: 1;
+        color: rgba(255,255,255,0.7);
+    }
+
+    /* Достижения */
+    .achievement-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        margin: 0.25rem;
+        background: rgba(255,215,0,0.15);
+        border: 1px solid rgba(255,215,0,0.3);
+        border-radius: 50px;
+        color: #ffd700;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .achievement-badge:hover {
+        background: rgba(255,215,0,0.25);
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255,215,0,0.2);
+    }
+
+    /* Прогресс-бары */
+    .progress-glass {
+        background: rgba(255,255,255,0.1);
+        border-radius: 50px;
+        height: 25px;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+    }
+
+    .progress-glass .progress-bar {
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        line-height: 25px;
+        transition: width 1s ease;
     }
 </style>
 {% endblock %}
@@ -99,7 +182,83 @@
                 <h4 class="mb-0">👋 Привет, {{ student.first_name }}!</h4>
             </div>
             <div class="card-body">
-                <!-- Ссылка на Google таблицу -->
+                
+                <!-- ===== ТРЕКЕР ЭКЗАМЕНОВ ===== -->
+                {% if active_exams %}
+                <div class="exam-timer-card mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8 text-center text-md-start">
+                            <h5 class="exam-timer-label">⏳ До экзамена осталось:</h5>
+                            <div class="exam-timer-number">{{ active_exams.0.days_left }}</div>
+                            <div class="exam-timer-label fs-4">{{ active_exams.0.name }}</div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <span class="badge {% if active_exams.0.is_near %}bg-danger{% else %}bg-light text-dark{% endif %} px-4 py-3 fs-5">
+                                📅 {{ active_exams.0.date|date:"d E Y" }}
+                            </span>
+                            {% if active_exams|length > 1 %}
+                            <div class="mt-2">
+                                <span class="badge bg-secondary">+ еще {{ active_exams|length|add:"-1" }} экзамена</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== ДОСТИЖЕНИЯ ===== -->
+                {% if achievements %}
+                <div class="mb-4">
+                    <h6 class="mb-2">🏆 Ваши достижения:</h6>
+                    <div>
+                        {% for achievement in achievements %}
+                        <span class="achievement-badge">🎯 {{ achievement }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== ПРОГРЕСС ПО ПРЕДМЕТАМ ===== -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-dark text-white h-100">
+                            <div class="card-body">
+                                <h6>🧮 Математика</h6>
+                                <div class="progress progress-glass">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info"
+                                         role="progressbar"
+                                         style="width: {{ math_progress }}%;"
+                                         aria-valuenow="{{ math_progress }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ math_progress }}%
+                                    </div>
+                                </div>
+                                <small class="text-muted mt-1 d-block">
+                                    {{ math_completed }} из {{ math_total }} заданий выполнено
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-dark text-white h-100">
+                            <div class="card-body">
+                                <h6>⚡ Физика</h6>
+                                <div class="progress progress-glass">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
+                                         role="progressbar"
+                                         style="width: {{ physics_progress }}%;"
+                                         aria-valuenow="{{ physics_progress }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ physics_progress }}%
+                                    </div>
+                                </div>
+                                <small class="text-muted mt-1 d-block">
+                                    {{ physics_completed }} из {{ physics_total }} заданий выполнено
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ССЫЛКА НА GOOGLE ТАБЛИЦУ ===== -->
                 {% if student.google_sheet_url %}
                 <div class="mt-3 mb-4">
                     <a href="{{ student.google_sheet_url }}" target="_blank" class="btn btn-success btn-lg w-100">
@@ -108,7 +267,7 @@
                 </div>
                 {% endif %}
 
-                <!-- Напоминания о незакрытых заданиях -->
+                <!-- ===== НАПОМИНАНИЯ ===== -->
                 {% if math_homework or physics_homework or math_active_probniks or physics_active_probniks or math_overdue or physics_overdue %}
                 <div class="mt-3">
                     <h6 class="mb-3">📋 На сегодня:</h6>
@@ -174,7 +333,7 @@
                 </div>
                 {% endif %}
                 
-                <!-- Проверенные ДЗ и пробники (сворачиваемые блоки) -->
+                <!-- ===== ПРОВЕРЕННЫЕ РАБОТЫ ===== -->
                 {% if math_checked_homework or physics_checked_homework or math_completed_probniks or physics_completed_probniks %}
                 <div class="mt-4">
                     <h6 class="mb-3">✅ Проверенное</h6>

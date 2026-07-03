@@ -1,15 +1,84 @@
 /* ===== Общие стили ===== */
+:root {
+    --math-color: #00d2ff;
+    --physics-color: #ff6b6b;
+    --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --warning-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --sidebar-width: 250px;
+    --sidebar-bg: #1a1d23;
+    --sidebar-hover: #2a2d35;
+    --sidebar-active: #0d6efd;
+    --sidebar-text: #a0a4b0;
+    --sidebar-text-active: #ffffff;
+}
+
 body {
     background-color: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding-bottom: 20px;
 }
 
+/* Карточки */
+.card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: var(--accent-gradient) !important;
+    color: white;
+    border-radius: 20px 20px 0 0 !important;
+    border: none;
+    padding: 15px 20px;
+}
+
+.card-header.bg-success {
+    background: var(--success-gradient) !important;
+}
+
+.card-header.bg-warning {
+    background: var(--warning-gradient) !important;
+    color: #fff !important;
+}
+
+.card-header.bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.card-header.bg-danger {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+.card-header.bg-info {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+.card-header h4, .card-header h5 {
+    margin-bottom: 0;
+}
+
+.card-body {
+    padding: 20px;
+}
+
 /* Навбар */
 .navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--accent-gradient);
     padding: 0.5rem 1rem;
 }
+
 .navbar-brand {
     font-weight: bold;
     color: white !important;
@@ -20,6 +89,7 @@ body {
     padding: 0.5rem 1rem !important;
     border-radius: 5px;
 }
+
 .navbar-nav .nav-link:hover {
     background-color: rgba(255,255,255,0.1);
 }
@@ -31,45 +101,62 @@ body {
     padding: 0.5rem 1rem;
     cursor: pointer;
 }
+
 .logout-btn:hover {
     background-color: rgba(255,255,255,0.1);
     border-radius: 5px;
 }
 
-/* Карточки */
-.card {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-}
-.card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 15px 15px 0 0 !important;
-    border: none;
-    padding: 15px 20px;
-}
-.card-header h4, .card-header h5 {
-    margin-bottom: 0;
-}
-.card-body {
-    padding: 20px;
-}
-
 /* Кнопки */
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--accent-gradient);
     border: none;
 }
+
 .btn-primary:hover {
     background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: scale(1.02);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+    background: var(--success-gradient);
+    border: none;
+}
+
+.btn-success:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+}
+
+.btn-warning {
+    background: var(--warning-gradient);
+    border: none;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
+    color: #fff;
+}
+
+/* Badges */
+.badge-math {
+    background: var(--math-color);
+    color: #000;
+}
+
+.badge-physics {
+    background: var(--physics-color);
+    color: #fff;
 }
 
 /* Таблицы */
 .table {
     margin-bottom: 0;
 }
+
 .table th {
     border-top: none;
     background-color: #f8f9fa;
@@ -98,7 +185,7 @@ footer {
 }
 
 .offcanvas-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--accent-gradient);
     color: white;
 }
 
@@ -114,7 +201,7 @@ footer {
 .avatar-circle {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--accent-gradient);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -273,6 +360,67 @@ footer {
 .student-card .card-actions .btn-card-outline:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ===== Быстрые действия (Quick Actions) ===== */
+.quick-action-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+}
+
+.quick-action-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+}
+
+.quick-action-card .card-body {
+    padding: 1.5rem 1rem;
+}
+
+.quick-action-card .display-4 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+}
+
+/* ===== Градиентные карточки для дашборда ===== */
+.bg-gradient-dark {
+    background: linear-gradient(145deg, #1e1e2e 0%, #2a2a3e 100%);
+}
+
+.bg-gradient-success {
+    background: var(--success-gradient);
+}
+
+.bg-gradient-warning {
+    background: var(--warning-gradient);
+}
+
+/* ===== Анимация загрузки ===== */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.shimmer-loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* ===== Трекер экзаменов ===== */
+.exam-timer {
+    font-size: 4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* ===== Адаптивность ===== */

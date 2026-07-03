@@ -100,6 +100,31 @@ def teacher_dashboard(request):
         uploaded_by=teacher
     ).order_by('-uploaded_at')[:5]
     
+    # Подсчет непроверенных работ для бейджа "Срочно!"
+    unchecked_homework = Homework.objects.filter(
+        assigned_by=teacher,
+        status__in=['assigned', 'in_progress']
+    ).count()
+    
+    unchecked_probniks = Probnik.objects.filter(
+        assigned_by=teacher,
+        status='in_progress'
+    ).count()
+    
+    # Получаем список учеников с просроченными заданиями для быстрого доступа
+    students_with_overdue = []
+    for student in teacher.students.all():
+        overdue_count = student.homework.filter(
+            deadline__lt=today,
+            status__in=['assigned', 'in_progress']
+        ).count()
+        if overdue_count > 0:
+            students_with_overdue.append({
+                'student': student,
+                'overdue_count': overdue_count
+            })
+    students_with_overdue = sorted(students_with_overdue, key=lambda x: -x['overdue_count'])[:5]
+    
     context = {
         'teacher': teacher,
         'total_students': total_students,
@@ -112,6 +137,9 @@ def teacher_dashboard(request):
         'recent_homework': recent_homework,
         'recent_probniks': recent_probniks,
         'recent_files': recent_files,
+        'unchecked_homework': unchecked_homework,
+        'unchecked_probniks': unchecked_probniks,
+        'students_with_overdue': students_with_overdue,
     }
     
     return render(request, 'students/teacher_dashboard.html', context)
@@ -193,7 +221,7 @@ def student_create(request):
                 }
             
             student.save()
-            messages.success(request, f'Ученик {student} успешно создан!')
+            messages.success(request, f'🎉 Ученик {student} успешно создан!')
             
             credentials = request.session.get('new_student_credentials')
             if credentials:
@@ -279,7 +307,7 @@ def student_edit(request, student_id):
         form = StudentForm(request.POST, instance=student, teacher=teacher)
         if form.is_valid():
             form.save()
-            messages.success(request, f'Данные ученика {student} обновлены!')
+            messages.success(request, f'✅ Данные ученика {student} обновлены!')
             return redirect('teacher_student_detail', student_id=student.id)
     else:
         form = StudentForm(instance=student, teacher=teacher)
@@ -334,7 +362,7 @@ def homework_create(request):
                     f'Уведомление не будет отправлено.'
                 )
             
-            messages.success(request, f'Задание "{homework.title}" создано!')
+            messages.success(request, f'🚀 Задание "{homework.title}" создано!')
             return redirect('teacher_dashboard')
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
@@ -345,10 +373,21 @@ def homework_create(request):
         else:
             form.fields['student'].queryset = Student.objects.all()
     
+    # Передаем списки учеников по предметам для динамической фильтрации
+    if hasattr(request.user, 'teacher_profile'):
+        all_students = request.user.teacher_profile.students.all()
+    else:
+        all_students = Student.objects.all()
+    
+    math_students = [s for s in all_students if s.has_math]
+    physics_students = [s for s in all_students if s.has_physics]
+    
     return render(request, 'students/teacher_homework_form.html', {
         'teacher': teacher,
         'form': form,
         'title': 'Добавить домашнее задание',
+        'math_students': math_students,
+        'physics_students': physics_students,
     })
 
 
@@ -429,7 +468,7 @@ def homework_detail(request, homework_id):
                     uploaded_by=request.user,
                     description=f"Дополнительный материал от {timezone.now().strftime('%d.%m.%Y')}"
                 )
-            messages.success(request, 'Файл добавлен!')
+            messages.success(request, '📎 Файл добавлен!')
             return redirect('teacher_homework_detail', homework_id=homework.id)
         
         elif 'check_homework' in request.POST:
@@ -450,7 +489,7 @@ def homework_detail(request, homework_id):
             notify_student_homework_checked(homework)
             
             grade_display = dict(homework._meta.get_field('grade').choices).get(homework.grade, '—')
-            messages.success(request, f'✅ Домашнее задание проверено! Оценка: {grade_display}')
+            messages.success(request, f'🎯 Домашнее задание проверено! Оценка: {grade_display}')
             
             return redirect('teacher_homework_detail', homework_id=homework.id)
     
@@ -501,7 +540,7 @@ def teacher_probnik_create(request):
                     f'Уведомление не будет отправлено.'
                 )
             
-            messages.success(request, f'Пробник "{probnik.title}" успешно создан!')
+            messages.success(request, f'🎯 Пробник "{probnik.title}" успешно создан!')
             return redirect('teacher_probnik_list')
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
@@ -512,10 +551,21 @@ def teacher_probnik_create(request):
         else:
             form.fields['student'].queryset = Student.objects.all()
     
+    # Передаем списки учеников по предметам для динамической фильтрации
+    if hasattr(request.user, 'teacher_profile'):
+        all_students = request.user.teacher_profile.students.all()
+    else:
+        all_students = Student.objects.all()
+    
+    math_students = [s for s in all_students if s.has_math]
+    physics_students = [s for s in all_students if s.has_physics]
+    
     return render(request, 'students/teacher_probnik_form.html', {
         'teacher': teacher,
         'form': form,
         'title': 'Создать пробник',
+        'math_students': math_students,
+        'physics_students': physics_students,
     })
 
 
@@ -586,12 +636,12 @@ def teacher_probnik_detail(request, probnik_id):
             grade = request.POST.get('grade')
             teacher_comment = request.POST.get('teacher_comment')
             
-            if score:
-                probnik.score = int(score) if score else None
+            if score or score == '0':
+                probnik.score = int(score)
             
             if grade:
                 probnik.grade = grade
-            elif probnik.score:
+            elif probnik.score is not None:
                 probnik.grade = probnik.get_grade_from_score()
             
             probnik.teacher_comment = teacher_comment
@@ -604,7 +654,7 @@ def teacher_probnik_detail(request, probnik_id):
             grade_display = dict(probnik._meta.get_field('grade').choices).get(probnik.grade, '—')
             messages.success(
                 request,
-                f'✅ Пробник проверен! Оценка: {grade_display}, Баллы: {probnik.score}/{probnik.max_score}'
+                f'🎯 Пробник проверен! Оценка: {grade_display}, Баллы: {probnik.score}/{probnik.max_score}'
             )
             
             return redirect('teacher_probnik_detail', probnik_id=probnik.id)
@@ -620,7 +670,7 @@ def teacher_probnik_detail(request, probnik_id):
                         uploaded_by=request.user,
                         description=f"Дополнительные материалы: {uploaded_file.name}"
                     )
-                messages.success(request, f'Добавлено файлов: {len(files)}')
+                messages.success(request, f'📎 Добавлено файлов: {len(files)}')
             else:
                 messages.warning(request, 'Выберите файлы для загрузки')
             return redirect('teacher_probnik_detail', probnik_id=probnik.id)
@@ -655,18 +705,29 @@ def teacher_probnik_edit(request, probnik_id):
         form = ProbnikForm(request.POST, instance=probnik)
         if form.is_valid():
             form.save()
-            messages.success(request, f'Пробник "{probnik.title}" обновлен!')
+            messages.success(request, f'✅ Пробник "{probnik.title}" обновлен!')
             return redirect('teacher_probnik_detail', probnik_id=probnik.id)
     else:
         form = ProbnikForm(instance=probnik)
         if hasattr(request.user, 'teacher_profile'):
             form.fields['student'].queryset = request.user.teacher_profile.students.all()
     
+    # Передаем списки учеников по предметам для динамической фильтрации
+    if hasattr(request.user, 'teacher_profile'):
+        all_students = request.user.teacher_profile.students.all()
+    else:
+        all_students = Student.objects.all()
+    
+    math_students = [s for s in all_students if s.has_math]
+    physics_students = [s for s in all_students if s.has_physics]
+    
     return render(request, 'students/teacher_probnik_form.html', {
         'teacher': teacher,
         'form': form,
         'probnik': probnik,
         'title': 'Редактировать пробник',
+        'math_students': math_students,
+        'physics_students': physics_students,
     })
 
 
@@ -688,7 +749,7 @@ def teacher_probnik_delete(request, probnik_id):
         probnik_title = probnik.title
         student_name = str(probnik.student)
         probnik.delete()  # Сигнал pre_delete удалит все связанные файлы
-        messages.success(request, f'Пробник "{probnik_title}" для ученика {student_name} и все связанные файлы успешно удалены!')
+        messages.success(request, f'🗑️ Пробник "{probnik_title}" для ученика {student_name} и все связанные файлы успешно удалены!')
         return redirect('teacher_probnik_list')
     
     return render(request, 'students/teacher_probnik_confirm_delete.html', {
@@ -712,7 +773,7 @@ def study_file_create(request):
             study_file = form.save(commit=False)
             study_file.uploaded_by = teacher
             study_file.save()
-            messages.success(request, f'Файл "{study_file.title}" загружен!')
+            messages.success(request, f'📁 Файл "{study_file.title}" загружен!')
             return redirect('teacher_student_detail', student_id=study_file.student.id)
     else:
         form = StudyFileForm()
@@ -745,7 +806,7 @@ def homework_delete(request, homework_id):
     if request.method == 'POST':
         homework_title = homework.title
         homework.delete()  # Сигнал pre_delete удалит все связанные файлы
-        messages.success(request, f'Задание "{homework_title}" и все связанные файлы удалены!')
+        messages.success(request, f'🗑️ Задание "{homework_title}" и все связанные файлы удалены!')
         return redirect('teacher_homework_list')
     
     return render(request, 'students/teacher_homework_delete.html', {
@@ -772,7 +833,7 @@ def delete_teacher_homework_file(request, file_id):
     
     if request.method == 'POST':
         file.delete()  # Сигнал post_delete удалит файл из файловой системы
-        messages.success(request, 'Файл успешно удален из базы данных и файловой системы')
+        messages.success(request, '🗑️ Файл успешно удален из базы данных и файловой системы')
     
     return redirect('teacher_homework_detail', homework_id=homework_id)
 
@@ -795,7 +856,7 @@ def delete_teacher_probnik_file(request, file_id):
     
     if request.method == 'POST':
         file.delete()  # Сигнал post_delete удалит файл из файловой системы
-        messages.success(request, 'Файл удален из базы данных и файловой системы')
+        messages.success(request, '🗑️ Файл удален из базы данных и файловой системы')
     
     return redirect('teacher_probnik_detail', probnik_id=probnik_id)
 
@@ -818,7 +879,7 @@ def delete_study_file(request, file_id):
     
     if request.method == 'POST':
         file.delete()  # Сигнал post_delete удалит файл из файловой системы
-        messages.success(request, f'Файл "{file.title}" успешно удален из базы данных и файловой системы')
+        messages.success(request, f'🗑️ Файл "{file.title}" успешно удален из базы данных и файловой системы')
     
     return redirect('teacher_student_detail', student_id=student_id)
 

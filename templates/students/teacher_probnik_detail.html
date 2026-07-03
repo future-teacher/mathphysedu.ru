@@ -183,8 +183,7 @@
                                 <strong>ℹ️ После проверки:</strong> Статус изменится на "Проверен", и ученик увидит результаты.
                             </div>
                             
-                            <button type="submit" name="check_probnik" class="btn btn-primary btn-lg" 
-                                    {% if not student_files %}disabled{% endif %}>
+                            <button type="submit" name="check_probnik" class="btn btn-primary btn-lg">
                                 ✅ Завершить проверку
                             </button>
                         </form>
@@ -193,6 +192,7 @@
                 {% endif %}
                 
                 {% if probnik.status == 'checked' %}
+                {% with percentage=probnik.get_percentage %}
                 <div class="card mb-4 border-success">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0">📊 Результаты проверки</h5>
@@ -206,11 +206,11 @@
                                     </div>
                                     <div class="fs-3 text-success">/{{ probnik.max_score }}</div>
                                 </div>
-                                <h2 class="d-none d-md-block {% if probnik.get_percentage >= 80 %}text-success{% elif probnik.get_percentage >= 60 %}text-info{% elif probnik.get_percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
-                                    {{ probnik.get_percentage }}%
+                                <h2 class="d-none d-md-block {% if percentage >= 80 %}text-success{% elif percentage >= 60 %}text-info{% elif percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ percentage }}%
                                 </h2>
-                                <h4 class="d-block d-md-none {% if probnik.get_percentage >= 80 %}text-success{% elif probnik.get_percentage >= 60 %}text-info{% elif probnik.get_percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
-                                    {{ probnik.get_percentage }}%
+                                <h4 class="d-block d-md-none {% if percentage >= 80 %}text-success{% elif percentage >= 60 %}text-info{% elif percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ percentage }}%
                                 </h4>
                                 {% if probnik.grade %}
                                 <div class="mt-2">
@@ -247,6 +247,7 @@
                         </div>
                     </div>
                 </div>
+                {% endwith %}
                 {% endif %}
                 
                 <div class="card mb-4">

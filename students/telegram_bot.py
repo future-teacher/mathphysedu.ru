@@ -455,12 +455,15 @@ def notify_student_new_probnik(probnik) -> bool:
     deadline_str = (
         probnik.deadline.strftime('%d.%m.%Y') if probnik.deadline else 'Не указан'
     )
+    month_display = probnik.get_month_display() if probnik.month else None
 
     text = (
         f"📝 <b>Новый пробник!</b>\n\n"
         f"<b>Предмет:</b> {subject_display}\n"
         f"<b>Название:</b> {probnik.title}\n"
     )
+    if month_display:
+        text += f"<b>Месяц:</b> {month_display}\n"
     text += (
         f"<b>Дедлайн:</b> {deadline_str}\n"
         f"<b>Макс. балл:</b> {probnik.max_score}\n\n"
@@ -561,7 +564,20 @@ def notify_teacher_homework_submitted(homework) -> bool:
         homework: экземпляр модели Homework
     """
     teacher = homework.assigned_by
-    if not teacher or not teacher.telegram:
+    if not teacher:
+        logger.warning(
+            f'Cannot notify teacher: homework {homework.id} has no assigned teacher'
+        )
+        return False
+
+    # Проверяем, есть ли способ отправить уведомление (chat_id или telegram username)
+    if not teacher.telegram_chat_id and not teacher.telegram:
+        logger.warning(
+            f'Cannot notify teacher {teacher.user.username}: '
+            f'no telegram_chat_id and no telegram username configured. '
+            f'Teacher needs to fill in their Telegram username in profile settings '
+            f'and send /start to @MathPhyseduBot.'
+        )
         return False
 
     student = homework.student
@@ -577,7 +593,13 @@ def notify_teacher_homework_submitted(homework) -> bool:
         f"Проверить</a>"
     )
 
-    return _send_telegram_message(teacher, text)
+    result = _send_telegram_message(teacher, text)
+    if result:
+        logger.info(
+            f'Notification sent to teacher {teacher.user.username} '
+            f'about homework {homework.id} from student {student.first_name} {student.last_name}'
+        )
+    return result
 
 
 def notify_teacher_probnik_submitted(probnik) -> bool:
@@ -588,7 +610,20 @@ def notify_teacher_probnik_submitted(probnik) -> bool:
         probnik: экземпляр модели Probnik
     """
     teacher = probnik.assigned_by
-    if not teacher or not teacher.telegram:
+    if not teacher:
+        logger.warning(
+            f'Cannot notify teacher: probnik {probnik.id} has no assigned teacher'
+        )
+        return False
+
+    # Проверяем, есть ли способ отправить уведомление (chat_id или telegram username)
+    if not teacher.telegram_chat_id and not teacher.telegram:
+        logger.warning(
+            f'Cannot notify teacher {teacher.user.username}: '
+            f'no telegram_chat_id and no telegram username configured. '
+            f'Teacher needs to fill in their Telegram username in profile settings '
+            f'and send /start to @MathPhyseduBot.'
+        )
         return False
 
     student = probnik.student
@@ -604,4 +639,10 @@ def notify_teacher_probnik_submitted(probnik) -> bool:
         f"Проверить</a>"
     )
 
-    return _send_telegram_message(teacher, text)
+    result = _send_telegram_message(teacher, text)
+    if result:
+        logger.info(
+            f'Notification sent to teacher {teacher.user.username} '
+            f'about probnik {probnik.id} from student {student.first_name} {student.last_name}'
+        )
+    return result

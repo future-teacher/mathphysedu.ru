@@ -102,8 +102,27 @@
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
+                                    <label for="id_month" class="form-label">Месяц аттестации</label>
+                                    <select name="month" id="id_month" class="form-control">
+                                        <option value="" {% if not form.month.value %}selected{% endif %}>-- Не выбрано --</option>
+                                        <option value="september" {% if form.month.value == 'september' %}selected{% endif %}>Сентябрь</option>
+                                        <option value="october" {% if form.month.value == 'october' %}selected{% endif %}>Октябрь</option>
+                                        <option value="november" {% if form.month.value == 'november' %}selected{% endif %}>Ноябрь</option>
+                                        <option value="december" {% if form.month.value == 'december' %}selected{% endif %}>Декабрь</option>
+                                        <option value="january" {% if form.month.value == 'january' %}selected{% endif %}>Январь</option>
+                                        <option value="february" {% if form.month.value == 'february' %}selected{% endif %}>Февраль</option>
+                                        <option value="march" {% if form.month.value == 'march' %}selected{% endif %}>Март</option>
+                                        <option value="april" {% if form.month.value == 'april' %}selected{% endif %}>Апрель</option>
+                                        <option value="may" {% if form.month.value == 'may' %}selected{% endif %}>Май</option>
+                                    </select>
+                                    <div class="form-text">Выберите месяц для ежемесячной аттестации</div>
+                                    {% if form.month.errors %}
+                                    <div class="text-danger">{{ form.month.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <label for="id_deadline" class="form-label">Дедлайн</label>
-                                    <input type="date" name="deadline" id="id_deadline" class="form-control" 
+                                    <input type="date" name="deadline" id="id_deadline" class="form-control"
                                            value="{{ form.deadline.value|date:'Y-m-d'|default:'' }}">
                                     <div class="form-text">Дата, до которой нужно написать пробник</div>
                                     {% if form.deadline.errors %}
@@ -212,6 +231,60 @@
             deadlineInput.value = formattedDate;
         }
         
+        // Динамическая фильтрация учеников по предмету
+        const subjectSelect = document.getElementById('id_subject');
+        const studentSelect = document.getElementById('id_student');
+        
+        if (subjectSelect && studentSelect) {
+            const mathStudentIds = [{% for s in math_students %}{{ s.id }},{% endfor %}];
+            const physicsStudentIds = [{% for s in physics_students %}{{ s.id }},{% endfor %}];
+            
+            const allOptions = Array.from(studentSelect.options);
+            
+            function filterStudents() {
+                const selectedSubject = subjectSelect.value;
+                const currentValue = studentSelect.value;
+                
+                studentSelect.innerHTML = '';
+                
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.textContent = '---------';
+                studentSelect.appendChild(emptyOption);
+                
+                allOptions.forEach(function(option) {
+                    if (!option.value) return;
+                    
+                    const sid = parseInt(option.value);
+                    let showStudent = false;
+                    
+                    if (selectedSubject === 'math') {
+                        showStudent = mathStudentIds.includes(sid);
+                    } else if (selectedSubject === 'physics') {
+                        showStudent = physicsStudentIds.includes(sid);
+                    } else {
+                        showStudent = true;
+                    }
+                    
+                    if (showStudent) {
+                        const newOption = document.createElement('option');
+                        newOption.value = option.value;
+                        newOption.textContent = option.textContent;
+                        studentSelect.appendChild(newOption);
+                    }
+                });
+                
+                if (currentValue) {
+                    const matchingOption = Array.from(studentSelect.options).find(o => o.value === currentValue);
+                    if (matchingOption) {
+                        studentSelect.value = currentValue;
+                    }
+                }
+            }
+            
+            subjectSelect.addEventListener('change', filterStudents);
+            filterStudents();
+        }
     });
 </script>
 

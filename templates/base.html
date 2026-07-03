@@ -197,6 +197,63 @@
             display: block;
         }
 
+        /* ===== СПИННЕР С ЮМОРОМ ===== */
+        .loading-spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner-overlay.show {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: #fff;
+            padding: 2rem;
+        }
+
+        .loading-content .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        .loading-content .loading-emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .loading-content .loading-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .loading-content .loading-sub {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Mobile responsive */
         @media (max-width: 991.98px) {
             .sidebar {
@@ -242,6 +299,16 @@
     </style>
 </head>
 <body>
+    <!-- ===== СПИННЕР ЗАГРУЗКИ ===== -->
+    <div class="loading-spinner-overlay" id="loadingSpinner">
+        <div class="loading-content">
+            <span class="loading-emoji" id="loadingEmoji">🧠</span>
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Ищем решения...</div>
+            <div class="loading-sub" id="loadingSub">Это может занять пару секунд</div>
+        </div>
+    </div>
+
     {% if user.is_authenticated %}
     <!-- Sidebar Overlay (mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -420,6 +487,71 @@
                 closeSidebar();
             }
         });
+
+        // ===== СПИННЕР С ЮМОРОМ =====
+        const loadingMessages = [
+            { emoji: '🧠', text: 'Ищем решения...', sub: 'Мозг разгоняется...' },
+            { emoji: '📚', text: 'Шлифуем ваши знания...', sub: 'Достаем учебники...' },
+            { emoji: '🚀', text: 'Загружаем порцию вдохновения...', sub: 'Готовим турбо-режим...' },
+            { emoji: '🔬', text: 'Проверяем формулы...', sub: 'Эйнштейн бы гордился...' },
+            { emoji: '🎯', text: 'Настраиваем прицел...', sub: 'Цель — отличный результат!' },
+            { emoji: '⚡', text: 'Заряжаем батарейку...', sub: 'Энергия для учёбы...' },
+            { emoji: '🐱', text: 'Ловим вдохновение...', sub: 'Кот Шрёдингера помогает...' },
+        ];
+
+        function showLoadingSpinner() {
+            const overlay = document.getElementById('loadingSpinner');
+            const emoji = document.getElementById('loadingEmoji');
+            const text = document.getElementById('loadingText');
+            const sub = document.getElementById('loadingSub');
+            
+            if (overlay && emoji && text && sub) {
+                const random = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+                emoji.textContent = random.emoji;
+                text.textContent = random.text;
+                sub.textContent = random.sub;
+                overlay.classList.add('show');
+            }
+        }
+
+        function hideLoadingSpinner() {
+            const overlay = document.getElementById('loadingSpinner');
+            if (overlay) {
+                overlay.classList.remove('show');
+            }
+        }
+
+        // Показываем спиннер при клике на ссылки (кроме некоторых)
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (link && link.href && link.href.startsWith(window.location.origin)) {
+                // Не показываем спиннер для ссылок с якорем, скачиванием или открытием в новом окне
+                if (link.hash || link.target === '_blank' || link.download) {
+                    return;
+                }
+                // Не показываем для кнопок "Назад" и подобных
+                if (link.classList.contains('btn-outline-secondary') || 
+                    link.classList.contains('btn-secondary')) {
+                    return;
+                }
+                showLoadingSpinner();
+            }
+        });
+
+        // Скрываем спиннер после загрузки страницы
+        window.addEventListener('load', function() {
+            hideLoadingSpinner();
+        });
+
+        // Скрываем спиннер при ошибке загрузки
+        window.addEventListener('error', function() {
+            hideLoadingSpinner();
+        });
+
+        // Скрываем спиннер через 10 секунд (защита от зависания)
+        setTimeout(function() {
+            hideLoadingSpinner();
+        }, 10000);
     </script>
     {% endif %}
 </body>

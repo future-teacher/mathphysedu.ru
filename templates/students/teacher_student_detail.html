@@ -111,22 +111,24 @@
                     </div>
                     <div class="card-body">
                         {% with active_exams=student.get_active_exam_dates %}
-                            {% if active_exams %}
-                                {% for exam_name, exam_date in active_exams %}
-                                <div class="alert {% if exam_date|timeuntil <= '30 days' %}alert-danger{% else %}alert-info{% endif %} mb-2 py-2">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>{{ exam_name }}</strong><br>
-                                            <span class="small">{{ exam_date|date:"d.m.Y" }}</span>
-                                        </div>
-                                        <div class="text-end">
-                                            <span class="badge {% if exam_date|timeuntil <= '30 days' %}bg-danger{% else %}bg-primary{% endif %}">
-                                                {{ exam_date|timeuntil }}
-                                            </span>
+                                {% if active_exams %}
+                                    {% for exam_name, exam_date in active_exams %}
+                                    {% with days_left=exam_date|timeuntil|cut:" " %}
+                                    <div class="alert alert-info mb-2 py-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ exam_name }}</strong><br>
+                                                <span class="small">{{ exam_date|date:"d.m.Y" }}</span>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-primary">
+                                                    {{ exam_date|timeuntil }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                {% endfor %}
+                                    {% endwith %}
+                                    {% endfor %}
                             {% else %}
                                 <div class="row">
                                     {% if student.exam_date_oge_math %}

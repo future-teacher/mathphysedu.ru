@@ -55,6 +55,7 @@
                 </div>
                 
                 {% if probnik.status == 'checked' and probnik.score is not None %}
+                {% with percentage=probnik.get_percentage %}
                 <div class="card mb-4 border-success">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0">✅ Результаты проверки</h5>
@@ -72,12 +73,12 @@
                                 
                                 <!-- Процент с отступом сверху -->
                                 <div class="mb-3">
-                                    <span class="badge 
-                                        {% if probnik.get_percentage >= 80 %}bg-success
-                                        {% elif probnik.get_percentage >= 60 %}bg-info
-                                        {% elif probnik.get_percentage >= 40 %}bg-warning text-dark
+                                    <span class="badge
+                                        {% if percentage >= 80 %}bg-success
+                                        {% elif percentage >= 60 %}bg-info
+                                        {% elif percentage >= 40 %}bg-warning text-dark
                                         {% else %}bg-danger{% endif %} fs-5">
-                                        {{ probnik.get_percentage }}%
+                                        {{ percentage }}%
                                     </span>
                                 </div>
                                 
@@ -102,11 +103,11 @@
                                 
                                 <!-- Мотивационное сообщение с отступом -->
                                 <div class="d-block d-md-none mt-3">
-                                    {% if probnik.get_percentage >= 80 %}
+                                    {% if percentage >= 80 %}
                                         <div class="alert alert-success py-2 mb-0">Отличный результат! 🎉</div>
-                                    {% elif probnik.get_percentage >= 60 %}
+                                    {% elif percentage >= 60 %}
                                         <div class="alert alert-info py-2 mb-0">Хороший результат! 👍</div>
-                                    {% elif probnik.get_percentage >= 40 %}
+                                    {% elif percentage >= 40 %}
                                         <div class="alert alert-warning py-2 mb-0">Средний результат</div>
                                     {% else %}
                                         <div class="alert alert-danger py-2 mb-0">Нужно поработать</div>
@@ -114,11 +115,11 @@
                                 </div>
                                 
                                 <div class="d-none d-md-block mt-4">
-                                    {% if probnik.get_percentage >= 80 %}
+                                    {% if percentage >= 80 %}
                                         <div class="alert alert-success mb-0">Отличный результат! 🎉</div>
-                                    {% elif probnik.get_percentage >= 60 %}
+                                    {% elif percentage >= 60 %}
                                         <div class="alert alert-info mb-0">Хороший результат! 👍</div>
-                                    {% elif probnik.get_percentage >= 40 %}
+                                    {% elif percentage >= 40 %}
                                         <div class="alert alert-warning mb-0">Средний результат</div>
                                     {% else %}
                                         <div class="alert alert-danger mb-0">Нужно поработать</div>
@@ -146,6 +147,7 @@
                         </div>
                     </div>
                 </div>
+                {% endwith %}
                 {% endif %}
                 
                 {% if teacher_files %}

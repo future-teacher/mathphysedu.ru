@@ -11,6 +11,15 @@
                 <h4 class="mb-0">📝 Создать домашнее задание</h4>
             </div>
             <div class="card-body">
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>Ошибка:</strong>
+                    {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
@@ -107,6 +116,66 @@
             weekLater.setDate(today.getDate() + 7);
             const formattedDate = weekLater.toISOString().split('T')[0];
             deadlineInput.value = formattedDate;
+        }
+        
+        // Динамическая фильтрация учеников по предмету
+        const subjectSelect = document.getElementById('id_subject');
+        const studentSelect = document.getElementById('id_student');
+        
+        if (subjectSelect && studentSelect) {
+            // Сохраняем оригинальные опции учеников с их предметами
+            const mathStudentIds = [{% for s in math_students %}{{ s.id }},{% endfor %}];
+            const physicsStudentIds = [{% for s in physics_students %}{{ s.id }},{% endfor %}];
+            
+            const allOptions = Array.from(studentSelect.options);
+            
+            function filterStudents() {
+                const selectedSubject = subjectSelect.value;
+                const currentValue = studentSelect.value;
+                
+                // Очищаем select
+                studentSelect.innerHTML = '';
+                
+                // Добавляем пустую опцию
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.textContent = '---------';
+                studentSelect.appendChild(emptyOption);
+                
+                // Фильтруем опции
+                allOptions.forEach(function(option) {
+                    if (!option.value) return; // пропускаем пустую опцию
+                    
+                    const studentId = parseInt(option.value);
+                    let showStudent = false;
+                    
+                    if (selectedSubject === 'math') {
+                        showStudent = mathStudentIds.includes(studentId);
+                    } else if (selectedSubject === 'physics') {
+                        showStudent = physicsStudentIds.includes(studentId);
+                    } else {
+                        showStudent = true;
+                    }
+                    
+                    if (showStudent) {
+                        const newOption = document.createElement('option');
+                        newOption.value = option.value;
+                        newOption.textContent = option.textContent;
+                        studentSelect.appendChild(newOption);
+                    }
+                });
+                
+                // Восстанавливаем выбранное значение, если оно подходит
+                if (currentValue) {
+                    const matchingOption = Array.from(studentSelect.options).find(o => o.value === currentValue);
+                    if (matchingOption) {
+                        studentSelect.value = currentValue;
+                    }
+                }
+            }
+            
+            subjectSelect.addEventListener('change', filterStudents);
+            filterStudents();
         }
     });
 </script>

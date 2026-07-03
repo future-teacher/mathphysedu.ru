@@ -171,6 +171,25 @@ class HomeworkForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['status'].initial = 'assigned'
         self.fields['status'].required = False
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        student = cleaned_data.get('student')
+        subject = cleaned_data.get('subject')
+        
+        if student and subject:
+            if subject == 'math' and not student.has_math:
+                raise ValidationError(
+                    f'Ученик {student.first_name} {student.last_name} не занимается математикой. '
+                    f'Выберите другого ученика или измените предмет.'
+                )
+            elif subject == 'physics' and not student.has_physics:
+                raise ValidationError(
+                    f'Ученик {student.first_name} {student.last_name} не занимается физикой. '
+                    f'Выберите другого ученика или измените предмет.'
+                )
+        
+        return cleaned_data
 
 
 class HomeworkCheckForm(forms.ModelForm):
@@ -189,7 +208,7 @@ class HomeworkCheckForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['status'].choices = [('checked', 'Проверено')]
         self.fields['status'].initial = 'checked'
-        self.fields['status'].widget.attrs['readonly'] = True
+        self.fields['status'].widget.attrs['disabled'] = True
         self.fields['grade'].label = 'Оценка'
         self.fields['teacher_comment'].label = 'Комментарий'
         self.fields['teacher_comment'].help_text = 'Напишите комментарий к работе'
@@ -213,11 +232,12 @@ class ProbnikForm(forms.ModelForm):
     
     class Meta:
         model = Probnik
-        fields = ['student', 'title', 'subject', 'deadline', 'max_score', 'status', 'score', 'teacher_comment', 'is_hidden']
+        fields = ['student', 'title', 'subject', 'month', 'deadline', 'max_score', 'status', 'score', 'teacher_comment', 'is_hidden']
         widgets = {
             'student': forms.Select(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Название пробника'}),
             'subject': forms.Select(attrs={'class': 'form-control'}),
+            'month': forms.Select(attrs={'class': 'form-control'}),
             'deadline': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'max_score': forms.NumberInput(attrs={'class': 'form-control', 'value': 100}),
             'status': forms.Select(attrs={'class': 'form-control'}),
@@ -242,6 +262,25 @@ class ProbnikForm(forms.ModelForm):
         if max_score is None:
             return 100
         return max_score
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        student = cleaned_data.get('student')
+        subject = cleaned_data.get('subject')
+        
+        if student and subject:
+            if subject == 'math' and not student.has_math:
+                raise ValidationError(
+                    f'Ученик {student.first_name} {student.last_name} не занимается математикой. '
+                    f'Выберите другого ученика или измените предмет.'
+                )
+            elif subject == 'physics' and not student.has_physics:
+                raise ValidationError(
+                    f'Ученик {student.first_name} {student.last_name} не занимается физикой. '
+                    f'Выберите другого ученика или измените предмет.'
+                )
+        
+        return cleaned_data
 
 
 class ProbnikCheckForm(forms.ModelForm):

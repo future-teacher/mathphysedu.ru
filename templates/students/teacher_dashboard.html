@@ -5,6 +5,198 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+    /* Статистика */
+    .stat-card {
+        background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+        border: 2px solid transparent;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        color: #fff;
+    }
+
+    .stat-card:hover {
+        border-color: #6366f1;
+        transform: translateY(-0.3rem);
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.85rem;
+        margin-bottom: 0;
+    }
+
+    /* Быстрые действия */
+    .quick-action-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 1rem;
+        cursor: pointer;
+        padding: 0.75rem;
+        text-align: center;
+    }
+
+    .quick-action-card:hover {
+        transform: scale(1.05) translateY(-0.3rem);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
+    }
+
+    .quick-action-card .qa-icon {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .quick-action-card .qa-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    /* Просроченные ученики */
+    .overdue-student {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .overdue-student:last-child {
+        border-bottom: none;
+    }
+
+    .overdue-student .student-name {
+        color: #e2e8f0;
+        font-weight: 500;
+    }
+
+    .overdue-student .overdue-count {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    /* Карточка ученика на дашборде */
+    .td-student-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        width: 11rem;
+        padding: 1.2rem 1rem;
+        border-radius: 1rem;
+        border: 2px solid transparent;
+        background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+        transition: all 0.3s ease;
+    }
+
+    .td-student-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+        transform: translateY(-0.3rem);
+    }
+
+    .td-student-avatar {
+        width: 3.5rem;
+        height: 3.5rem;
+        background: #6366f1;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .td-student-name {
+        font-weight: 600;
+        color: #e2e8f0;
+        text-align: center;
+        font-size: 0.9rem;
+        line-height: 1.2;
+    }
+
+    .td-student-class {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .td-student-exams {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+
+    .td-exam-badge {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.4rem;
+        background: rgba(99, 102, 241, 0.3);
+        color: rgba(255, 255, 255, 0.8);
+        border-radius: 0.4rem;
+        white-space: nowrap;
+    }
+
+    .td-student-actions {
+        display: flex;
+        gap: 0.4rem;
+        margin-top: 0.3rem;
+    }
+
+    .td-btn {
+        padding: 0.35rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+    .td-btn-primary {
+        background: #6366f1;
+        color: white;
+        border: none;
+    }
+
+    .td-btn-primary:hover {
+        background: #4f46e5;
+        color: white;
+    }
+
+    .td-btn-outline {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .td-btn-outline:hover {
+        border-color: rgba(255, 255, 255, 0.5);
+        color: white;
+    }
+
+    @media (max-width: 576px) {
+        .td-student-card {
+            width: 9rem;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -27,9 +219,96 @@
         </div>
         {% endif %}
 
-        <!-- Мои ученики -->
+        <!-- ===== СТАТИСТИКА ===== -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card text-center">
+                    <div class="stat-number">{{ total_students }}</div>
+                    <p class="stat-label">👥 Учеников</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card text-center">
+                    <div class="stat-number">{{ active_homework }}</div>
+                    <p class="stat-label">📝 Активных ДЗ</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card text-center">
+                    <div class="stat-number">{{ overdue_homework }}</div>
+                    <p class="stat-label">⚠️ Просроченных</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card text-center">
+                    <div class="stat-number">
+                        {% if unchecked_homework > 0 or unchecked_probniks > 0 %}
+                        <span class="text-danger">!</span>
+                        {% endif %}
+                        {{ unchecked_homework|add:unchecked_probniks }}
+                    </div>
+                    <p class="stat-label">📋 На проверку</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== БЫСТРЫЕ ДЕЙСТВИЯ ===== -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <a href="{% url 'teacher_homework_create' %}" class="text-decoration-none">
+                    <div class="quick-action-card bg-primary text-white">
+                        <span class="qa-icon">📝</span>
+                        <p class="qa-label">Новое ДЗ</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 col-6">
+                <a href="{% url 'teacher_probnik_create' %}" class="text-decoration-none">
+                    <div class="quick-action-card bg-warning text-dark">
+                        <span class="qa-icon">📊</span>
+                        <p class="qa-label">Новый пробник</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 col-6">
+                <a href="{% url 'teacher_student_create' %}" class="text-decoration-none">
+                    <div class="quick-action-card bg-success text-white">
+                        <span class="qa-icon">➕</span>
+                        <p class="qa-label">Добавить ученика</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 col-6">
+                <a href="{% url 'teacher_studyfile_create' %}" class="text-decoration-none">
+                    <div class="quick-action-card bg-info text-white">
+                        <span class="qa-icon">📁</span>
+                        <p class="qa-label">Загрузить файл</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- ===== ПРОСРОЧЕННЫЕ УЧЕНИКИ ===== -->
+        {% if students_with_overdue %}
+        <div class="card bg-dark text-white mb-4">
+            <div class="card-header bg-danger">
+                <h5 class="mb-0">⚠️ Ученики с просроченными заданиями</h5>
+            </div>
+            <div class="card-body">
+                {% for item in students_with_overdue %}
+                <div class="overdue-student">
+                    <span class="student-name">{{ item.student.first_name }} {{ item.student.last_name }}</span>
+                    <span class="overdue-count">{{ item.overdue_count }} просрочено</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ===== СПИСОК УЧЕНИКОВ ===== -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">👥 Мои ученики</h5>
+            <span class="badge bg-secondary">{{ total_students }}</span>
         </div>
 
         <form method="get" class="mb-4">
@@ -48,7 +327,7 @@
         {% if students %}
         <div class="d-flex flex-wrap gap-3 justify-content-start mb-4">
             {% for student in students %}
-            <div class="card td-student-card">
+            <div class="td-student-card">
                 <div class="td-student-avatar">{{ student.first_name|first }}{{ student.last_name|first }}</div>
                 <div class="td-student-name">{{ student.first_name }} {{ student.last_name }}</div>
                 <div class="td-student-class">{{ student.class_name }} класс</div>
@@ -114,114 +393,4 @@
     </div>
 </div>
 {% endif %}
-{% endblock %}
-
-{% block extra_js %}
-<style>
-/* ===== Дашборд преподавателя — тёмные карточки ===== */
-
-/* Карточка ученика */
-.td-student-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    width: 11rem;
-    padding: 1.2rem 1rem;
-    border-radius: 1rem;
-    border: 2px solid transparent;
-    background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
-    transition: all 0.3s ease;
-}
-
-.td-student-card:hover {
-    border-color: #6366f1;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-    transform: translateY(-0.3rem);
-}
-
-.td-student-avatar {
-    width: 3.5rem;
-    height: 3.5rem;
-    background: #6366f1;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: white;
-}
-
-.td-student-name {
-    font-weight: 600;
-    color: #e2e8f0;
-    text-align: center;
-    font-size: 0.9rem;
-    line-height: 1.2;
-}
-
-.td-student-class {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.td-student-exams {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.25rem;
-}
-
-.td-exam-badge {
-    font-size: 0.6rem;
-    padding: 0.15rem 0.4rem;
-    background: rgba(99, 102, 241, 0.3);
-    color: rgba(255, 255, 255, 0.8);
-    border-radius: 0.4rem;
-    white-space: nowrap;
-}
-
-.td-student-actions {
-    display: flex;
-    gap: 0.4rem;
-    margin-top: 0.3rem;
-}
-
-.td-btn {
-    padding: 0.35rem 0.8rem;
-    border-radius: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.15s ease;
-}
-
-.td-btn-primary {
-    background: #6366f1;
-    color: white;
-    border: none;
-}
-
-.td-btn-primary:hover {
-    background: #4f46e5;
-}
-
-.td-btn-outline {
-    background: transparent;
-    color: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.td-btn-outline:hover {
-    border-color: rgba(255, 255, 255, 0.5);
-    color: white;
-}
-
-@media (max-width: 576px) {
-    .td-student-card {
-        width: 9rem;
-    }
-}
-</style>
 {% endblock %}
