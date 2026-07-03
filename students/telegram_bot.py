@@ -466,7 +466,6 @@ def notify_student_new_probnik(probnik) -> bool:
         text += f"<b>Месяц:</b> {month_display}\n"
     text += (
         f"<b>Дедлайн:</b> {deadline_str}\n"
-        f"<b>Макс. балл:</b> {probnik.max_score}\n\n"
         f"🔗 <a href=\"{settings.BASE_URL}/students/probnik/{probnik.id}/\">"
         f"Открыть пробник</a>"
     )
@@ -484,7 +483,6 @@ def notify_student_new_probnik(probnik) -> bool:
             parent_text += f"<b>Месяц:</b> {month_display}\n"
         parent_text += (
             f"<b>Дедлайн:</b> {deadline_str}\n"
-            f"<b>Макс. балл:</b> {probnik.max_score}\n\n"
             f"🔗 <a href=\"{settings.BASE_URL}/students/probnik/{probnik.id}/\">"
             f"Открыть пробник</a>"
         )

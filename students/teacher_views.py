@@ -54,30 +54,6 @@ def teacher_dashboard(request):
         messages.error(request, 'У вас нет прав преподавателя')
         return redirect('login')
     
-    total_students = teacher.students.count()
-    today = timezone.now().date()
-    
-    active_homework = Homework.objects.filter(
-        assigned_by=teacher
-    ).filter(
-        Q(deadline__gte=today) | Q(deadline__isnull=True)
-    ).count()
-    
-    overdue_homework = Homework.objects.filter(
-        assigned_by=teacher,
-        deadline__lt=today
-    ).count()
-    
-    active_probniks = Probnik.objects.filter(
-        assigned_by=teacher,
-        status='in_progress'
-    ).count()
-    
-    checked_probniks = Probnik.objects.filter(
-        assigned_by=teacher,
-        status='checked'
-    ).count()
-    
     students = teacher.students.all().order_by('last_name', 'first_name')[:10]
     
     search_query = request.GET.get('search', '')
@@ -88,58 +64,10 @@ def teacher_dashboard(request):
             Q(class_name__icontains=search_query)
         ).order_by('last_name', 'first_name')[:10]
     
-    recent_homework = Homework.objects.filter(
-        assigned_by=teacher
-    ).order_by('-created_at')[:5]
-    
-    recent_probniks = Probnik.objects.filter(
-        assigned_by=teacher
-    ).order_by('-created_at')[:5]
-    
-    recent_files = StudyFile.objects.filter(
-        uploaded_by=teacher
-    ).order_by('-uploaded_at')[:5]
-    
-    # Подсчет непроверенных работ для бейджа "Срочно!"
-    unchecked_homework = Homework.objects.filter(
-        assigned_by=teacher,
-        status__in=['assigned', 'in_progress']
-    ).count()
-    
-    unchecked_probniks = Probnik.objects.filter(
-        assigned_by=teacher,
-        status='in_progress'
-    ).count()
-    
-    # Получаем список учеников с просроченными заданиями для быстрого доступа
-    students_with_overdue = []
-    for student in teacher.students.all():
-        overdue_count = student.homework.filter(
-            deadline__lt=today,
-            status__in=['assigned', 'in_progress']
-        ).count()
-        if overdue_count > 0:
-            students_with_overdue.append({
-                'student': student,
-                'overdue_count': overdue_count
-            })
-    students_with_overdue = sorted(students_with_overdue, key=lambda x: -x['overdue_count'])[:5]
-    
     context = {
         'teacher': teacher,
-        'total_students': total_students,
-        'active_homework': active_homework,
-        'overdue_homework': overdue_homework,
-        'active_probniks': active_probniks,
-        'to_check_probniks': checked_probniks,
         'students': students,
         'search_query': search_query,
-        'recent_homework': recent_homework,
-        'recent_probniks': recent_probniks,
-        'recent_files': recent_files,
-        'unchecked_homework': unchecked_homework,
-        'unchecked_probniks': unchecked_probniks,
-        'students_with_overdue': students_with_overdue,
     }
     
     return render(request, 'students/teacher_dashboard.html', context)

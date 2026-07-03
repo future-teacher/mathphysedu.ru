@@ -219,39 +219,6 @@
         </div>
         {% endif %}
 
-        <!-- ===== СТАТИСТИКА ===== -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3 col-6">
-                <div class="stat-card text-center">
-                    <div class="stat-number">{{ total_students }}</div>
-                    <p class="stat-label">👥 Учеников</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-card text-center">
-                    <div class="stat-number">{{ active_homework }}</div>
-                    <p class="stat-label">📝 Активных ДЗ</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-card text-center">
-                    <div class="stat-number">{{ overdue_homework }}</div>
-                    <p class="stat-label">⚠️ Просроченных</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-card text-center">
-                    <div class="stat-number">
-                        {% if unchecked_homework > 0 or unchecked_probniks > 0 %}
-                        <span class="text-danger">!</span>
-                        {% endif %}
-                        {{ unchecked_homework|add:unchecked_probniks }}
-                    </div>
-                    <p class="stat-label">📋 На проверку</p>
-                </div>
-            </div>
-        </div>
-
         <!-- ===== БЫСТРЫЕ ДЕЙСТВИЯ ===== -->
         <div class="row g-3 mb-4">
             <div class="col-md-3 col-6">
@@ -287,23 +254,6 @@
                 </a>
             </div>
         </div>
-
-        <!-- ===== ПРОСРОЧЕННЫЕ УЧЕНИКИ ===== -->
-        {% if students_with_overdue %}
-        <div class="card bg-dark text-white mb-4">
-            <div class="card-header bg-danger">
-                <h5 class="mb-0">⚠️ Ученики с просроченными заданиями</h5>
-            </div>
-            <div class="card-body">
-                {% for item in students_with_overdue %}
-                <div class="overdue-student">
-                    <span class="student-name">{{ item.student.first_name }} {{ item.student.last_name }}</span>
-                    <span class="overdue-count">{{ item.overdue_count }} просрочено</span>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
 
         <!-- ===== СПИСОК УЧЕНИКОВ ===== -->
         <div class="d-flex justify-content-between align-items-center mb-3">
