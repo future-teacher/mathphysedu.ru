@@ -177,11 +177,17 @@ class Homework(models.Model):
     
     teacher_comment = models.TextField(verbose_name='Комментарий преподавателя', blank=True)
     grade = models.CharField(
-        max_length=5, 
-        null=True, 
-        blank=True, 
-        verbose_name='Оценка', 
+        max_length=5,
+        null=True,
+        blank=True,
+        verbose_name='Оценка',
         choices=GRADE_CHOICES
+    )
+    
+    is_hidden = models.BooleanField(
+        default=False,
+        verbose_name='Скрыть от ученика',
+        help_text='Если включено, задание не будет отображаться у ученика'
     )
     
     created_at = models.DateTimeField(auto_now_add=True)

@@ -266,18 +266,75 @@
 
             .topbar {
                 left: 0;
+                height: 48px;
+                padding: 0 0.75rem;
             }
 
             .topbar .sidebar-toggle {
                 display: block;
+                font-size: 1.3rem;
+            }
+
+            .topbar .topbar-title {
+                font-size: 0.9rem;
             }
 
             .main-content {
                 margin-left: 0;
+                margin-top: 48px;
+                padding: 0.75rem;
+                min-height: calc(100vh - 48px);
             }
 
             .sidebar-overlay.show {
                 display: block;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .main-content {
+                padding: 0.5rem;
+            }
+
+            .topbar {
+                height: 44px;
+                padding: 0 0.5rem;
+            }
+
+            .main-content {
+                margin-top: 44px;
+                min-height: calc(100vh - 44px);
+            }
+
+            .topbar .topbar-title {
+                font-size: 0.8rem;
+            }
+
+            .sidebar {
+                max-width: 280px;
+                width: 85vw;
+            }
+
+            .sidebar-brand {
+                padding: 0.8rem 1rem;
+                font-size: 1rem;
+            }
+
+            .sidebar-user {
+                padding: 0.6rem 1rem;
+            }
+
+            .sidebar-user .user-name {
+                font-size: 0.85rem;
+            }
+
+            .sidebar-nav a {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .sidebar-footer {
+                padding: 0.5rem 1rem;
             }
         }
 

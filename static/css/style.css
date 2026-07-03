@@ -462,12 +462,23 @@ footer {
     .navbar-toggler {
         display: block !important;
     }
+    .card {
+        border-radius: 14px;
+        margin-bottom: 12px;
+    }
     .card-body {
-        padding: 15px;
+        padding: 12px;
+    }
+    .card-header {
+        padding: 10px 14px;
+        border-radius: 14px 14px 0 0 !important;
+    }
+    .card-header h4, .card-header h5 {
+        font-size: 1rem;
     }
     .table th, .table td {
-        padding: 0.5rem 0.25rem;
-        font-size: 0.85rem;
+        padding: 0.5rem 0.3rem;
+        font-size: 0.8rem;
     }
     .filter-buttons-full {
         width: 100% !important;
@@ -475,18 +486,18 @@ footer {
     }
     .filter-buttons-full .btn {
         flex: 1 !important;
-        font-size: 0.85rem;
-        padding: 0.4rem 0.5rem;
+        font-size: 0.8rem;
+        padding: 0.35rem 0.4rem;
     }
     .badge {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.4rem;
+        font-size: 0.65rem;
+        padding: 0.25rem 0.35rem;
     }
     h4 {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     h5 {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     .display-4 {
         font-size: 1.5rem;
@@ -495,23 +506,187 @@ footer {
     .table td:nth-child(3) {
         display: none;
     }
+    .btn {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.75rem;
+    }
+    .btn-lg {
+        font-size: 0.95rem;
+        padding: 0.5rem 1rem;
+    }
+    .student-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+    .student-card {
+        max-width: 100%;
+        height: 260px;
+    }
+    .student-card .student-name {
+        font-size: 14px;
+    }
+    .motivation-quote {
+        margin: 12px 0;
+        padding-left: 12px;
+    }
+    .exam-timer {
+        font-size: 2.5rem;
+    }
+    .avatar-circle {
+        width: 60px;
+        height: 60px;
+    }
+    .initials {
+        font-size: 1.5rem;
+    }
+    .list-group-item {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    .quick-action-card .card-body {
+        padding: 1rem 0.75rem;
+    }
+    .quick-action-card .display-4 {
+        font-size: 2rem;
+    }
 }
 
 @media (max-width: 575.98px) {
     .container {
-        padding-left: 10px;
-        padding-right: 10px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    .card {
+        border-radius: 12px;
+        margin-bottom: 10px;
+    }
+    .card-body {
+        padding: 10px;
+    }
+    .card-header {
+        padding: 8px 12px;
+        border-radius: 12px 12px 0 0 !important;
+    }
+    .card-header h4, .card-header h5 {
+        font-size: 0.9rem;
     }
     .table th, .table td {
-        padding: 0.4rem 0.2rem;
-        font-size: 0.75rem;
+        padding: 0.3rem 0.15rem;
+        font-size: 0.7rem;
     }
     .btn-sm {
-        padding: 0.2rem 0.4rem;
-        font-size: 0.7rem;
+        padding: 0.15rem 0.3rem;
+        font-size: 0.65rem;
+    }
+    .btn {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+    .btn-lg {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.75rem;
     }
     .table th:nth-child(4),
     .table td:nth-child(4) {
         display: none;
+    }
+    h4 {
+        font-size: 1rem;
+    }
+    h5 {
+        font-size: 0.9rem;
+    }
+    .display-4 {
+        font-size: 1.3rem;
+    }
+    .display-6 {
+        font-size: 1.5rem;
+    }
+    .badge {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.3rem;
+    }
+    .student-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+    .student-card {
+        height: 240px;
+        border-radius: 12px;
+    }
+    .student-card .img {
+        width: 55px;
+        height: 55px;
+        font-size: 1.4rem;
+        margin-top: 14px;
+    }
+    .student-card .student-name {
+        font-size: 12px;
+        padding: 6px 8px 0;
+    }
+    .student-card .student-class {
+        font-size: 10px;
+        padding: 2px 8px 0;
+    }
+    .student-card .exam-badges {
+        padding: 4px 8px 0;
+        gap: 3px;
+    }
+    .student-card .exam-badges .badge {
+        font-size: 0.55rem !important;
+        padding: 1px 4px !important;
+    }
+    .student-card .card-actions {
+        padding: 6px 8px 10px;
+        gap: 6px;
+    }
+    .student-card .card-actions .btn-card,
+    .student-card .card-actions .btn-card-outline {
+        padding: 4px 10px;
+        font-size: 0.7rem;
+    }
+    .exam-timer {
+        font-size: 2rem;
+    }
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+    }
+    .initials {
+        font-size: 1.2rem;
+    }
+    .list-group-item {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    .quick-action-card .card-body {
+        padding: 0.75rem 0.5rem;
+    }
+    .quick-action-card .display-4 {
+        font-size: 1.5rem;
+    }
+    .motivation-quote {
+        margin: 8px 0;
+        padding-left: 10px;
+        font-size: 0.85rem;
+    }
+    footer {
+        margin-top: 20px;
+        padding: 12px 0;
+        font-size: 0.8rem;
+    }
+    .input-group .form-control,
+    .input-group .btn {
+        font-size: 0.8rem;
+    }
+    .input-group .form-control {
+        padding: 0.3rem 0.6rem;
+    }
+    .rounded-pill {
+        border-radius: 50rem !important;
+    }
+    .btn.rounded-pill {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
     }
 }
