@@ -502,7 +502,6 @@ def notify_student_probnik_checked(probnik) -> bool:
     """
     student = probnik.student
     subject_display = probnik.get_subject_display()
-    grade_display = probnik.get_grade_display() or '—'
     percentage = probnik.get_percentage()
 
     text = (
@@ -513,7 +512,7 @@ def notify_student_probnik_checked(probnik) -> bool:
     )
     if percentage is not None:
         text += f" ({percentage}%)"
-    text += f"\n<b>Оценка:</b> {grade_display}\n"
+    text += "\n"
 
     if probnik.teacher_comment:
         text += f"\n<b>Комментарий:</b>\n{probnik.teacher_comment}\n"
@@ -535,7 +534,7 @@ def notify_student_probnik_checked(probnik) -> bool:
         )
         if percentage is not None:
             parent_text += f" ({percentage}%)"
-        parent_text += f"\n<b>Оценка:</b> {grade_display}\n"
+        parent_text += "\n"
         if probnik.teacher_comment:
             parent_text += f"\n<b>Комментарий:</b>\n{probnik.teacher_comment}\n"
         parent_text += (

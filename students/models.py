@@ -155,11 +155,8 @@ class Homework(models.Model):
     ]
     
     GRADE_CHOICES = [
-        ('5', 'Отлично (5)'),
-        ('4', 'Хорошо (4)'),
-        ('3', 'Удовлетворительно (3)'),
-        ('2', 'Неудовлетворительно (2)'),
         ('z', 'Зачтено'),
+        ('nz', 'Не зачтено'),
     ]
     
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='homework')
@@ -333,18 +330,6 @@ class Probnik(models.Model):
     
     score = models.IntegerField(null=True, blank=True, verbose_name='Баллы')
     max_score = models.IntegerField(default=100, verbose_name='Максимальный балл')
-    grade = models.CharField(
-        max_length=5, 
-        null=True, 
-        blank=True, 
-        verbose_name='Оценка', 
-        choices=[
-            ('5', 'Отлично (5)'), 
-            ('4', 'Хорошо (4)'), 
-            ('3', 'Удовлетворительно (3)'), 
-            ('2', 'Неудовлетворительно (2)')
-        ]
-    )
     teacher_comment = models.TextField(verbose_name='Комментарий преподавателя', blank=True)
     
     is_hidden = models.BooleanField(
@@ -385,22 +370,6 @@ class Probnik(models.Model):
         if self.score is not None and self.max_score > 0:
             return round((self.score / self.max_score) * 100, 1)
         return None
-    
-    def get_grade_from_score(self):
-        """Получить оценку на основе баллов"""
-        if self.score is None or self.max_score is None or self.max_score <= 0:
-            return None
-        
-        percentage = (self.score / self.max_score) * 100
-        
-        if percentage >= 85:
-            return '5'
-        elif percentage >= 70:
-            return '4'
-        elif percentage >= 50:
-            return '3'
-        else:
-            return '2'
     
     def has_student_files(self):
         """Проверить, есть ли файлы ученика"""

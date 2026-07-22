@@ -404,7 +404,7 @@ def homework_detail(request, homework_id):
             teacher_comment = request.POST.get('teacher_comment')
             
             if not grade:
-                messages.error(request, 'Пожалуйста, выберите оценку')
+                messages.error(request, 'Пожалуйста, выберите результат')
                 return redirect('teacher_homework_detail', homework_id=homework.id)
             
             homework.status = 'checked'
@@ -417,7 +417,7 @@ def homework_detail(request, homework_id):
             notify_student_homework_checked(homework)
             
             grade_display = dict(homework._meta.get_field('grade').choices).get(homework.grade, '—')
-            messages.success(request, f'🎯 Домашнее задание проверено! Оценка: {grade_display}')
+            messages.success(request, f'🎯 Домашнее задание проверено! Результат: {grade_display}')
             
             return redirect('teacher_homework_detail', homework_id=homework.id)
     
@@ -561,16 +561,10 @@ def teacher_probnik_detail(request, probnik_id):
     if request.method == 'POST':
         if 'check_probnik' in request.POST:
             score = request.POST.get('score')
-            grade = request.POST.get('grade')
             teacher_comment = request.POST.get('teacher_comment')
             
             if score or score == '0':
                 probnik.score = int(score)
-            
-            if grade:
-                probnik.grade = grade
-            elif probnik.score is not None:
-                probnik.grade = probnik.get_grade_from_score()
             
             probnik.teacher_comment = teacher_comment
             probnik.status = 'checked'
@@ -579,10 +573,9 @@ def teacher_probnik_detail(request, probnik_id):
             # Отправляем уведомление ученику о проверке пробника
             notify_student_probnik_checked(probnik)
             
-            grade_display = dict(probnik._meta.get_field('grade').choices).get(probnik.grade, '—')
             messages.success(
                 request,
-                f'🎯 Пробник проверен! Оценка: {grade_display}, Баллы: {probnik.score}/{probnik.max_score}'
+                f'🎯 Пробник проверен! Баллы: {probnik.score}/{probnik.max_score}'
             )
             
             return redirect('teacher_probnik_detail', probnik_id=probnik.id)

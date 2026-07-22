@@ -64,35 +64,20 @@
                             <div class="col-12 col-md-4 text-center mb-4 mb-md-0">
                                 {% if homework.grade %}
                                     <div class="d-flex d-md-block align-items-center justify-content-center mb-3">
-                                        {% if homework.grade == '5' %}
-                                            <div class="display-1 text-success me-3 me-md-0">5</div>
-                                        {% elif homework.grade == '4' %}
-                                            <div class="display-1 text-info me-3 me-md-0">4</div>
-                                        {% elif homework.grade == '3' %}
-                                            <div class="display-1 text-warning me-3 me-md-0">3</div>
-                                        {% elif homework.grade == '2' %}
-                                            <div class="display-1 text-danger me-3 me-md-0">2</div>
-                                        {% elif homework.grade == 'z' %}
+                                        {% if homework.grade == 'z' %}
                                             <div class="display-1 text-success me-3 me-md-0">✓</div>
+                                        {% elif homework.grade == 'nz' %}
+                                            <div class="display-1 text-danger me-3 me-md-0">✗</div>
                                         {% endif %}
                                     </div>
                                     
                                     <div class="mb-3">
-                                        {% if homework.grade == '5' %}
-                                            <span class="badge bg-success fs-5 d-inline d-md-none">Отлично</span>
-                                            <span class="badge bg-success fs-4 d-none d-md-inline">Отлично</span>
-                                        {% elif homework.grade == '4' %}
-                                            <span class="badge bg-info fs-5 d-inline d-md-none">Хорошо</span>
-                                            <span class="badge bg-info fs-4 d-none d-md-inline">Хорошо</span>
-                                        {% elif homework.grade == '3' %}
-                                            <span class="badge bg-warning text-dark fs-5 d-inline d-md-none">Удовл.</span>
-                                            <span class="badge bg-warning text-dark fs-4 d-none d-md-inline">Удовлетворительно</span>
-                                        {% elif homework.grade == '2' %}
-                                            <span class="badge bg-danger fs-5 d-inline d-md-none">Неуд.</span>
-                                            <span class="badge bg-danger fs-4 d-none d-md-inline">Неудовлетворительно</span>
-                                        {% elif homework.grade == 'z' %}
+                                        {% if homework.grade == 'z' %}
                                             <span class="badge bg-success fs-5 d-inline d-md-none">Зачтено</span>
                                             <span class="badge bg-success fs-4 d-none d-md-inline">Зачтено</span>
+                                        {% elif homework.grade == 'nz' %}
+                                            <span class="badge bg-danger fs-5 d-inline d-md-none">Не зачтено</span>
+                                            <span class="badge bg-danger fs-4 d-none d-md-inline">Не зачтено</span>
                                         {% endif %}
                                     </div>
                                 {% endif %}
@@ -224,7 +209,7 @@
                     </a>
                     
                     <div>
-                        {% if homework.status == 'checked' and homework.grade == '2' %}
+                        {% if homework.status == 'checked' and homework.grade == 'nz' %}
                         <a href="#" class="btn btn-warning" onclick="alert('Обратитесь к преподавателю для обсуждения ошибок');">
                             💬 Нужна помощь
                         </a>

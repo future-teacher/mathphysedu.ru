@@ -77,14 +77,6 @@
                             </div>
                         </div>
 
-                        <!-- Прогресс-бар -->
-                        <div class="hw-progress-bar">
-                            <div class="hw-progress-fill
-                                {% if hw.has_student_files %}hw-progress-started
-                                {% else %}hw-progress-assigned{% endif %}">
-                            </div>
-                        </div>
-
                         <!-- Бейдж просрочки -->
                         {% if hw.is_overdue %}
                         <div class="hw-badge hw-badge-overdue">Просрочено</div>
@@ -288,29 +280,14 @@
     transition: all 0.3s ease;
 }
 
-.hw-grade-5 {
+.hw-grade-z {
     background: rgba(34, 197, 94, 0.2);
     color: #4ade80;
 }
 
-.hw-grade-4 {
-    background: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-}
-
-.hw-grade-3 {
-    background: rgba(234, 179, 8, 0.2);
-    color: #facc15;
-}
-
-.hw-grade-2 {
+.hw-grade-nz {
     background: rgba(239, 68, 68, 0.2);
     color: #f87171;
-}
-
-.hw-grade-z {
-    background: rgba(99, 102, 241, 0.2);
-    color: #818cf8;
 }
 
 /* Мета-информация */
@@ -338,37 +315,6 @@
 .hw-meta-danger {
     color: #f87171 !important;
     font-weight: 600;
-}
-
-/* Прогресс-бар */
-.hw-progress-bar {
-    width: 80%;
-    height: 0.25rem;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: auto;
-}
-
-.hw-progress-fill {
-    height: 100%;
-    border-radius: 999px;
-    transition: width 0.3s ease;
-}
-
-.hw-progress-assigned {
-    width: 10%;
-    background: #6b7280;
-}
-
-.hw-progress-started {
-    width: 50%;
-    background: #3b82f6;
-}
-
-.hw-progress-checked {
-    width: 100%;
-    background: #22c55e;
 }
 
 /* Бейдж */
@@ -428,10 +374,6 @@
         top: 0.4rem;
         right: 0.5rem;
     }
-    .hw-progress-bar {
-        width: 85%;
-        height: 0.2rem;
-    }
     .hw-badge {
         font-size: 0.5rem;
         padding: 0.1rem 0.4rem;
@@ -473,10 +415,6 @@
         height: 0.4rem;
         top: 0.3rem;
         right: 0.4rem;
-    }
-    .hw-progress-bar {
-        width: 90%;
-        height: 0.15rem;
     }
     .hw-badge {
         font-size: 0.45rem;

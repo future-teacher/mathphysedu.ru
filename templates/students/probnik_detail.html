@@ -82,25 +82,6 @@
                                     </span>
                                 </div>
                                 
-                                <!-- Оценка с отступом -->
-                                {% if probnik.grade %}
-                                <div class="mb-3">
-                                    {% if probnik.grade == '5' %}
-                                        <span class="badge bg-success fs-5 d-inline d-md-none">Отлично</span>
-                                        <span class="badge bg-success fs-4 d-none d-md-inline">Отлично (5)</span>
-                                    {% elif probnik.grade == '4' %}
-                                        <span class="badge bg-info fs-5 d-inline d-md-none">Хорошо</span>
-                                        <span class="badge bg-info fs-4 d-none d-md-inline">Хорошо (4)</span>
-                                    {% elif probnik.grade == '3' %}
-                                        <span class="badge bg-warning text-dark fs-5 d-inline d-md-none">Удовл.</span>
-                                        <span class="badge bg-warning text-dark fs-4 d-none d-md-inline">Удовлетворительно (3)</span>
-                                    {% elif probnik.grade == '2' %}
-                                        <span class="badge bg-danger fs-5 d-inline d-md-none">Неуд.</span>
-                                        <span class="badge bg-danger fs-4 d-none d-md-inline">Неудовлетворительно (2)</span>
-                                    {% endif %}
-                                </div>
-                                {% endif %}
-                                
                                 <!-- Мотивационное сообщение с отступом -->
                                 <div class="d-block d-md-none mt-3">
                                     {% if percentage >= 80 %}
@@ -283,30 +264,4 @@
 </div>
 {% endif %}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const scoreInput = document.getElementById('id_score');
-    const gradeSelect = document.getElementById('id_grade');
-    const maxScore = {{ probnik.max_score|default:100 }};
-    
-    if (scoreInput && gradeSelect) {
-        scoreInput.addEventListener('input', function() {
-            const score = parseInt(this.value);
-            if (!isNaN(score) && maxScore > 0) {
-                const percentage = (score / maxScore) * 100;
-                
-                if (percentage >= 85) {
-                    gradeSelect.value = '5';
-                } else if (percentage >= 70) {
-                    gradeSelect.value = '4';
-                } else if (percentage >= 50) {
-                    gradeSelect.value = '3';
-                } else if (percentage > 0) {
-                    gradeSelect.value = '2';
-                }
-            }
-        });
-    }
-});
-</script>
 {% endblock %}

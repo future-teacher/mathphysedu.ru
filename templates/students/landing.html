@@ -5,6 +5,8 @@
 
 {% block navbar %}{% endblock %}
 
+{% block sidebar %}{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/landing.css' %}">
 <style>
@@ -60,9 +62,58 @@
     transform: translateY(0);
 }
 
+/* User info in navbar when authenticated */
+.landing-nav .nav-user-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.landing-nav .nav-user-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.landing-nav .nav-dashboard-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.landing-nav .nav-dashboard-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+}
+
+.landing-nav .nav-dashboard-btn:active {
+    transform: translateY(0);
+}
+
 /* Push hero section down to account for fixed navbar */
 .hero-section {
     padding-top: 80px;
+}
+
+/* Landing page has no sidebar — reset main content margins */
+.main-content {
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    min-height: 100vh !important;
+    padding: 0 !important;
+    background: transparent !important;
 }
 
 @media (max-width: 768px) {
@@ -76,6 +127,263 @@
         padding: 8px 18px;
         font-size: 14px;
     }
+    .landing-nav .nav-user-name {
+        font-size: 13px;
+    }
+    .landing-nav .nav-dashboard-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+/* ===== Плавающая кнопка прайс-листа ===== */
+.pricing-fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pricing-fab-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.pricing-fab-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(102, 126, 234, 0.7);
+}
+
+.pricing-fab-btn:active {
+    transform: scale(0.95);
+}
+
+.pricing-fab-btn .fab-tooltip {
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.pricing-fab-btn:hover .fab-tooltip {
+    opacity: 1;
+}
+
+.pricing-fab-btn .fab-tooltip::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-left-color: rgba(0, 0, 0, 0.85);
+}
+
+.pricing-fab-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 3px 10px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+}
+
+/* Анимация пульсации для кнопки */
+.pricing-fab-btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 0.3;
+    animation: fab-pulse 2s ease-in-out infinite;
+}
+
+@keyframes fab-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.15); opacity: 0.1; }
+}
+
+/* ===== Секция прайс-листа (скрыта по умолчанию) ===== */
+.pricing-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #1a1a4e 0%, #0d47a1 100%);
+    display: none;
+}
+
+.pricing-section.show {
+    display: block;
+    animation: pricing-fade-in 0.5s ease forwards;
+}
+
+@keyframes pricing-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pricing-section .section-title {
+    color: #fff;
+    margin-bottom: 3rem;
+}
+
+.pricing-cards {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.pricing-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    flex: 1 1 280px;
+    max-width: 340px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.pricing-card-individual {
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.pricing-card-individual:hover {
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 20px 60px rgba(255, 215, 0, 0.1);
+}
+
+.pricing-card-badge {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    font-size: 2rem;
+    animation: badge-bounce 2s ease-in-out infinite;
+}
+
+@keyframes badge-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.pricing-card-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+.pricing-card h5 {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.pricing-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.pricing-amount {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    margin: 1rem 0;
+}
+
+.pricing-price {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+}
+
+.pricing-currency {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+    width: 100%;
+}
+
+.pricing-features li {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pricing-features li:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .pricing-section {
+        padding: 3rem 0;
+    }
+    .pricing-card {
+        padding: 2rem 1.5rem;
+        flex: 1 1 240px;
+    }
+    .pricing-price {
+        font-size: 2.5rem;
+    }
+    .pricing-card-icon {
+        font-size: 2.8rem;
+    }
 }
 </style>
 {% endblock %}
@@ -84,6 +392,26 @@
 <!-- Top Navigation -->
 <nav class="landing-nav">
     <a href="{% url 'landing' %}" class="nav-brand">📐 MathPhysEdu</a>
+    {% if user.is_authenticated %}
+    <div class="nav-user-info">
+        <span class="nav-user-name">
+            {% if user.student_profile %}
+                {{ user.student_profile.first_name }} {{ user.student_profile.last_name }}
+            {% elif user.teacher_profile %}
+                {{ user.get_full_name|default:user.username }}
+            {% else %}
+                {{ user.username }}
+            {% endif %}
+        </span>
+        <a href="
+            {% if user.student_profile %}{% url 'dashboard' %}
+            {% elif user.teacher_profile %}{% url 'teacher_dashboard' %}
+            {% else %}{% url 'login' %}
+            {% endif %}" class="nav-dashboard-btn">
+            🚀 В кабинет
+        </a>
+    </div>
+    {% else %}
     <a href="{% url 'login' %}" class="nav-login-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -92,6 +420,7 @@
         </svg>
         Войти в личный кабинет
     </a>
+    {% endif %}
 </nav>
 
 <!-- Hero секция -->
@@ -103,36 +432,43 @@
             с отслеживанием прогресса и индивидуальными материалами
         </p>
 
-        <div class="hero-features">
-            <div class="hero-feature">
-                <div class="hero-feature-icon">📊</div>
-                <div class="hero-feature-title">Прогресс</div>
-                <div class="hero-feature-desc">Отслеживай результаты</div>
-            </div>
-            <div class="hero-feature">
-                <div class="hero-feature-icon">📁</div>
-                <div class="hero-feature-title">Материалы</div>
-                <div class="hero-feature-desc">Учебные файлы</div>
-            </div>
-            <div class="hero-feature">
-                <div class="hero-feature-icon">📅</div>
-                <div class="hero-feature-title">Дедлайны</div>
-                <div class="hero-feature-desc">Контроль сроков</div>
-            </div>
-        </div>
-
     </div>
 </div>
 
-<!-- Секция "О нас" -->
+<!-- Секция "О преподавателе" -->
 <div class="about-section">
     <div class="container">
-        <h2 class="section-title">Почему выбирают нас?</h2>
+        <h2 class="section-title">Почему стоит обратиться ко мне?</h2>
+
+        <!-- Карточка преподавателя -->
+        <div class="teacher-card">
+            <div class="teacher-avatar">
+                <img src="{% static 'img/ава.png' %}" alt="Андрей — преподаватель" class="teacher-photo">
+            </div>
+            <div class="teacher-card-content">
+                <div class="teacher-info">
+                    <h3 class="teacher-name">Андрей</h3>
+                    <p class="teacher-tagline">Инженер по образованию</p>
+                </div>
+                <div class="teacher-card-body">
+                    <p>Окончил <strong>БГТУ «Военмех» (СПб)</strong> с красным дипломом. За 5 лет работы с учениками понял главное: технические предметы требуют не зубрежки, а глубокого понимания. Именно его я и даю.</p>
+                    <p class="teacher-goal">🎯 Моя цель — не просто натаскать на экзамен, а заложить фундамент, который обеспечит высокий балл на ЕГЭ/ОГЭ и лёгкое погружение в учёбу на первом курсе технического вуза.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Преимущества -->
+        <h3 class="results-title">Что Вас ждёт?</h3>
         <div class="about-cards">
             <div class="about-card">
                 <div class="about-card-icon">🎯</div>
                 <h5>Индивидуальный подход</h5>
                 <p>Каждый ученик получает персональные задания и материалы, подобранные под его уровень подготовки.</p>
+            </div>            
+            <div class="about-card">
+                <div class="about-card-icon">💻</div>
+                <h5>Личный кабинет и Telegram-бот</h5>
+                <p>У каждого ученика — свой личный кабинет, а Telegram-бот напомнит о домашних заданиях и пробниках. Всё всегда под рукой.</p>
             </div>
             <div class="about-card">
                 <div class="about-card-icon">📈</div>
@@ -145,12 +481,116 @@
                 <p>Система дедлайнов приучает к регулярным занятиям и помогает не откладывать подготовку.</p>
             </div>
             <div class="about-card">
-                <div class="about-card-icon">💬</div>
-                <h5>Обратная связь</h5>
-                <p>Преподаватель проверяет работы и оставляет подробные комментарии по каждой задаче.</p>
+                <div class="about-card-icon">🖥️</div>
+                <h5>Онлайн-занятия с интерактивной доской</h5>
+                <p>Занятия проходят на платформе Яндекс Телемост. Использую интерактивную доску для наглядного объяснения.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card-icon">📊</div>
+                <h5>Отчёты для родителей</h5>
+                <p>Регулярно присылаю наглядный отчёт об успеваемости, чтобы вы всегда были в курсе.</p>
+            </div>
+        </div>
+
+        <!-- Результаты учеников -->
+        <div class="results-section">
+            <h3 class="results-title">
+                Почему это работает? Результаты:</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-icon">✅</div>
+                    <div class="result-value">70+</div>
+                    <div class="result-label">Средний балл моих учеников на ЕГЭ</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-icon">✅</div>
+                    <div class="result-value">🎓</div>
+                    <div class="result-label">Поступление на бюджет в желаемые вузы</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-icon">✅</div>
+                    <div class="result-value">+1–2</div>
+                    <div class="result-label">Повышение оценки в школе на балла</div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<!-- Секция отзывов родителей -->
+<div class="reviews-section">
+    <div class="container">
+        <h2 class="section-title">💬 Отзывы родителей</h2>
+    </div>
+    <div class="reviews-scroll-container">
+        <div class="reviews-track">
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115759.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115808.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115811.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115814.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115817.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115821.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115824.jpg' %}" alt="Отзыв родителя"></div>
+            <!-- Дублируем для бесшовной прокрутки -->
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115759.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115808.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115811.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115814.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115817.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115821.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><img src="{% static 'img/IMG_20260722_115824.jpg' %}" alt="Отзыв родителя"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Секция прайс-листа -->
+<div class="pricing-section">
+    <div class="container">
+        <h2 class="section-title">💰 Стоимость занятий</h2>
+        <div class="pricing-cards">
+            <div class="pricing-card pricing-card-individual">
+                <div class="pricing-card-badge">🔥</div>
+                <div class="pricing-card-icon">👨‍🏫</div>
+                <h5>Индивидуальное занятие</h5>
+                <div class="pricing-amount">
+                    <span class="pricing-price">от 1 100</span>
+                    <span class="pricing-currency">₽</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>✅ Персональная программа</li>
+                    <li>✅ Внимание только вам</li>
+                    <li>✅ Удобный график</li>
+                    <li>✅ Разбор сложных тем</li>
+                </ul>
+            </div>
+            <div class="pricing-card pricing-card-group">
+                <div class="pricing-card-icon">👥</div>
+                <h5>Занятие в группе</h5>
+                <div class="pricing-subtitle">(3–5 человек)</div>
+                <div class="pricing-amount">
+                    <span class="pricing-price">от 300</span>
+                    <span class="pricing-currency">₽</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>✅ Работа в команде</li>
+                    <li>✅ Обсуждение задач</li>
+                    <li>✅ Доступная цена</li>
+                    <li>✅ Поддержка преподавателя</li>
+                </ul>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Плавающая кнопка прайс-листа -->
+<div class="pricing-fab" id="pricingFab">
+    <button class="pricing-fab-btn" id="pricingToggle" aria-label="Показать стоимость">
+        <span class="fab-tooltip">Стоимость занятий</span>
+        💰
+    </button>
+    <span class="pricing-fab-label">Цены</span>
 </div>
 
 <!-- Футер -->
@@ -159,4 +599,30 @@
         <p class="mb-0">© {% now "Y" %} MathPhysEdu — Подготовка к ОГЭ и ЕГЭ по математике и физике</p>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('pricingToggle');
+    const pricingSection = document.querySelector('.pricing-section');
+    let isOpen = false;
+
+    if (toggleBtn && pricingSection) {
+        toggleBtn.addEventListener('click', function() {
+            isOpen = !isOpen;
+            pricingSection.classList.toggle('show', isOpen);
+            toggleBtn.textContent = isOpen ? '✕' : '💰';
+            toggleBtn.style.background = isOpen
+                ? 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)'
+                : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+
+            // Плавный скролл к секции при открытии
+            if (isOpen) {
+                setTimeout(function() {
+                    pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

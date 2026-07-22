@@ -151,24 +151,12 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="score" class="form-label">Баллы *</label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="score" name="score" 
-                                               min="0" max="{{ probnik.max_score }}" step="1" 
+                                        <input type="number" class="form-control" id="score" name="score"
+                                               min="0" max="{{ probnik.max_score }}" step="1"
                                                value="{{ probnik.score|default:'' }}" required>
                                         <span class="input-group-text">/ {{ probnik.max_score }}</span>
                                     </div>
                                     <div class="form-text">Введите количество набранных баллов</div>
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="grade" class="form-label">Оценка</label>
-                                    <select class="form-control" id="grade" name="grade">
-                                        <option value="">-- Автоматически --</option>
-                                        <option value="5" {% if probnik.grade == '5' %}selected{% endif %}>Отлично (5)</option>
-                                        <option value="4" {% if probnik.grade == '4' %}selected{% endif %}>Хорошо (4)</option>
-                                        <option value="3" {% if probnik.grade == '3' %}selected{% endif %}>Удовлетворительно (3)</option>
-                                        <option value="2" {% if probnik.grade == '2' %}selected{% endif %}>Неудовлетворительно (2)</option>
-                                    </select>
-                                    <div class="form-text">Выберите оценку или оставьте пустым для автоматического расчета</div>
                                 </div>
                             </div>
                             
@@ -212,23 +200,6 @@
                                 <h4 class="d-block d-md-none {% if percentage >= 80 %}text-success{% elif percentage >= 60 %}text-info{% elif percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
                                     {{ percentage }}%
                                 </h4>
-                                {% if probnik.grade %}
-                                <div class="mt-2">
-                                    {% if probnik.grade == '5' %}
-                                        <span class="badge bg-success fs-5 d-inline d-md-none">Отлично</span>
-                                        <span class="badge bg-success fs-4 d-none d-md-inline">Отлично (5)</span>
-                                    {% elif probnik.grade == '4' %}
-                                        <span class="badge bg-info fs-5 d-inline d-md-none">Хорошо</span>
-                                        <span class="badge bg-info fs-4 d-none d-md-inline">Хорошо (4)</span>
-                                    {% elif probnik.grade == '3' %}
-                                        <span class="badge bg-warning text-dark fs-5 d-inline d-md-none">Удовл.</span>
-                                        <span class="badge bg-warning text-dark fs-4 d-none d-md-inline">Удовлетворительно (3)</span>
-                                    {% elif probnik.grade == '2' %}
-                                        <span class="badge bg-danger fs-5 d-inline d-md-none">Неуд.</span>
-                                        <span class="badge bg-danger fs-4 d-none d-md-inline">Неудовлетворительно (2)</span>
-                                    {% endif %}
-                                </div>
-                                {% endif %}
                             </div>
                             <div class="col-12 col-md-8">
                                 {% if probnik.teacher_comment %}
@@ -276,32 +247,6 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const scoreInput = document.getElementById('score');
-    const gradeSelect = document.getElementById('grade');
-    const maxScore = {{ probnik.max_score|default:100 }};
-    
-    if (scoreInput && gradeSelect) {
-        scoreInput.addEventListener('input', function() {
-            const score = parseInt(this.value);
-            if (!isNaN(score) && maxScore > 0) {
-                const percentage = (score / maxScore) * 100;
-                
-                if (percentage >= 85) {
-                    gradeSelect.value = '5';
-                } else if (percentage >= 70) {
-                    gradeSelect.value = '4';
-                } else if (percentage >= 50) {
-                    gradeSelect.value = '3';
-                } else if (percentage > 0) {
-                    gradeSelect.value = '2';
-                }
-            }
-        });
-    }
-});
-</script>
 {% else %}
 <div class="row justify-content-center">
     <div class="col-md-6">

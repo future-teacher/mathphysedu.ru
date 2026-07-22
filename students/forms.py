@@ -209,7 +209,7 @@ class HomeworkCheckForm(forms.ModelForm):
         self.fields['status'].choices = [('checked', 'Проверено')]
         self.fields['status'].initial = 'checked'
         self.fields['status'].widget.attrs['disabled'] = True
-        self.fields['grade'].label = 'Оценка'
+        self.fields['grade'].label = 'Результат'
         self.fields['teacher_comment'].label = 'Комментарий'
         self.fields['teacher_comment'].help_text = 'Напишите комментарий к работе'
 
@@ -288,20 +288,17 @@ class ProbnikCheckForm(forms.ModelForm):
     
     class Meta:
         model = Probnik
-        fields = ['score', 'grade', 'teacher_comment']
+        fields = ['score', 'teacher_comment']
         widgets = {
             'score': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '1'}),
-            'grade': forms.Select(attrs={'class': 'form-control'}),
             'teacher_comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Комментарий к работе'}),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['score'].label = 'Баллы'
-        self.fields['grade'].label = 'Оценка'
         self.fields['teacher_comment'].label = 'Комментарий'
         self.fields['score'].help_text = 'Введите количество набранных баллов'
-        self.fields['grade'].help_text = 'Выберите оценку или оставьте пустым для автоматического расчета'
         self.fields['teacher_comment'].help_text = 'Напишите разбор ошибок и рекомендации'
 
 

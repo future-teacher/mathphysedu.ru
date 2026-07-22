@@ -78,14 +78,6 @@
                             </div>
                         </div>
 
-                        <!-- Прогресс-бар -->
-                        <div class="probnik-progress-bar">
-                            <div class="probnik-progress-fill 
-                                {% if probnik.has_student_files %}probnik-progress-started
-                                {% else %}probnik-progress-assigned{% endif %}">
-                            </div>
-                        </div>
-
                         <!-- Бейдж просрочки -->
                         {% if probnik.is_overdue %}
                         <div class="probnik-badge probnik-badge-overdue">Просрочено</div>
@@ -311,34 +303,6 @@
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* Оценка */
-.probnik-grade {
-    font-size: 1rem;
-    font-weight: 700;
-    padding: 0.1rem 0.5rem;
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.probnik-grade-5 {
-    background: rgba(34, 197, 94, 0.2);
-    color: #4ade80;
-}
-
-.probnik-grade-4 {
-    background: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-}
-
-.probnik-grade-3 {
-    background: rgba(234, 179, 8, 0.2);
-    color: #facc15;
-}
-
-.probnik-grade-2 {
-    background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
-}
 
 /* Мета-информация */
 .probnik-meta {
@@ -366,37 +330,6 @@
 .probnik-meta-danger {
     color: #f87171 !important;
     font-weight: 600;
-}
-
-/* Прогресс-бар */
-.probnik-progress-bar {
-    width: 80%;
-    height: 0.25rem;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: auto;
-}
-
-.probnik-progress-fill {
-    height: 100%;
-    border-radius: 999px;
-    transition: width 0.3s ease;
-}
-
-.probnik-progress-assigned {
-    width: 15%;
-    background: #6b7280;
-}
-
-.probnik-progress-started {
-    width: 50%;
-    background: #f59e0b;
-}
-
-.probnik-progress-checked {
-    width: 100%;
-    background: #22c55e;
 }
 
 /* Бейдж */
@@ -455,10 +388,6 @@
         top: 0.4rem;
         right: 0.5rem;
     }
-    .probnik-progress-bar {
-        width: 85%;
-        height: 0.2rem;
-    }
     .probnik-badge {
         font-size: 0.5rem;
         padding: 0.1rem 0.4rem;
@@ -499,10 +428,6 @@
         height: 0.4rem;
         top: 0.3rem;
         right: 0.4rem;
-    }
-    .probnik-progress-bar {
-        width: 90%;
-        height: 0.15rem;
     }
     .probnik-badge {
         font-size: 0.45rem;

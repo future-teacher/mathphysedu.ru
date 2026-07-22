@@ -151,21 +151,12 @@
                         <div class="row">
                             <div class="col-md-4 text-center">
                                 {% if homework.grade %}
-                                    {% if homework.grade == '5' %}
-                                        <div class="display-1 text-success">5</div>
-                                        <span class="badge bg-success fs-4">Отлично</span>
-                                    {% elif homework.grade == '4' %}
-                                        <div class="display-1 text-info">4</div>
-                                        <span class="badge bg-info fs-4">Хорошо</span>
-                                    {% elif homework.grade == '3' %}
-                                        <div class="display-1 text-warning">3</div>
-                                        <span class="badge bg-warning fs-4">Удовлетворительно</span>
-                                    {% elif homework.grade == '2' %}
-                                        <div class="display-1 text-danger">2</div>
-                                        <span class="badge bg-danger fs-4">Неудовлетворительно</span>
-                                    {% elif homework.grade == 'z' %}
+                                    {% if homework.grade == 'z' %}
                                         <div class="display-1 text-success">✓</div>
                                         <span class="badge bg-success fs-4">Зачтено</span>
+                                    {% elif homework.grade == 'nz' %}
+                                        <div class="display-1 text-danger">✗</div>
+                                        <span class="badge bg-danger fs-4">Не зачтено</span>
                                     {% endif %}
                                 {% endif %}
                             </div>
@@ -206,16 +197,13 @@
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="grade" class="form-label">Оценка *</label>
+                                    <label for="grade" class="form-label">Результат *</label>
                                     <select class="form-control" id="grade" name="grade" required>
-                                        <option value="">-- Выберите оценку --</option>
-                                        <option value="5" {% if homework.grade == '5' %}selected{% endif %}>Отлично (5)</option>
-                                        <option value="4" {% if homework.grade == '4' %}selected{% endif %}>Хорошо (4)</option>
-                                        <option value="3" {% if homework.grade == '3' %}selected{% endif %}>Удовлетворительно (3)</option>
-                                        <option value="2" {% if homework.grade == '2' %}selected{% endif %}>Неудовлетворительно (2)</option>
+                                        <option value="">-- Выберите результат --</option>
                                         <option value="z" {% if homework.grade == 'z' %}selected{% endif %}>Зачтено</option>
+                                        <option value="nz" {% if homework.grade == 'nz' %}selected{% endif %}>Не зачтено</option>
                                     </select>
-                                    <div class="form-text">Оценка за домашнее задание</div>
+                                    <div class="form-text">Результат проверки домашнего задания</div>
                                 </div>
                             </div>
                             
@@ -292,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const grade = document.getElementById('grade').value;
             if (!grade) {
                 e.preventDefault();
-                alert('Пожалуйста, выберите оценку');
+                alert('Пожалуйста, выберите результат');
                 return false;
             }
             

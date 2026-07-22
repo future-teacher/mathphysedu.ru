@@ -267,11 +267,9 @@
                                         <td>
                                             {% if hw.status == 'checked' %}
                                                 {% if hw.grade %}
-                                                    <span class="badge 
-                                                        {% if hw.grade == '5' %}bg-success
-                                                        {% elif hw.grade == '4' %}bg-info
-                                                        {% elif hw.grade == '3' %}bg-warning text-dark
-                                                        {% elif hw.grade == '2' %}bg-danger
+                                                    <span class="badge
+                                                        {% if hw.grade == 'z' %}bg-success
+                                                        {% elif hw.grade == 'nz' %}bg-danger
                                                         {% else %}bg-secondary{% endif %}">
                                                         {{ hw.get_grade_display }}
                                                     </span>
@@ -378,11 +376,9 @@
                                         <td>
                                             {% if hw.status == 'checked' %}
                                                 {% if hw.grade %}
-                                                    <span class="badge 
-                                                        {% if hw.grade == '5' %}bg-success
-                                                        {% elif hw.grade == '4' %}bg-info
-                                                        {% elif hw.grade == '3' %}bg-warning text-dark
-                                                        {% elif hw.grade == '2' %}bg-danger
+                                                    <span class="badge
+                                                        {% if hw.grade == 'z' %}bg-success
+                                                        {% elif hw.grade == 'nz' %}bg-danger
                                                         {% else %}bg-secondary{% endif %}">
                                                         {{ hw.get_grade_display }}
                                                     </span>
@@ -481,15 +477,6 @@
                                                 <span class="badge bg-info">
                                                     {{ probnik.score }}/{{ probnik.max_score }}
                                                 </span>
-                                                {% if probnik.grade %}
-                                                    <span class="badge 
-                                                        {% if probnik.grade == '5' %}bg-success
-                                                        {% elif probnik.grade == '4' %}bg-info
-                                                        {% elif probnik.grade == '3' %}bg-warning text-dark
-                                                        {% else %}bg-danger{% endif %}">
-                                                        {{ probnik.grade }}
-                                                    </span>
-                                                {% endif %}
                                             {% else %}
                                                 <span class="text-muted">-</span>
                                             {% endif %}
@@ -571,15 +558,6 @@
                                                 <span class="badge bg-info">
                                                     {{ probnik.score }}/{{ probnik.max_score }}
                                                 </span>
-                                                {% if probnik.grade %}
-                                                    <span class="badge 
-                                                        {% if probnik.grade == '5' %}bg-success
-                                                        {% elif probnik.grade == '4' %}bg-info
-                                                        {% elif probnik.grade == '3' %}bg-warning text-dark
-                                                        {% else %}bg-danger{% endif %}">
-                                                        {{ probnik.grade }}
-                                                    </span>
-                                                {% endif %}
                                             {% else %}
                                                 <span class="text-muted">-</span>
                                             {% endif %}
