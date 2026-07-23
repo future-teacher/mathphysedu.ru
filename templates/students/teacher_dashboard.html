@@ -126,16 +126,17 @@
     }
 
     .td-student-name {
-        font-weight: 600;
+        font-weight: 400;
         color: #e2e8f0;
         text-align: center;
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         line-height: 1.2;
     }
 
     .td-student-class {
-        font-size: 0.75rem;
+        font-size: 0.65rem;
         color: rgba(255, 255, 255, 0.5);
+        font-weight: 300;
     }
 
     .td-student-exams {
@@ -217,10 +218,10 @@
             font-size: 1rem;
         }
         .td-student-name {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
         .td-student-class {
-            font-size: 0.65rem;
+            font-size: 0.55rem;
         }
         .td-exam-badge {
             font-size: 0.5rem;
@@ -265,10 +266,10 @@
             font-size: 0.85rem;
         }
         .td-student-name {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
         }
         .td-student-class {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
         }
         .td-student-exams {
             gap: 0.15rem;
@@ -316,42 +317,6 @@
             </div>
         </div>
         {% endif %}
-
-        <!-- ===== БЫСТРЫЕ ДЕЙСТВИЯ ===== -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3 col-6">
-                <a href="{% url 'teacher_homework_create' %}" class="text-decoration-none">
-                    <div class="quick-action-card bg-primary text-white">
-                        <span class="qa-icon">📝</span>
-                        <p class="qa-label">Новое ДЗ</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-3 col-6">
-                <a href="{% url 'teacher_probnik_create' %}" class="text-decoration-none">
-                    <div class="quick-action-card bg-warning text-dark">
-                        <span class="qa-icon">📊</span>
-                        <p class="qa-label">Новый пробник</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-3 col-6">
-                <a href="{% url 'teacher_student_create' %}" class="text-decoration-none">
-                    <div class="quick-action-card bg-success text-white">
-                        <span class="qa-icon">➕</span>
-                        <p class="qa-label">Добавить ученика</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-3 col-6">
-                <a href="{% url 'teacher_studyfile_create' %}" class="text-decoration-none">
-                    <div class="quick-action-card bg-info text-white">
-                        <span class="qa-icon">📁</span>
-                        <p class="qa-label">Загрузить файл</p>
-                    </div>
-                </a>
-            </div>
-        </div>
 
         <!-- ===== СПИСОК УЧЕНИКОВ ===== -->
         <div class="d-flex justify-content-between align-items-center mb-3">

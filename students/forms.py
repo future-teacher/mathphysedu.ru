@@ -102,8 +102,7 @@ class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
         fields = ['first_name', 'last_name', 'class_name', 'telegram_username',
-                 'parent_name', 'parent_telegram', 'school', 'current_level',
-                 'weak_topics', 'start_date', 'google_sheet_url', 'notes']
+                 'parent_name', 'parent_telegram', 'start_date', 'google_sheet_url', 'notes']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -111,9 +110,6 @@ class StudentForm(forms.ModelForm):
             'telegram_username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '@username'}),
             'parent_name': forms.TextInput(attrs={'class': 'form-control'}),
             'parent_telegram': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '@username'}),
-            'school': forms.TextInput(attrs={'class': 'form-control'}),
-            'current_level': forms.TextInput(attrs={'class': 'form-control'}),
-            'weak_topics': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'google_sheet_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://docs.google.com/spreadsheets/d/...'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),

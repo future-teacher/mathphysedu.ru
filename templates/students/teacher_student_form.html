@@ -28,7 +28,7 @@
                                     {% endif %}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_last_name" class="form-label">Фамилия *</label>
+                                    <label for="id_last_name" class="form-label">Фамилия</label>
                                     {{ form.last_name }}
                                     {% if form.last_name.errors %}
                                     <div class="text-danger">{{ form.last_name.errors }}</div>
@@ -38,14 +38,14 @@
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_class_name" class="form-label">Класс *</label>
+                                    <label for="id_class_name" class="form-label">Класс</label>
                                     {{ form.class_name }}
                                     {% if form.class_name.errors %}
                                     <div class="text-danger">{{ form.class_name.errors }}</div>
                                     {% endif %}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_start_date" class="form-label">Дата начала занятий *</label>
+                                    <label for="id_start_date" class="form-label">Дата начала занятий</label>
                                     {{ form.start_date }}
                                     {% if form.start_date.errors %}
                                     <div class="text-danger">{{ form.start_date.errors }}</div>
@@ -62,7 +62,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_telegram_username" class="form-label">Telegram ученика (@username) *</label>
+                                    <label for="id_telegram_username" class="form-label">Telegram ученика (@username)</label>
                                     {{ form.telegram_username }}
                                     <div class="form-text">Например: @ivanov_student</div>
                                     {% if form.telegram_username.errors %}
@@ -80,63 +80,10 @@
                             </div>
                             
                             <div class="mb-3">
-                                <label for="id_parent_name" class="form-label">Имя родителя *</label>
+                                <label for="id_parent_name" class="form-label">Имя родителя</label>
                                 {{ form.parent_name }}
                                 {% if form.parent_name.errors %}
                                 <div class="text-danger">{{ form.parent_name.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="id_school" class="form-label">Школа *</label>
-                                {{ form.school }}
-                                {% if form.school.errors %}
-                                <div class="text-danger">{{ form.school.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card mb-4">
-                        <div class="card-header bg-light">
-                            <h5 class="mb-0">🎯 Учебная информация</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Направления подготовки *</label>
-                                <div class="border p-3 rounded">
-                                    {% for choice in form.exam_type_choices.field.choices %}
-                                    <div class="form-check">
-                                        <input type="checkbox" name="exam_type_choices" value="{{ choice.0 }}" 
-                                               id="id_exam_type_choices_{{ forloop.counter }}" 
-                                               class="form-check-input"
-                                               {% if choice.0 in form.exam_type_choices.value %}checked{% endif %}>
-                                        <label class="form-check-label" for="id_exam_type_choices_{{ forloop.counter }}">
-                                            {{ choice.1 }}
-                                        </label>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                                {% if form.exam_type_choices.errors %}
-                                <div class="text-danger">{{ form.exam_type_choices.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="id_current_level" class="form-label">Текущий уровень *</label>
-                                {{ form.current_level }}
-                                <div class="form-text">Например: Средний, Хороший, Отличный</div>
-                                {% if form.current_level.errors %}
-                                <div class="text-danger">{{ form.current_level.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="id_weak_topics" class="form-label">Слабые темы *</label>
-                                {{ form.weak_topics }}
-                                <div class="form-text">Перечислите темы, которые нужно подтянуть</div>
-                                {% if form.weak_topics.errors %}
-                                <div class="text-danger">{{ form.weak_topics.errors }}</div>
                                 {% endif %}
                             </div>
                         </div>

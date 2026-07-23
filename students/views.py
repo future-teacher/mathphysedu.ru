@@ -140,23 +140,12 @@ def dashboard(request):
     
     active_exams.sort(key=lambda x: x['date'])
     
-    # === РАСЧЕТ ПРОГРЕССА ДЛЯ ГЕЙМИФИКАЦИИ ===
-    # Математика
+    # === ДОСТИЖЕНИЯ (ГЕЙМИФИКАЦИЯ) ===
     math_total = student.homework.filter(subject='math').count()
-    math_completed = student.homework.filter(subject='math', status='checked').count()
-    math_progress = int((math_completed / math_total * 100)) if math_total > 0 else 0
-    
-    # Физика
     physics_total = student.homework.filter(subject='physics').count()
-    physics_completed = student.homework.filter(subject='physics', status='checked').count()
-    physics_progress = int((physics_completed / physics_total * 100)) if physics_total > 0 else 0
-    
-    # Общий прогресс по всем предметам
     total_all = student.homework.count()
     completed_all = student.homework.filter(status='checked').count()
-    total_progress = int((completed_all / total_all * 100)) if total_all > 0 else 0
     
-    # Количество достижений (для геймификации)
     achievements = []
     if math_total >= 10:
         achievements.append('🧮 Математический боец')
@@ -187,14 +176,6 @@ def dashboard(request):
         'active_exams': active_exams,
         'today': today,
         'week_ago': week_ago,
-        # Данные для прогресса
-        'math_progress': math_progress,
-        'physics_progress': physics_progress,
-        'total_progress': total_progress,
-        'math_total': math_total,
-        'math_completed': math_completed,
-        'physics_total': physics_total,
-        'physics_completed': physics_completed,
         'achievements': achievements,
     })
 

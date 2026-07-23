@@ -385,6 +385,82 @@
         font-size: 2.8rem;
     }
 }
+
+/* ===== Модальное окно для отзывов ===== */
+.review-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.review-modal.show {
+    display: flex;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.review-modal-content {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    cursor: default;
+    object-fit: contain;
+}
+
+.review-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+    line-height: 1;
+    z-index: 10000;
+}
+
+.review-modal-close:hover {
+    transform: rotate(90deg);
+    color: #ff4444;
+}
+
+.review-link {
+    display: block;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.review-link:hover img {
+    transform: scale(1.03);
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .review-modal-content {
+        max-width: 95%;
+        max-height: 80%;
+    }
+    .review-modal-close {
+        top: 15px;
+        right: 20px;
+        font-size: 32px;
+    }
+}
 </style>
 {% endblock %}
 
@@ -428,8 +504,8 @@
     <div class="hero-content">
         <h1 class="hero-title">📐 MathPhysEdu</h1>
         <p class="hero-subtitle">
-            Персональная подготовка к ОГЭ и ЕГЭ по математике и физике<br>
-            с отслеживанием прогресса и индивидуальными материалами
+            Подготовка к ОГЭ и ЕГЭ по математике и физике в группах выходного дня<br>
+            Интенсивный разбор первой части уже через полгода
         </p>
 
     </div>
@@ -452,6 +528,7 @@
                 </div>
                 <div class="teacher-card-body">
                     <p>Окончил <strong>БГТУ «Военмех» (СПб)</strong> с красным дипломом. За 5 лет работы с учениками понял главное: технические предметы требуют не зубрежки, а глубокого понимания. Именно его я и даю.</p>
+                    <p>Сам ежегодно сдаю ЕГЭ — это подтверждает мою вовлечённость в процесс и позволяет всегда быть в курсе актуальных требований экзамена.</p>
                     <p class="teacher-goal">🎯 Моя цель — не просто натаскать на экзамен, а заложить фундамент, который обеспечит высокий балл на ЕГЭ/ОГЭ и лёгкое погружение в учёбу на первом курсе технического вуза.</p>
                 </div>
             </div>
@@ -460,11 +537,6 @@
         <!-- Преимущества -->
         <h3 class="results-title">Что Вас ждёт?</h3>
         <div class="about-cards">
-            <div class="about-card">
-                <div class="about-card-icon">🎯</div>
-                <h5>Индивидуальный подход</h5>
-                <p>Каждый ученик получает персональные задания и материалы, подобранные под его уровень подготовки.</p>
-            </div>            
             <div class="about-card">
                 <div class="about-card-icon">💻</div>
                 <h5>Личный кабинет и Telegram-бот</h5>
@@ -484,6 +556,11 @@
                 <div class="about-card-icon">🖥️</div>
                 <h5>Онлайн-занятия с интерактивной доской</h5>
                 <p>Занятия проходят на платформе Яндекс Телемост. Использую интерактивную доску для наглядного объяснения.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card-icon">📋</div>
+                <h5>Задания из банка ФИПИ</h5>
+                <p>Все задания составляются на основе актуального банка задач ФИПИ — никакой «воды», только то, что реально встретится на экзамене.</p>
             </div>
             <div class="about-card">
                 <div class="about-card-icon">📊</div>
@@ -507,11 +584,6 @@
                     <div class="result-value">🎓</div>
                     <div class="result-label">Поступление на бюджет в желаемые вузы</div>
                 </div>
-                <div class="result-card">
-                    <div class="result-icon">✅</div>
-                    <div class="result-value">+1–2</div>
-                    <div class="result-label">Повышение оценки в школе на балла</div>
-                </div>
             </div>
         </div>
 
@@ -526,51 +598,42 @@
     </div>
     <div class="reviews-scroll-container">
         <div class="reviews-track">
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115759.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115808.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115811.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115814.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115817.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115821.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115824.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115759.jpg' %}"><img src="{% static 'img/IMG_20260722_115759.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115808.jpg' %}"><img src="{% static 'img/IMG_20260722_115808.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115811.jpg' %}"><img src="{% static 'img/IMG_20260722_115811.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115814.jpg' %}"><img src="{% static 'img/IMG_20260722_115814.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115817.jpg' %}"><img src="{% static 'img/IMG_20260722_115817.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115821.jpg' %}"><img src="{% static 'img/IMG_20260722_115821.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115824.jpg' %}"><img src="{% static 'img/IMG_20260722_115824.jpg' %}" alt="Отзыв родителя"></a></div>
             <!-- Дублируем для бесшовной прокрутки -->
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115759.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115808.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115811.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115814.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115817.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115821.jpg' %}" alt="Отзыв родителя"></div>
-            <div class="review-card"><img src="{% static 'img/IMG_20260722_115824.jpg' %}" alt="Отзыв родителя"></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115759.jpg' %}"><img src="{% static 'img/IMG_20260722_115759.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115808.jpg' %}"><img src="{% static 'img/IMG_20260722_115808.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115811.jpg' %}"><img src="{% static 'img/IMG_20260722_115811.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115814.jpg' %}"><img src="{% static 'img/IMG_20260722_115814.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115817.jpg' %}"><img src="{% static 'img/IMG_20260722_115817.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115821.jpg' %}"><img src="{% static 'img/IMG_20260722_115821.jpg' %}" alt="Отзыв родителя"></a></div>
+            <div class="review-card"><a href="#" class="review-link" data-img="{% static 'img/IMG_20260722_115824.jpg' %}"><img src="{% static 'img/IMG_20260722_115824.jpg' %}" alt="Отзыв родителя"></a></div>
         </div>
     </div>
+</div>
+
+<!-- Модальное окно для просмотра отзывов -->
+<div class="review-modal" id="reviewModal">
+    <span class="review-modal-close">&times;</span>
+    <img class="review-modal-content" id="reviewModalImg">
 </div>
 
 <!-- Секция прайс-листа -->
 <div class="pricing-section">
     <div class="container">
-        <h2 class="section-title">💰 Стоимость занятий</h2>
+        <h2 class="section-title">💰 Стоимость занятий в группах</h2>
         <div class="pricing-cards">
-            <div class="pricing-card pricing-card-individual">
-                <div class="pricing-card-badge">🔥</div>
-                <div class="pricing-card-icon">👨‍🏫</div>
-                <h5>Индивидуальное занятие</h5>
-                <div class="pricing-amount">
-                    <span class="pricing-price">от 1 100</span>
-                    <span class="pricing-currency">₽</span>
-                </div>
-                <ul class="pricing-features">
-                    <li>✅ Персональная программа</li>
-                    <li>✅ Внимание только вам</li>
-                    <li>✅ Удобный график</li>
-                    <li>✅ Разбор сложных тем</li>
-                </ul>
-            </div>
             <div class="pricing-card pricing-card-group">
                 <div class="pricing-card-icon">👥</div>
                 <h5>Занятие в группе</h5>
                 <div class="pricing-subtitle">(3–5 человек)</div>
                 <div class="pricing-amount">
-                    <span class="pricing-price">от 300</span>
+                    <span class="pricing-price">от 400</span>
                     <span class="pricing-currency">₽</span>
                 </div>
                 <ul class="pricing-features">
@@ -623,6 +686,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // ===== Модальное окно для отзывов =====
+    const modal = document.getElementById('reviewModal');
+    const modalImg = document.getElementById('reviewModalImg');
+    const modalClose = document.querySelector('.review-modal-close');
+    const reviewLinks = document.querySelectorAll('.review-link');
+
+    reviewLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            modalImg.src = this.dataset.img;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    function closeReviewModal() {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    if (modalClose) {
+        modalClose.addEventListener('click', closeReviewModal);
+    }
+
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeReviewModal();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('show')) {
+            closeReviewModal();
+        }
+    });
 });
 </script>
 {% endblock %}

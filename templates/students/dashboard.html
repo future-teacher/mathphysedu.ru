@@ -154,22 +154,6 @@
         box-shadow: 0 0 20px rgba(255,215,0,0.2);
     }
 
-    /* Прогресс-бары */
-    .progress-glass {
-        background: rgba(255,255,255,0.1);
-        border-radius: 50px;
-        height: 25px;
-        overflow: hidden;
-        backdrop-filter: blur(10px);
-    }
-
-    .progress-glass .progress-bar {
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.8rem;
-        line-height: 25px;
-        transition: width 1s ease;
-    }
     @media (max-width: 991.98px) {
         .exam-timer-number {
             font-size: 3rem;
@@ -190,13 +174,6 @@
         .achievement-badge {
             padding: 0.35rem 0.75rem;
             font-size: 0.75rem;
-        }
-        .progress-glass {
-            height: 20px;
-        }
-        .progress-glass .progress-bar {
-            font-size: 0.7rem;
-            line-height: 20px;
         }
     }
 
@@ -295,46 +272,6 @@
                     </div>
                 </div>
                 {% endif %}
-
-                <!-- ===== ПРОГРЕСС ПО ПРЕДМЕТАМ ===== -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <div class="card bg-dark text-white h-100">
-                            <div class="card-body">
-                                <h6>🧮 Математика</h6>
-                                <div class="progress progress-glass">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info"
-                                         role="progressbar"
-                                         style="width: {{ math_progress }}%;"
-                                         aria-valuenow="{{ math_progress }}" aria-valuemin="0" aria-valuemax="100">
-                                        {{ math_progress }}%
-                                    </div>
-                                </div>
-                                <small class="text-muted mt-1 d-block">
-                                    {{ math_completed }} из {{ math_total }} заданий выполнено
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card bg-dark text-white h-100">
-                            <div class="card-body">
-                                <h6>⚡ Физика</h6>
-                                <div class="progress progress-glass">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
-                                         role="progressbar"
-                                         style="width: {{ physics_progress }}%;"
-                                         aria-valuenow="{{ physics_progress }}" aria-valuemin="0" aria-valuemax="100">
-                                        {{ physics_progress }}%
-                                    </div>
-                                </div>
-                                <small class="text-muted mt-1 d-block">
-                                    {{ physics_completed }} из {{ physics_total }} заданий выполнено
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- ===== ССЫЛКА НА GOOGLE ТАБЛИЦУ ===== -->
                 {% if student.google_sheet_url %}

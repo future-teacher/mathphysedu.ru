@@ -42,8 +42,8 @@ class Student(models.Model):
                                related_name='students', verbose_name='Преподаватель')
     
     first_name = models.CharField(max_length=100, verbose_name='Имя')
-    last_name = models.CharField(max_length=100, verbose_name='Фамилия')
-    class_name = models.CharField(max_length=50, verbose_name='Класс')
+    last_name = models.CharField(max_length=100, verbose_name='Фамилия', blank=True)
+    class_name = models.CharField(max_length=50, verbose_name='Класс', blank=True)
     
     telegram_username = models.CharField(max_length=100, verbose_name='Telegram @username',
                                         help_text='Начинается с @')
@@ -53,9 +53,9 @@ class Student(models.Model):
     )
     parent_telegram = models.CharField(max_length=100, verbose_name='Telegram родителя',
                                       blank=True, help_text='Начинается с @')
-    parent_name = models.CharField(max_length=200, verbose_name='Имя родителя')
+    parent_name = models.CharField(max_length=200, verbose_name='Имя родителя', blank=True)
     
-    school = models.CharField(max_length=200, verbose_name='Школа')
+    school = models.CharField(max_length=200, verbose_name='Школа', blank=True)
     
     exam_types = models.CharField(
         max_length=200,
@@ -65,8 +65,8 @@ class Student(models.Model):
         blank=True
     )
     
-    current_level = models.CharField(max_length=100, verbose_name='Текущий уровень')
-    weak_topics = models.TextField(verbose_name='Слабые темы')
+    current_level = models.CharField(max_length=100, verbose_name='Текущий уровень', blank=True)
+    weak_topics = models.TextField(verbose_name='Слабые темы', blank=True)
     start_date = models.DateField(verbose_name='Дата начала занятий')
     
     exam_date_oge_math = models.DateField(null=True, blank=True, verbose_name='Дата ОГЭ по математике')
