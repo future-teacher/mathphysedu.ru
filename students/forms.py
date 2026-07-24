@@ -248,6 +248,9 @@ class ProbnikForm(forms.ModelForm):
         self.fields['max_score'].required = False
         
         if not self.instance.pk:
+            # При создании нового пробника скрываем поле is_hidden
+            self.fields['is_hidden'].widget = forms.HiddenInput()
+            self.fields['is_hidden'].initial = False
             self.fields['deadline'].initial = timezone.now().date() + timezone.timedelta(days=7)
             self.fields['score'].required = False
             self.fields['teacher_comment'].required = False
@@ -332,9 +335,8 @@ class TeacherProfileForm(forms.ModelForm):
 
     class Meta:
         model = Teacher
-        fields = ['phone', 'telegram', 'bio']
+        fields = ['telegram', 'bio']
         widgets = {
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+7 (999) 123-45-67'}),
             'telegram': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '@username'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'О себе...'}),
         }

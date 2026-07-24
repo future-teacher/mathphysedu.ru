@@ -373,18 +373,13 @@
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-        <a class="sidebar-brand" href="
-            {% if user.student_profile %}{% url 'dashboard' %}
-            {% elif user.teacher_profile %}{% url 'teacher_dashboard' %}
-            {% else %}{% url 'login' %}
-            {% endif %}">
+        <a class="sidebar-brand" href="{% url 'landing' %}">
             🎓 MathPhysEdu
         </a>
 
         <div class="sidebar-user">
             {% if user.student_profile %}
                 <div class="user-name">{{ user.student_profile.first_name }} {{ user.student_profile.last_name }}</div>
-                <div>{{ user.student_profile.class_name }}</div>
             {% elif user.teacher_profile %}
                 <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
                 <div>Преподаватель</div>
@@ -431,9 +426,6 @@
                 </a>
 
                 <div class="nav-section">Управление</div>
-                <a href="{% url 'teacher_student_create' %}">
-                    <span class="icon">➕</span> Добавить ученика
-                </a>
                 <a href="{% url 'teacher_homework_create' %}">
                     <span class="icon">📝</span> Создать ДЗ
                 </a>
@@ -442,6 +434,11 @@
                 </a>
                 <a href="{% url 'teacher_studyfile_create' %}">
                     <span class="icon">📁</span> Загрузить файл
+                </a>
+
+                <div class="nav-section">Заявки</div>
+                <a href="{% url 'teacher_applications' %}" {% if request.resolver_match.url_name == 'teacher_applications' %}class="active"{% endif %}>
+                    <span class="icon">📋</span> Заявки
                 </a>
 
                 <div class="nav-section">Настройки</div>
@@ -464,9 +461,6 @@
         <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
         <span class="topbar-title">{% block topbar_title %}MathPhysEdu{% endblock %}</span>
         <div class="topbar-right">
-            {% if user.student_profile %}
-                <span class="badge bg-primary rounded-pill">{{ user.student_profile.class_name }}</span>
-            {% endif %}
         </div>
     </header>
 

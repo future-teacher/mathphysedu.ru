@@ -132,15 +132,23 @@
                 </div>
                 {% endif %}
                 
-                {% if probnik.status == 'in_progress' %}
+                <!-- Форма проверки/редактирования пробника (доступна всегда) -->
                 <div class="card mb-4 border-primary">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">✅ Проверка пробника</h5>
+                    <div class="card-header {% if probnik.status == 'checked' %}bg-warning{% else %}bg-primary{% endif %} text-white">
+                        <h5 class="mb-0">
+                            {% if probnik.status == 'checked' %}✏️ Редактировать результаты{% else %}✅ Проверка пробника{% endif %}
+                        </h5>
                     </div>
                     <div class="card-body">
-                        {% if not student_files %}
+                        {% if not student_files and probnik.status != 'checked' %}
                         <div class="alert alert-warning">
                             <strong>⚠️ Внимание!</strong> Ученик еще не загрузил решения. Проверять пока нечего.
+                        </div>
+                        {% endif %}
+                        
+                        {% if probnik.status == 'checked' %}
+                        <div class="alert alert-info">
+                            <strong>ℹ️ Режим редактирования:</strong> Пробник уже проверен. Вы можете изменить баллы или комментарий.
                         </div>
                         {% endif %}
                         
@@ -162,7 +170,7 @@
                             
                             <div class="mb-3">
                                 <label for="teacher_comment" class="form-label">Комментарий преподавателя</label>
-                                <textarea class="form-control" id="teacher_comment" name="teacher_comment" 
+                                <textarea class="form-control" id="teacher_comment" name="teacher_comment"
                                           rows="4" placeholder="Напишите разбор ошибок и рекомендации...">{{ probnik.teacher_comment|default:'' }}</textarea>
                                 <div class="form-text">Подробный разбор ошибок и рекомендации</div>
                             </div>
@@ -172,54 +180,11 @@
                             </div>
                             
                             <button type="submit" name="check_probnik" class="btn btn-primary btn-lg">
-                                ✅ Завершить проверку
+                                {% if probnik.status == 'checked' %}💾 Сохранить изменения{% else %}✅ Завершить проверку{% endif %}
                             </button>
                         </form>
                     </div>
                 </div>
-                {% endif %}
-                
-                {% if probnik.status == 'checked' %}
-                {% with percentage=probnik.get_percentage %}
-                <div class="card mb-4 border-success">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">📊 Результаты проверки</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-12 col-md-4 text-center mb-3 mb-md-0">
-                                <div class="d-flex d-md-block align-items-center justify-content-center">
-                                    <div class="display-2 text-success me-3 me-md-0">
-                                        {{ probnik.score }}
-                                    </div>
-                                    <div class="fs-3 text-success">/{{ probnik.max_score }}</div>
-                                </div>
-                                <h2 class="d-none d-md-block {% if percentage >= 80 %}text-success{% elif percentage >= 60 %}text-info{% elif percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
-                                    {{ percentage }}%
-                                </h2>
-                                <h4 class="d-block d-md-none {% if percentage >= 80 %}text-success{% elif percentage >= 60 %}text-info{% elif percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
-                                    {{ percentage }}%
-                                </h4>
-                            </div>
-                            <div class="col-12 col-md-8">
-                                {% if probnik.teacher_comment %}
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0">💬 Комментарий преподавателя</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        {{ probnik.teacher_comment|linebreaks }}
-                                    </div>
-                                </div>
-                                {% else %}
-                                <p class="text-muted">Комментарий не добавлен</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endwith %}
-                {% endif %}
                 
                 <div class="card mb-4">
                     <div class="card-header bg-light">

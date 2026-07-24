@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseNotAllowed
-from .models import Student, Probnik, ProbnikFile, StudyFile, Homework, HomeworkFile
+from .models import Student, Probnik, ProbnikFile, StudyFile, Homework, HomeworkFile, Application
 from .telegram_bot import (
     notify_teacher_homework_submitted,
     notify_teacher_probnik_submitted,
@@ -19,6 +19,23 @@ from django.core.paginator import Paginator
 
 def landing(request):
     """Главная страница с внешней информацией"""
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        exam_type = request.POST.get('exam_type', '').strip()
+        
+        if name and phone and exam_type:
+            Application.objects.create(
+                name=name,
+                phone=phone,
+                exam_type=exam_type
+            )
+            messages.success(request, '✅ Спасибо! Ваша заявка принята. Я свяжусь с вами в ближайшее время.')
+        else:
+            messages.error(request, 'Пожалуйста, заполните все поля формы.')
+        
+        return redirect('landing')
+    
     return render(request, 'students/landing.html')
 
 def student_login(request):

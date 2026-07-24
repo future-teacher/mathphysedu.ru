@@ -51,26 +51,17 @@
                             <h5 class="mb-0">📞 Контакты</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="id_phone" class="form-label">Телефон</label>
-                                    {{ form.phone }}
-                                    {% if form.phone.errors %}
-                                    <div class="text-danger">{{ form.phone.errors }}</div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="id_telegram" class="form-label">
-                                        Telegram <span class="text-danger">*</span>
-                                    </label>
-                                    {{ form.telegram }}
-                                    {% if form.telegram.errors %}
-                                    <div class="text-danger">{{ form.telegram.errors }}</div>
-                                    {% endif %}
-                                    <div class="form-text">
-                                        <strong>Обязательно для получения уведомлений</strong> о новых работах учеников.
-                                        Укажите ваш @username в Telegram.
-                                    </div>
+                            <div class="mb-3">
+                                <label for="id_telegram" class="form-label">
+                                    Telegram <span class="text-danger">*</span>
+                                </label>
+                                {{ form.telegram }}
+                                {% if form.telegram.errors %}
+                                <div class="text-danger">{{ form.telegram.errors }}</div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <strong>Обязательно для получения уведомлений</strong> о новых работах учеников.
+                                    Укажите ваш @username в Telegram.
                                 </div>
                             </div>
                         </div>

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .models import Student, Probnik, ProbnikFile, StudyFile, Homework, HomeworkFile, Teacher
+from .models import Student, Probnik, ProbnikFile, StudyFile, Homework, HomeworkFile, Teacher, Application
 
 
 # --- Базовый класс для инлайнов с файлами ---
@@ -230,3 +230,12 @@ class StudyFileAdmin(admin.ModelAdmin):
     list_display = ('title', 'student', 'subject', 'file_type', 'uploaded_at')
     list_filter = ('subject', 'file_type', 'student')
     search_fields = ('title', 'description', 'student__first_name', 'student__last_name')
+
+
+@admin.register(Application)
+class ApplicationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'exam_type', 'created_at', 'is_viewed')
+    list_filter = ('exam_type', 'is_viewed', 'created_at')
+    search_fields = ('name', 'phone')
+    readonly_fields = ('created_at',)
+    list_editable = ('is_viewed',)

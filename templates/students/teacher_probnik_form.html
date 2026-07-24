@@ -75,6 +75,7 @@
                                     <div class="text-danger">{{ form.status.errors }}</div>
                                     {% endif %}
                                 </div>
+                                {% if probnik %}
                                 <div class="col-md-6 mb-3">
                                     <div class="form-check mt-4 pt-2">
                                         {{ form.is_hidden }}
@@ -87,6 +88,7 @@
                                         {% endif %}
                                     </div>
                                 </div>
+                                {% endif %}
                             </div>
                             
                             <div class="mb-3">

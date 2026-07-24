@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from .models import Teacher, Student, Homework, Probnik, ProbnikFile, StudyFile, HomeworkFile
+from .models import Teacher, Student, Homework, Probnik, ProbnikFile, StudyFile, HomeworkFile, Application
 from .forms import StudentForm, HomeworkForm, ProbnikForm, StudyFileForm, TeacherProfileForm
 from .telegram_bot import (
     notify_student_new_homework,
@@ -68,6 +68,7 @@ def teacher_dashboard(request):
         'teacher': teacher,
         'students': students,
         'search_query': search_query,
+        'total_students': teacher.students.count(),
     }
     
     return render(request, 'students/teacher_dashboard.html', context)
@@ -291,7 +292,7 @@ def homework_create(request):
                 )
             
             messages.success(request, f'🚀 Задание "{homework.title}" создано!')
-            return redirect('teacher_dashboard')
+            return redirect('teacher_student_detail', student_id=homework.student.id)
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
     else:
@@ -407,14 +408,16 @@ def homework_detail(request, homework_id):
                 messages.error(request, 'Пожалуйста, выберите результат')
                 return redirect('teacher_homework_detail', homework_id=homework.id)
             
+            was_already_checked = homework.status == 'checked'
             homework.status = 'checked'
             homework.checked_date = timezone.now().date()
             homework.grade = grade
             homework.teacher_comment = teacher_comment
             homework.save()
             
-            # Отправляем уведомление ученику о проверке ДЗ
-            notify_student_homework_checked(homework)
+            # Отправляем уведомление ученику о проверке ДЗ (только при первой проверке)
+            if not was_already_checked:
+                notify_student_homework_checked(homework)
             
             grade_display = dict(homework._meta.get_field('grade').choices).get(homework.grade, '—')
             messages.success(request, f'🎯 Домашнее задание проверено! Результат: {grade_display}')
@@ -469,7 +472,7 @@ def teacher_probnik_create(request):
                 )
             
             messages.success(request, f'🎯 Пробник "{probnik.title}" успешно создан!')
-            return redirect('teacher_probnik_list')
+            return redirect('teacher_student_detail', student_id=probnik.student.id)
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
     else:
@@ -566,12 +569,14 @@ def teacher_probnik_detail(request, probnik_id):
             if score or score == '0':
                 probnik.score = int(score)
             
+            was_already_checked = probnik.status == 'checked'
             probnik.teacher_comment = teacher_comment
             probnik.status = 'checked'
             probnik.save()
             
-            # Отправляем уведомление ученику о проверке пробника
-            notify_student_probnik_checked(probnik)
+            # Отправляем уведомление ученику о проверке пробника (только при первой проверке)
+            if not was_already_checked:
+                notify_student_probnik_checked(probnik)
             
             messages.success(
                 request,
@@ -803,6 +808,46 @@ def delete_study_file(request, file_id):
         messages.success(request, f'🗑️ Файл "{file.title}" успешно удален из базы данных и файловой системы')
     
     return redirect('teacher_student_detail', student_id=student_id)
+
+
+@login_required
+@user_passes_test(is_teacher, login_url='/students/login/')
+def teacher_applications(request):
+    """Список заявок на пробное занятие"""
+    teacher = get_teacher_or_admin(request.user)
+    if not teacher:
+        messages.error(request, 'У вас нет прав преподавателя')
+        return redirect('login')
+    
+    applications = Application.objects.all().order_by('-created_at')
+    applications_oge = applications.filter(exam_type='oge').count()
+    applications_ege = applications.filter(exam_type='ege').count()
+    
+    return render(request, 'students/teacher_applications.html', {
+        'teacher': teacher,
+        'applications': applications,
+        'applications_oge': applications_oge,
+        'applications_ege': applications_ege,
+    })
+
+
+@login_required
+@user_passes_test(is_teacher, login_url='/students/login/')
+def teacher_application_delete(request, application_id):
+    """Удаление заявки на пробное занятие"""
+    teacher = get_teacher_or_admin(request.user)
+    if not teacher:
+        messages.error(request, 'У вас нет прав преподавателя')
+        return redirect('login')
+    
+    application = get_object_or_404(Application, id=application_id)
+    
+    if request.method == 'POST':
+        application.delete()
+        messages.success(request, f'🗑️ Заявка от {application.name} удалена.')
+        return redirect('teacher_applications')
+    
+    return redirect('teacher_applications')
 
 
 @login_required

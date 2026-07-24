@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Заявки на пробное занятие{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+    .application-card {
+        background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+        border: 2px solid transparent;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        color: #fff;
+        margin-bottom: 1rem;
+    }
+
+    .application-card:hover {
+        border-color: #6366f1;
+        transform: translateY(-0.2rem);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+    }
+
+    .application-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .application-phone {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1rem;
+    }
+
+    .application-exam {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .application-exam.oge {
+        background: rgba(99, 102, 241, 0.2);
+        color: #818cf8;
+    }
+
+    .application-exam.ege {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+    }
+
+    .application-date {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.85rem;
+    }
+
+    .application-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .application-empty .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .application-empty h4 {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .btn-delete-app {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 0.5rem;
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .btn-delete-app:hover {
+        background: rgba(239, 68, 68, 0.3);
+        color: #fff;
+    }
+
+    .app-stat-card {
+        background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        color: #fff;
+    }
+
+    .app-stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .app-stat-label {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-0">📋 Заявки на пробное занятие</h4>
+        <p class="text-muted">Заявки с лендинга от желающих записаться на пробное занятие</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="app-stat-card">
+            <div class="app-stat-number">{{ applications.count }}</div>
+            <div class="app-stat-label">Всего заявок</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="app-stat-card">
+            <div class="app-stat-number">{{ applications_oge }}</div>
+            <div class="app-stat-label">ОГЭ</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="app-stat-card">
+            <div class="app-stat-number">{{ applications_ege }}</div>
+            <div class="app-stat-label">ЕГЭ</div>
+        </div>
+    </div>
+</div>
+
+{% if applications %}
+    {% for app in applications %}
+    <div class="application-card">
+        <div class="row align-items-center">
+            <div class="col-md-4 mb-2 mb-md-0">
+                <div class="application-name">{{ app.name }}</div>
+                <div class="application-phone">
+                    <a href="tel:{{ app.phone }}" style="color: rgba(255,255,255,0.7); text-decoration: none;">
+                        📞 {{ app.phone }}
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <span class="application-exam {{ app.exam_type }}">
+                    {{ app.get_exam_type_display }}
+                </span>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <div class="application-date">
+                    🕐 {{ app.created_at|date:"d.m.Y H:i" }}
+                </div>
+            </div>
+            <div class="col-md-2 text-md-end">
+                <form method="post" action="{% url 'teacher_application_delete' app.id %}" 
+                      onsubmit="return confirm('Удалить заявку от {{ app.name }}?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-delete-app">🗑️ Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="application-empty">
+        <div class="empty-icon">📭</div>
+        <h4>Новых заявок пока нет</h4>
+        <p>Заявки будут появляться здесь, когда кто-то заполнит форму на главной странице.</p>
+    </div>
+{% endif %}
+{% endblock %}

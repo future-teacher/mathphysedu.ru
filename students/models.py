@@ -418,6 +418,31 @@ class ProbnikFile(models.Model):
         verbose_name_plural = 'Файлы пробников'
 
 
+class Application(models.Model):
+    """Модель заявки на пробное занятие с лендинга"""
+    
+    EXAM_TYPE_CHOICES = [
+        ('oge', 'ОГЭ'),
+        ('ege', 'ЕГЭ'),
+    ]
+    
+    name = models.CharField(max_length=100, verbose_name='Имя')
+    phone = models.CharField(max_length=20, verbose_name='Номер телефона')
+    exam_type = models.CharField(
+        max_length=10, choices=EXAM_TYPE_CHOICES, verbose_name='Тип подготовки'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата заявки')
+    is_viewed = models.BooleanField(default=False, verbose_name='Просмотрено')
+    
+    def __str__(self):
+        return f"{self.name} - {self.get_exam_type_display()} ({self.created_at.strftime('%d.%m.%Y')})"
+    
+    class Meta:
+        verbose_name = 'Заявка'
+        verbose_name_plural = 'Заявки'
+        ordering = ['-created_at']
+
+
 class StudyFile(models.Model):
     """Модель учебных файлов"""
     

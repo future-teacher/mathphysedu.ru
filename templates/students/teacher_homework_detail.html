@@ -141,57 +141,26 @@
                 </div>
                 {% endif %}
                 
-                <!-- Отображение результатов, если задание уже проверено -->
-                {% if homework.status == 'checked' %}
+                <!-- Форма проверки/редактирования результатов (доступна всегда) -->
                 <div class="card mb-4 border-success">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">📊 Результаты проверки</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4 text-center">
-                                {% if homework.grade %}
-                                    {% if homework.grade == 'z' %}
-                                        <div class="display-1 text-success">✓</div>
-                                        <span class="badge bg-success fs-4">Зачтено</span>
-                                    {% elif homework.grade == 'nz' %}
-                                        <div class="display-1 text-danger">✗</div>
-                                        <span class="badge bg-danger fs-4">Не зачтено</span>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            <div class="col-md-8">
-                                {% if homework.teacher_comment %}
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0">💬 Комментарий преподавателя</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        {{ homework.teacher_comment|linebreaks }}
-                                    </div>
-                                </div>
-                                {% else %}
-                                <p class="text-muted">Комментарий не добавлен</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                
-                <!-- Форма проверки (для заданий, которые ещё не проверены) -->
-                {% if homework.status != 'checked' %}
-                <div class="card mb-4 border-success">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">✅ Проверить задание</h5>
+                    <div class="card-header {% if homework.status == 'checked' %}bg-warning{% else %}bg-success{% endif %} text-white">
+                        <h5 class="mb-0">
+                            {% if homework.status == 'checked' %}✏️ Редактировать результаты{% else %}✅ Проверить задание{% endif %}
+                        </h5>
                     </div>
                     <div class="card-body">
                         <form method="post" id="check-homework-form">
                             {% csrf_token %}
                             
-                            {% if not student_files %}
+                            {% if not student_files and homework.status != 'checked' %}
                             <div class="alert alert-warning">
                                 <strong>⚠️ Внимание!</strong> Ученик не загрузил файлы. Вы можете проверить задание, поставив оценку и комментарий.
+                            </div>
+                            {% endif %}
+                            
+                            {% if homework.status == 'checked' %}
+                            <div class="alert alert-info">
+                                <strong>ℹ️ Режим редактирования:</strong> Задание уже проверено. Вы можете изменить оценку или комментарий.
                             </div>
                             {% endif %}
                             
@@ -219,12 +188,11 @@
                             </div>
                             
                             <button type="submit" name="check_homework" value="1" class="btn btn-success btn-lg">
-                                ✅ Завершить проверку
+                                {% if homework.status == 'checked' %}💾 Сохранить изменения{% else %}✅ Завершить проверку{% endif %}
                             </button>
                         </form>
                     </div>
                 </div>
-                {% endif %}
                                 
                 <!-- Добавление файлов (доступно всегда) -->
                 <div class="card mb-4">
