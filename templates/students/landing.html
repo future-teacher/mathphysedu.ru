@@ -627,7 +627,13 @@
 {% block content %}
 <!-- Top Navigation -->
 <nav class="landing-nav">
-    <a href="{% url 'landing' %}" class="nav-brand">📐 MathPhysEdu</a>
+    <a href="{% if user.is_authenticated %}
+        {% if user.student_profile %}{% url 'dashboard' %}
+        {% elif user.teacher_profile %}{% url 'teacher_dashboard' %}
+        {% else %}{% url 'landing' %}
+        {% endif %}
+    {% else %}{% url 'landing' %}
+    {% endif %}" class="nav-brand">📐 MathPhysEdu</a>
     {% if user.is_authenticated %}
     <div class="nav-user-info">
         <span class="nav-user-name">

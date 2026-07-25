@@ -373,7 +373,7 @@
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-        <a class="sidebar-brand" href="{% url 'landing' %}">
+        <a class="sidebar-brand" href="{% if user.student_profile %}{% url 'dashboard' %}{% elif user.teacher_profile %}{% url 'teacher_dashboard' %}{% else %}{% url 'landing' %}{% endif %}">
             🎓 MathPhysEdu
         </a>
 
