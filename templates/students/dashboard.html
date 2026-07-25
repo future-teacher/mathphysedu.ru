@@ -237,30 +237,6 @@
                 <h4 class="mb-0">👋 Привет, {{ student.first_name }}!</h4>
             </div>
             <div class="card-body">
-                
-                <!-- ===== ТРЕКЕР ЭКЗАМЕНОВ ===== -->
-                {% if active_exams %}
-                <div class="exam-timer-card mb-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8 text-center text-md-start">
-                            <h5 class="exam-timer-label">⏳ До экзамена осталось:</h5>
-                            <div class="exam-timer-number">{{ active_exams.0.days_left }}</div>
-                            <div class="exam-timer-label fs-4">{{ active_exams.0.name }}</div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <span class="badge {% if active_exams.0.is_near %}bg-danger{% else %}bg-light text-dark{% endif %} px-4 py-3 fs-5">
-                                📅 {{ active_exams.0.date|date:"d E Y" }}
-                            </span>
-                            {% if active_exams|length > 1 %}
-                            <div class="mt-2">
-                                <span class="badge bg-secondary">+ еще {{ active_exams|length|add:"-1" }} экзамена</span>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
                 <!-- ===== ДОСТИЖЕНИЯ ===== -->
                 {% if achievements %}
                 <div class="mb-4">
