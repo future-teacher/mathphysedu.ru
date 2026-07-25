@@ -659,33 +659,6 @@ def teacher_probnik_edit(request, probnik_id):
 
 @login_required
 @user_passes_test(is_teacher, login_url='/students/login/')
-def teacher_probnik_delete(request, probnik_id):
-    """Удаление пробника преподавателем"""
-    teacher = get_teacher_or_admin(request.user)
-    if not teacher:
-        messages.error(request, 'У вас нет прав преподавателя')
-        return redirect('login')
-    
-    if request.user.is_staff or request.user.is_superuser:
-        probnik = get_object_or_404(Probnik, id=probnik_id)
-    else:
-        probnik = get_object_or_404(Probnik, id=probnik_id, assigned_by=teacher)
-    
-    if request.method == 'POST':
-        probnik_title = probnik.title
-        student_name = str(probnik.student)
-        probnik.delete()  # Сигнал pre_delete удалит все связанные файлы
-        messages.success(request, f'🗑️ Пробник "{probnik_title}" для ученика {student_name} и все связанные файлы успешно удалены!')
-        return redirect('teacher_probnik_list')
-    
-    return render(request, 'students/teacher_probnik_confirm_delete.html', {
-        'teacher': teacher,
-        'probnik': probnik,
-    })
-
-
-@login_required
-@user_passes_test(is_teacher, login_url='/students/login/')
 def study_file_create(request):
     """Загрузка учебного файла"""
     teacher = get_teacher_or_admin(request.user)
@@ -738,6 +711,33 @@ def homework_delete(request, homework_id):
     return render(request, 'students/teacher_homework_delete.html', {
         'teacher': teacher,
         'homework': homework,
+    })
+
+
+@login_required
+@user_passes_test(is_teacher, login_url='/students/login/')
+def teacher_probnik_delete(request, probnik_id):
+    """Удаление пробника преподавателем"""
+    teacher = get_teacher_or_admin(request.user)
+    if not teacher:
+        messages.error(request, 'У вас нет прав преподавателя')
+        return redirect('login')
+    
+    if request.user.is_staff or request.user.is_superuser:
+        probnik = get_object_or_404(Probnik, id=probnik_id)
+    else:
+        probnik = get_object_or_404(Probnik, id=probnik_id, assigned_by=teacher)
+    
+    if request.method == 'POST':
+        probnik_title = probnik.title
+        student_name = str(probnik.student)
+        probnik.delete()  # Сигнал pre_delete удалит все связанные файлы
+        messages.success(request, f'🗑️ Пробник "{probnik_title}" для ученика {student_name} и все связанные файлы успешно удалены!')
+        return redirect('teacher_probnik_list')
+    
+    return render(request, 'students/teacher_probnik_confirm_delete.html', {
+        'teacher': teacher,
+        'probnik': probnik,
     })
 
 

@@ -53,6 +53,10 @@ class Student(models.Model):
     )
     parent_telegram = models.CharField(max_length=100, verbose_name='Telegram родителя',
                                       blank=True, help_text='Начинается с @')
+    parent_telegram_chat_id = models.BigIntegerField(
+        null=True, blank=True, verbose_name='Telegram Chat ID родителя',
+        help_text='Числовой ID чата родителя (заполняется автоматически после /start)'
+    )
     parent_name = models.CharField(max_length=200, verbose_name='Имя родителя', blank=True)
     
     school = models.CharField(max_length=200, verbose_name='Школа', blank=True)

@@ -41,8 +41,15 @@ def _resolve_chat_id(recipient):
     if hasattr(recipient, 'telegram_chat_id') and recipient.telegram_chat_id:
         return str(recipient.telegram_chat_id)
     
+    if hasattr(recipient, 'parent_telegram_chat_id') and recipient.parent_telegram_chat_id:
+        return str(recipient.parent_telegram_chat_id)
+    
     if hasattr(recipient, 'telegram_username') and recipient.telegram_username:
         username = recipient.telegram_username.lstrip('@')
+        return f'@{username}'
+    
+    if hasattr(recipient, 'parent_telegram') and recipient.parent_telegram:
+        username = recipient.parent_telegram.lstrip('@')
         return f'@{username}'
     
     if hasattr(recipient, 'telegram') and recipient.telegram:
@@ -224,6 +231,17 @@ def process_single_update(update_data):
                     student.save(update_fields=['telegram_chat_id'])
                     logger.info(f'Saved chat_id for student {student.first_name} {student.last_name}')
 
+            # Ищем родителя (по parent_telegram в модели Student)
+            parent_student = Student.objects.filter(parent_telegram__iexact=f'@{username}').first()
+            if parent_student:
+                if parent_student.parent_telegram_chat_id != chat_id:
+                    parent_student.parent_telegram_chat_id = chat_id
+                    parent_student.save(update_fields=['parent_telegram_chat_id'])
+                    logger.info(
+                        f'Saved parent_telegram_chat_id for parent of '
+                        f'{parent_student.first_name} {parent_student.last_name}'
+                    )
+
         return True
 
     return False
@@ -342,6 +360,21 @@ def sync_telegram_chat_ids():
                     logger.info(f'Updated Student {student.first_name} {student.last_name}: chat_id={chat_id}')
                     updated_count += 1
     
+    # Обновляем parent_telegram_chat_id для родителей
+    for student in Student.objects.all():
+        if student.parent_telegram:
+            username = student.parent_telegram.lstrip('@').lower()
+            if username in chat_map:
+                chat_id = chat_map[username]
+                if student.parent_telegram_chat_id != chat_id:
+                    student.parent_telegram_chat_id = chat_id
+                    student.save(update_fields=['parent_telegram_chat_id'])
+                    logger.info(
+                        f'Updated parent_telegram_chat_id for parent of '
+                        f'{student.first_name} {student.last_name}: chat_id={chat_id}'
+                    )
+                    updated_count += 1
+    
     logger.info(f'Sync complete. Updated {updated_count} records.')
     return updated_count
 
@@ -349,6 +382,36 @@ def sync_telegram_chat_ids():
 # ========================
 # УВЕДОМЛЕНИЯ УЧЕНИКАМ
 # ========================
+
+
+def _send_to_parent(student, text: str) -> bool:
+    """
+    Отправляет сообщение родителю ученика.
+    
+    Сначала пытается отправить по числовому parent_telegram_chat_id (надёжнее),
+    если не получается — по @username из parent_telegram.
+    
+    Args:
+        student: экземпляр модели Student
+        text: текст сообщения
+    
+    Returns:
+        True если отправлено успешно
+    """
+    if not student.parent_telegram:
+        return False
+    
+    # Пробуем отправить по chat_id (если есть)
+    if student.parent_telegram_chat_id:
+        result = _send_telegram_message(
+            str(student.parent_telegram_chat_id), text
+        )
+        if result:
+            return True
+    
+    # Пробуем отправить по @username
+    result = _send_telegram_message(student.parent_telegram, text)
+    return result
 
 
 def notify_student_new_homework(homework) -> bool:
@@ -387,9 +450,7 @@ def notify_student_new_homework(homework) -> bool:
             f"🔗 <a href=\"{settings.BASE_URL}/students/homework/{homework.id}/\">"
             f"Открыть задание</a>"
         )
-        sent_to_parent = _send_telegram_message(
-            student.parent_telegram, parent_text
-        )
+        sent_to_parent = _send_to_parent(student, parent_text)
 
     return sent_to_student or sent_to_parent
 
@@ -436,9 +497,7 @@ def notify_student_homework_checked(homework) -> bool:
             f"\n🔗 <a href=\"{settings.BASE_URL}/students/homework/{homework.id}/\">"
             f"Посмотреть</a>"
         )
-        sent_to_parent = _send_telegram_message(
-            student.parent_telegram, parent_text
-        )
+        sent_to_parent = _send_to_parent(student, parent_text)
 
     return sent_to_student or sent_to_parent
 
@@ -486,9 +545,7 @@ def notify_student_new_probnik(probnik) -> bool:
             f"🔗 <a href=\"{settings.BASE_URL}/students/probnik/{probnik.id}/\">"
             f"Открыть пробник</a>"
         )
-        sent_to_parent = _send_telegram_message(
-            student.parent_telegram, parent_text
-        )
+        sent_to_parent = _send_to_parent(student, parent_text)
 
     return sent_to_student or sent_to_parent
 
@@ -541,9 +598,7 @@ def notify_student_probnik_checked(probnik) -> bool:
             f"\n🔗 <a href=\"{settings.BASE_URL}/students/probnik/{probnik.id}/\">"
             f"Посмотреть</a>"
         )
-        sent_to_parent = _send_telegram_message(
-            student.parent_telegram, parent_text
-        )
+        sent_to_parent = _send_to_parent(student, parent_text)
 
     return sent_to_student or sent_to_parent
 

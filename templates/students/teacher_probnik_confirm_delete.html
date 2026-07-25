@@ -13,49 +13,34 @@
             <div class="card-body text-center">
                 <div class="alert alert-danger">
                     <h5 class="mb-3">⚠️ Вы уверены, что хотите удалить этот пробник?</h5>
-                    
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h6>{{ probnik.title }}</h6>
-                            <p class="mb-1">
-                                <strong>Ученик:</strong> {{ probnik.student }}<br>
-                                <strong>Предмет:</strong> 
-                                <span class="badge {% if probnik.subject == 'math' %}bg-primary{% else %}bg-danger{% endif %}">
-                                    {{ probnik.get_subject_display }}
-                                </span><br>
-                                <strong>Назначен:</strong> {{ probnik.assigned_date|date:"d.m.Y" }}<br>
-                                <strong>Дедлайн:</strong> {{ probnik.deadline|date:"d.m.Y"|default:"Не установлен" }}<br>
-                                <strong>Статус:</strong> 
-                                {% if probnik.status == 'in_progress' %}
-                                <span class="badge bg-info">В работе</span>
-                                {% elif probnik.status == 'checked' %}
-                                <span class="badge bg-success">Проверен</span>
-                                {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                    
+                    <p class="mb-1"><strong>{{ probnik.title }}</strong></p>
+                    <p class="mb-1">Ученик: {{ probnik.student }}</p>
+                    <p class="mb-0">Предмет: {{ probnik.get_subject_display }}</p>
+                </div>
+                
+                <div class="alert alert-warning">
                     <p class="mb-0">
                         <strong>Это действие нельзя отменить!</strong><br>
-                        Все загруженные файлы и результаты проверки будут безвозвратно удалены.
+                        Все загруженные файлы и решения будут безвозвратно удалены.
                     </p>
                 </div>
                 
                 <form method="post">
                     {% csrf_token %}
-                    <div class="d-grid gap-2">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'teacher_probnik_detail' probnik.id %}" class="btn btn-secondary btn-lg">
+                            ← Отмена
+                        </a>
                         <button type="submit" class="btn btn-danger btn-lg">
                             🗑️ Да, удалить пробник
                         </button>
-                        <a href="{% url 'teacher_probnik_detail' probnik.id %}" class="btn btn-outline-secondary">
-                            ← Отмена, вернуться к пробнику
-                        </a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 {% else %}
 <div class="row justify-content-center">
     <div class="col-md-6">
@@ -64,8 +49,8 @@
                 <h4 class="mb-0">Доступ ограничен</h4>
             </div>
             <div class="card-body text-center">
-                <p>У вас нет доступа к этой странице.</p>
-                <a href="{% url 'login' %}" class="btn btn-primary">Войти</a>
+                <p>У вас нет доступа к панели преподавателя.</p>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Выйти</a>
             </div>
         </div>
     </div>
