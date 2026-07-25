@@ -155,6 +155,18 @@ WELCOME_MESSAGE = (
     "Успехов в учёбе! 🚀"
 )
 
+PARENT_WELCOME_MESSAGE = (
+    "👋 <b>Уважаемый родитель!</b>\n\n"
+    "Добро пожаловать в MathPhysEdu Bot!\n"
+    "Этот бот будет информировать вас об успеваемости вашего ребёнка.\n\n"
+    "Вы будете получать уведомления о:\n\n"
+    "📚 <b>Новых домашних заданиях</b> — как только преподаватель выдаст задание\n"
+    "📝 <b>Новых пробниках</b> — когда появится новый пробник\n"
+    "✅ <b>Результатах проверки</b> — оценка и комментарий преподавателя\n\n"
+    "🔗 <a href=\"{base_url}/students/dashboard/\">Перейти на сайт</a>\n\n"
+    "Спасибо, что доверяете нам обучение вашего ребёнка! 🚀"
+)
+
 
 def _send_telegram_raw(token, chat_id, text, parse_mode='HTML'):
     """Отправляет сырое сообщение в Telegram по числовому chat_id."""
@@ -207,32 +219,51 @@ def process_single_update(update_data):
 
     # Проверяем команду /start
     if text.strip() == '/start':
+        # Определяем роль пользователя
+        user_role = None  # 'teacher', 'student', 'parent'
+        teacher = None
+        student = None
+        parent_student = None
+
+        if username:
+            teacher = Teacher.objects.filter(telegram__iexact=f'@{username}').first()
+            if teacher:
+                user_role = 'teacher'
+
+            student = Student.objects.filter(telegram_username__iexact=f'@{username}').first()
+            if student:
+                user_role = 'student'
+
+            parent_student = Student.objects.filter(parent_telegram__iexact=f'@{username}').first()
+            # Родитель — только если не ученик и не преподаватель
+            if parent_student and user_role is None:
+                user_role = 'parent'
+
+        # Выбираем приветствие в зависимости от роли
+        if user_role == 'parent':
+            welcome_text = PARENT_WELCOME_MESSAGE.format(base_url=base_url)
+        else:
+            welcome_text = WELCOME_MESSAGE.format(base_url=base_url)
+
         # Отправляем приветствие
-        welcome_text = WELCOME_MESSAGE.format(base_url=base_url)
         result = _send_telegram_raw(token, chat_id, welcome_text)
         if result.get('ok'):
-            logger.info(f'Sent welcome to @{username} (chat_id={chat_id})')
+            logger.info(f'Sent welcome to @{username} (chat_id={chat_id}, role={user_role})')
 
         # Сохраняем chat_id в модели (если есть username)
         if username:
-            # Ищем преподавателя
-            teacher = Teacher.objects.filter(telegram__iexact=f'@{username}').first()
             if teacher:
                 if teacher.telegram_chat_id != chat_id:
                     teacher.telegram_chat_id = chat_id
                     teacher.save(update_fields=['telegram_chat_id'])
                     logger.info(f'Saved chat_id for teacher {teacher.user.username}')
 
-            # Ищем ученика
-            student = Student.objects.filter(telegram_username__iexact=f'@{username}').first()
             if student:
                 if student.telegram_chat_id != chat_id:
                     student.telegram_chat_id = chat_id
                     student.save(update_fields=['telegram_chat_id'])
                     logger.info(f'Saved chat_id for student {student.first_name} {student.last_name}')
 
-            # Ищем родителя (по parent_telegram в модели Student)
-            parent_student = Student.objects.filter(parent_telegram__iexact=f'@{username}').first()
             if parent_student:
                 if parent_student.parent_telegram_chat_id != chat_id:
                     parent_student.parent_telegram_chat_id = chat_id
