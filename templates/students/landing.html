@@ -611,9 +611,16 @@
 }
 
 /* ===== Yandex SmartCaptcha ===== */
-.smart-captcha {
-    min-height: 100px;
+.smart-captcha-container {
+    min-height: 80px;
     margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.smart-captcha-container .SmartCaptcha-Overlay {
+    min-height: 80px;
 }
 
 /* ===== Увеличение отзывов при наведении ===== */
@@ -626,6 +633,23 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
     z-index: 10;
     position: relative;
+}
+
+/* Сообщения об ошибках */
+.alert-error, .alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 1rem;
+}
+
+/* Captcha error state */
+.captcha-error {
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 8px;
 }
 </style>
 {% endblock %}
@@ -679,7 +703,6 @@
             Подготовка к ОГЭ и ЕГЭ по математике и физике в группах выходного дня<br>
             Интенсивный разбор первой части уже через полгода
         </p>
-
     </div>
 </div>
 
@@ -758,8 +781,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 </div>
 
@@ -814,7 +835,7 @@
     </div>
 </div>
 
-<!-- ===== Модальное окно заявки на пробное занятие ===== -->
+<!-- ===== МОДАЛЬНОЕ ОКНО ЗАЯВКИ НА ПРОБНОЕ ЗАНЯТИЕ ===== -->
 <div class="modal-overlay" id="trialModal">
     <div class="modal-container">
         <button class="modal-close" id="modalClose">&times;</button>
@@ -823,44 +844,61 @@
             <h3>Запись на пробное занятие</h3>
             <p>Оставьте свои контакты, и я свяжусь с вами в ближайшее время</p>
         </div>
+        
+        <!-- Сообщения об ошибках -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
         <form method="post" action="{% url 'landing' %}" id="trialForm">
             {% csrf_token %}
             <div class="modal-body">
                 <div class="form-group">
                     <label for="id_name">Ваше имя</label>
                     <input type="text" id="id_name" name="name" class="form-input"
-                           placeholder="Например: Анна" required maxlength="100">
+                           placeholder="Например: Анна" required maxlength="100" 
+                           value="{{ request.POST.name|default:'' }}">
                 </div>
                 <div class="form-group">
                     <label for="id_phone">Номер телефона</label>
                     <input type="tel" id="id_phone" name="phone" class="form-input"
-                           placeholder="+7 (999) 123-45-67" required maxlength="20">
+                           placeholder="+7 (999) 123-45-67" required maxlength="20"
+                           value="{{ request.POST.phone|default:'' }}">
                 </div>
                 <div class="form-group">
                     <label>Тип подготовки</label>
                     <div class="exam-options">
                         <label class="exam-option">
-                            <input type="radio" name="exam_type" value="oge" required>
+                            <input type="radio" name="exam_type" value="oge" 
+                                   {% if request.POST.exam_type == 'oge' %}checked{% endif %} required>
                             <span class="exam-option-label">📘 ОГЭ</span>
                         </label>
                         <label class="exam-option">
-                            <input type="radio" name="exam_type" value="ege" required>
+                            <input type="radio" name="exam_type" value="ege" 
+                                   {% if request.POST.exam_type == 'ege' %}checked{% endif %} required>
                             <span class="exam-option-label">📕 ЕГЭ</span>
                         </label>
                     </div>
                 </div>
 
-                <!-- Yandex SmartCaptcha -->
+                <!-- ===== YANDEX SMARTCAPTCHA ===== -->
                 <div class="form-group">
-                    <div
-                        id="captcha-container"
-                        class="smart-captcha"
-                        data-sitekey="{{ captcha_site_key }}"
-                    ></div>
+                    <div id="captcha-container" class="smart-captcha-container"></div>
+                    <input type="hidden" name="smart-token" id="smart-token">
+                    {% if captcha_error %}
+                        <div class="captcha-error" style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                            ⚠️ Пожалуйста, подтвердите, что вы не робот
+                        </div>
+                    {% endif %}
                 </div>
+                <!-- ====================================== -->
             </div>
             <div class="modal-footer">
-                <button type="submit" class="modal-submit-btn" id="submitBtn">
+                <button type="submit" class="modal-submit-btn" id="submitBtn" disabled>
                     ✉️ Отправить заявку
                 </button>
                 <p class="modal-hint">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</p>
@@ -885,24 +923,88 @@
     </div>
 </div>
 
+<!-- ===== YANDEX SMARTCAPTCHA SCRIPTS ===== -->
 <script src="https://smartcaptcha.yandexcloud.net/captcha.js?render=onload&onload=onSmartCaptchaLoad" defer></script>
+
 <script>
 let smartCaptchaWidgetId = null;
 
 function onSmartCaptchaLoad() {
     const container = document.getElementById('captcha-container');
-    if (container && window.smartCaptcha) {
+    const tokenInput = document.getElementById('smart-token');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    console.log('🔍 Инициализация капчи...');
+    console.log('Контейнер найден:', !!container);
+    console.log('SmartCaptcha загружен:', typeof window.smartCaptcha !== 'undefined');
+    
+    if (!container) {
+        console.error('❌ Контейнер капчи не найден!');
+        return;
+    }
+    
+    if (!window.smartCaptcha) {
+        console.error('❌ SmartCaptcha не загружен!');
+        container.innerHTML = '<p style="color:red;">⚠️ Ошибка загрузки капчи</p>';
+        return;
+    }
+    
+    const siteKey = '{{ captcha_site_key }}';
+    console.log('SiteKey:', siteKey);
+    
+    if (!siteKey || siteKey.includes('placeholder')) {
+        console.warn('⚠️ Используется placeholder-ключ!');
+        container.innerHTML = '<p style="color:orange;">⚠️ Капча в режиме разработки</p>';
+        if (submitBtn) submitBtn.disabled = false;
+        return;
+    }
+    
+    try {
         smartCaptchaWidgetId = window.smartCaptcha.render(container, {
-            sitekey: container.getAttribute('data-sitekey'),
+            sitekey: siteKey,
             callback: function(token) {
-                // Капча пройдена — скрытый smart-token уже будет отправлен с формой
-                document.getElementById('submitBtn').disabled = false;
+                // Сохраняем токен в скрытое поле
+                if (tokenInput) {
+                    tokenInput.value = token;
+                    console.log('✅ Токен получен!');
+                }
+                // Разблокируем кнопку
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                }
+                // Убираем сообщение об ошибке капчи
+                const captchaError = document.querySelector('.captcha-error');
+                if (captchaError) {
+                    captchaError.style.display = 'none';
+                }
             },
+            onError: function(error) {
+                console.error('❌ Ошибка капчи:', error);
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                }
+                if (tokenInput) {
+                    tokenInput.value = '';
+                }
+                container.innerHTML = '<p style="color:red;">⚠️ Ошибка капчи. Обновите страницу.</p>';
+            },
+            onChallenge: function() {
+                console.log('🔄 Задание капчи начато');
+            },
+            onSuccess: function() {
+                console.log('✅ Капча успешно решена');
+            }
         });
+        console.log('✅ Виджет капчи создан, ID:', smartCaptchaWidgetId);
+    } catch (error) {
+        console.error('❌ Ошибка создания виджета:', error);
+        container.innerHTML = '<p style="color:red;">⚠️ Ошибка загрузки капчи</p>';
+        if (submitBtn) submitBtn.disabled = false;
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // ===== КНОПКА ПРАЙС-ЛИСТА =====
     const toggleBtn = document.getElementById('pricingToggle');
     const pricingSection = document.querySelector('.pricing-section');
     let isOpen = false;
@@ -916,7 +1018,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)'
                 : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
 
-            // Плавный скролл к секции при открытии
             if (isOpen) {
                 setTimeout(function() {
                     pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -925,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ===== МОДАЛЬНОЕ ОКНО ЗАЯВКИ =====
+    // ===== МОДАЛЬНОЕ ОКНО =====
     const trialBtn = document.getElementById('trialBtn');
     const modal = document.getElementById('trialModal');
     const modalClose = document.getElementById('modalClose');
@@ -949,7 +1050,6 @@ document.addEventListener('DOMContentLoaded', function() {
         modalClose.addEventListener('click', closeModal);
     }
 
-    // Закрытие по клику на оверлей
     if (modalOverlay) {
         modalOverlay.addEventListener('click', function(e) {
             if (e.target === modalOverlay) {
@@ -958,43 +1058,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Закрытие по Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal && modal.classList.contains('show')) {
             closeModal();
         }
     });
 
-    // Блокируем кнопку отправки, пока капча не пройдена
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn && smartCaptchaWidgetId === null) {
-        submitBtn.disabled = true;
-    }
-
-    // Валидация формы перед отправкой
+    // ===== ВАЛИДАЦИЯ ФОРМЫ =====
     const trialForm = document.getElementById('trialForm');
+    const submitBtn = document.getElementById('submitBtn');
+
     if (trialForm) {
         trialForm.addEventListener('submit', function(e) {
-            const smartToken = document.querySelector('input[name="smart-token"]');
+            const smartToken = document.getElementById('smart-token');
             if (!smartToken || !smartToken.value) {
                 e.preventDefault();
                 alert('Пожалуйста, пройдите проверку "Я не робот".');
                 return false;
             }
+            console.log('✅ Форма отправляется с токеном:', smartToken.value);
         });
     }
 
-    // Автоматически открыть модалку если были ошибки валидации
-    // (проверяем наличие сообщения об ошибке на странице)
+    // ===== АВТОМАТИЧЕСКОЕ ОТКРЫТИЕ МОДАЛКИ ПРИ ОШИБКЕ =====
     const errorAlerts = document.querySelectorAll('.alert-error, .alert-danger');
     for (let i = 0; i < errorAlerts.length; i++) {
-        if (errorAlerts[i].textContent.toLowerCase().includes('заполните все поля') ||
-            errorAlerts[i].textContent.toLowerCase().includes('капчу') ||
-            errorAlerts[i].textContent.toLowerCase().includes('робот')) {
+        const text = errorAlerts[i].textContent.toLowerCase();
+        if (text.includes('заполните все поля') || 
+            text.includes('капчу') || 
+            text.includes('робот') ||
+            text.includes('пожалуйста, подтвердите')) {
             openModal();
             break;
         }
     }
+
+    console.log('✅ Страница загружена, капча инициализируется...');
 });
 </script>
 {% endblock %}

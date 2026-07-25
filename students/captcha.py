@@ -13,7 +13,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 # URL для проверки токена капчи
-SMARTCAPTCHA_VALIDATE_URL = 'https://smartcaptcha.yandexcloud.net/validate'
+SMARTCAPTCHA_VALIDATE_URL = 'https://smartcaptcha.cloud.yandex.ru/validate'
 
 
 def check_captcha(token: str, ip: str | None = None) -> bool:
