@@ -133,3 +133,20 @@ TELEGRAM_BOT_ENABLED = bool(TELEGRAM_BOT_TOKEN)
 # Базовый URL сайта для ссылок в уведомлениях (без слеша на конце)
 # На сервере можно переопределить через: export BASE_URL='https://mathphysedu.ru'
 BASE_URL = os.environ.get('BASE_URL', 'https://mathphysedu.ru')
+
+# ========================
+# YANDEX SMARTCAPTCHA SETTINGS
+# ========================
+# Получите ключи в кабинете разработчика Yandex SmartCaptcha:
+# https://smartcaptcha.yandexcloud.net/
+# Ключи можно задать через переменные окружения:
+#   YANDEX_SMARTCAPTCHA_SITE_KEY   — ключ для виджета (на клиенте)
+#   YANDEX_SMARTCAPTCHA_SERVER_KEY — ключ для проверки (на сервере)
+YANDEX_SMARTCAPTCHA_SITE_KEY = os.environ.get(
+    'YANDEX_SMARTCAPTCHA_SITE_KEY',
+    'ysc1_placeholder_site_key'
+)
+YANDEX_SMARTCAPTCHA_SERVER_KEY = os.environ.get(
+    'YANDEX_SMARTCAPTCHA_SERVER_KEY',
+    'ysc2_placeholder_server_key'
+)

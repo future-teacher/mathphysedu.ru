@@ -610,6 +610,12 @@
     margin-top: 1rem;
 }
 
+/* ===== Yandex SmartCaptcha ===== */
+.smart-captcha {
+    min-height: 100px;
+    margin-bottom: 0.5rem;
+}
+
 /* ===== Увеличение отзывов при наведении ===== */
 .review-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -843,9 +849,18 @@
                         </label>
                     </div>
                 </div>
+
+                <!-- Yandex SmartCaptcha -->
+                <div class="form-group">
+                    <div
+                        id="captcha-container"
+                        class="smart-captcha"
+                        data-sitekey="{{ captcha_site_key }}"
+                    ></div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="modal-submit-btn">
+                <button type="submit" class="modal-submit-btn" id="submitBtn">
                     ✉️ Отправить заявку
                 </button>
                 <p class="modal-hint">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</p>
@@ -870,7 +885,23 @@
     </div>
 </div>
 
+<script src="https://smartcaptcha.yandexcloud.net/captcha.js?render=onload&onload=onSmartCaptchaLoad" defer></script>
 <script>
+let smartCaptchaWidgetId = null;
+
+function onSmartCaptchaLoad() {
+    const container = document.getElementById('captcha-container');
+    if (container && window.smartCaptcha) {
+        smartCaptchaWidgetId = window.smartCaptcha.render(container, {
+            sitekey: container.getAttribute('data-sitekey'),
+            callback: function(token) {
+                // Капча пройдена — скрытый smart-token уже будет отправлен с формой
+                document.getElementById('submitBtn').disabled = false;
+            },
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const toggleBtn = document.getElementById('pricingToggle');
     const pricingSection = document.querySelector('.pricing-section');
@@ -934,11 +965,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Блокируем кнопку отправки, пока капча не пройдена
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn && smartCaptchaWidgetId === null) {
+        submitBtn.disabled = true;
+    }
+
+    // Валидация формы перед отправкой
+    const trialForm = document.getElementById('trialForm');
+    if (trialForm) {
+        trialForm.addEventListener('submit', function(e) {
+            const smartToken = document.querySelector('input[name="smart-token"]');
+            if (!smartToken || !smartToken.value) {
+                e.preventDefault();
+                alert('Пожалуйста, пройдите проверку "Я не робот".');
+                return false;
+            }
+        });
+    }
+
     // Автоматически открыть модалку если были ошибки валидации
     // (проверяем наличие сообщения об ошибке на странице)
     const errorAlerts = document.querySelectorAll('.alert-error, .alert-danger');
     for (let i = 0; i < errorAlerts.length; i++) {
-        if (errorAlerts[i].textContent.toLowerCase().includes('заполните все поля')) {
+        if (errorAlerts[i].textContent.toLowerCase().includes('заполните все поля') ||
+            errorAlerts[i].textContent.toLowerCase().includes('капчу') ||
+            errorAlerts[i].textContent.toLowerCase().includes('робот')) {
             openModal();
             break;
         }

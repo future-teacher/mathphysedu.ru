@@ -1,4 +1,5 @@
 import json
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
@@ -14,6 +15,7 @@ from .telegram_bot import (
     notify_teacher_probnik_submitted,
     process_single_update,
 )
+from .captcha import check_captcha
 from django.core.paginator import Paginator
 
 
@@ -23,6 +25,15 @@ def landing(request):
         name = request.POST.get('name', '').strip()
         phone = request.POST.get('phone', '').strip()
         exam_type = request.POST.get('exam_type', '').strip()
+        
+        # Проверка Yandex SmartCaptcha
+        captcha_token = request.POST.get('smart-token', '')
+        if not check_captcha(captcha_token, request.META.get('REMOTE_ADDR')):
+            messages.error(
+                request,
+                '❌ Пожалуйста, подтвердите, что вы не робот (пройдите капчу).'
+            )
+            return redirect('landing')
         
         if name and phone and exam_type:
             Application.objects.create(
@@ -36,7 +47,9 @@ def landing(request):
         
         return redirect('landing')
     
-    return render(request, 'students/landing.html')
+    return render(request, 'students/landing.html', {
+        'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+    })
 
 def student_login(request):
     """Вход для учеников"""
