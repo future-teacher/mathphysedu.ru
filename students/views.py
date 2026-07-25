@@ -51,9 +51,25 @@ def landing(request):
         'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
     })
 
+
 def student_login(request):
     """Вход для учеников"""
     if request.method == 'POST':
+        # ===== ПРОВЕРКА КАПЧИ =====
+        captcha_token = request.POST.get('smart-token', '')
+        if not check_captcha(captcha_token, request.META.get('REMOTE_ADDR')):
+            form = AuthenticationForm(request, data=request.POST)
+            messages.error(
+                request,
+                '❌ Пожалуйста, подтвердите, что вы не робот (пройдите капчу).'
+            )
+            return render(request, 'students/login.html', {
+                'form': form,
+                'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+                'captcha_error': True,
+            })
+        # ===========================
+        
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
@@ -77,9 +93,19 @@ def student_login(request):
                     return redirect('teacher_dashboard')
                 messages.error(request, 'У вас нет доступа к системе')
                 return redirect('login')
+        else:
+            messages.error(request, 'Неверное имя пользователя или пароль.')
+            return render(request, 'students/login.html', {
+                'form': form,
+                'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+            })
     else:
         form = AuthenticationForm()
-    return render(request, 'students/login.html', {'form': form})
+    
+    return render(request, 'students/login.html', {
+        'form': form,
+        'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+    })
 
 
 @login_required
