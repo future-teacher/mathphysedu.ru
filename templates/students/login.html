@@ -216,6 +216,30 @@
                 padding: 20px;
             }
         }
+
+        /* Mobile: уменьшаем капчу чтобы не вылезала за границы формы */
+        @media (max-width: 480px) {
+            .captcha-container {
+                overflow: hidden;
+                padding: 0;
+                margin: 5px 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .captcha-container > div {
+                transform: scale(0.78);
+                transform-origin: center center;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .captcha-container > div {
+                transform: scale(0.68);
+                transform-origin: center center;
+            }
+        }
     </style>
 </head>
 <body>
