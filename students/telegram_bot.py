@@ -432,12 +432,16 @@ def _send_to_parent(student, text: str) -> bool:
     if not student.parent_telegram:
         return False
     
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+    if not token:
+        return False
+    
     # Пробуем отправить по chat_id (если есть)
     if student.parent_telegram_chat_id:
-        result = _send_telegram_message(
-            str(student.parent_telegram_chat_id), text
+        result = _send_telegram_raw(
+            token, student.parent_telegram_chat_id, text
         )
-        if result:
+        if result.get('ok'):
             return True
     
     # Пробуем отправить по @username
