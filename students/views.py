@@ -55,7 +55,7 @@ def landing(request):
 def student_login(request):
     """Вход для учеников"""
     if request.method == 'POST':
-        # ===== ПРОВЕРКА КАПЧИ =====
+        # Проверяем капчу
         captcha_token = request.POST.get('smart-token', '')
         if not check_captcha(captcha_token, request.META.get('REMOTE_ADDR')):
             form = AuthenticationForm(request, data=request.POST)
@@ -68,8 +68,8 @@ def student_login(request):
                 'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
                 'captcha_error': True,
             })
-        # ===========================
         
+        # Аутентификация пользователя
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
