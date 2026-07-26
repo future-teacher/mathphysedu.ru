@@ -61,7 +61,8 @@
             gap: 10px;
             background: linear-gradient(45deg, skyblue, darkblue);
             padding: 30px;
-            width: 450px;
+            width: 480px;
+            max-width: 100%;
             border-radius: 20px;
             transition: background 0.3s ease;
         }
@@ -187,21 +188,20 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 80px;
+            min-height: 70px;
             margin: 5px 0;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            padding: 5px;
-            overflow: hidden;
+            padding: 2px;
         }
         
         .captcha-container > div {
-            transform: scale(0.82);
+            transform: scale(0.75);
             transform-origin: center center;
         }
         
         .captcha-container .SmartCaptcha-Overlay {
-            min-height: 80px;
+            min-height: 70px;
         }
         
         .captcha-error {
@@ -226,14 +226,14 @@
         /* Mobile: уменьшаем капчу чтобы не вылезала за границы формы */
         @media (max-width: 480px) {
             .captcha-container > div {
-                transform: scale(0.72);
+                transform: scale(0.65);
                 transform-origin: center center;
             }
         }
 
         @media (max-width: 380px) {
             .captcha-container > div {
-                transform: scale(0.62);
+                transform: scale(0.55);
                 transform-origin: center center;
             }
         }
