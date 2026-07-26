@@ -34,7 +34,7 @@
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3.8rem;
     font-weight: 800;
     color: #fff;
     margin-bottom: 1rem;
@@ -42,7 +42,7 @@
 }
 
 .hero-subtitle {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 2.5rem;
     line-height: 1.6;
@@ -79,12 +79,12 @@
 .hero-feature-title {
     color: #fff;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
 .hero-feature-desc {
     color: rgba(255, 255, 255, 0.6);
-    font-size: 0.9rem;
+    font-size: 1rem;
     margin-top: 0.3rem;
 }
 
@@ -175,7 +175,7 @@
 
 .section-title {
     text-align: center;
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 700;
     color: #1a1a4e;
     margin-bottom: 3rem;
@@ -217,20 +217,20 @@
 }
 
 .teacher-name {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 800;
     margin: 0;
     color: #fff;
 }
 
 .teacher-tagline {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: rgba(255, 255, 255, 0.75);
     margin: 0.3rem 0 0;
 }
 
 .teacher-card-body {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.9);
     margin-top: 1rem;
@@ -246,7 +246,7 @@
 }
 
 .teacher-goal {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     padding: 1rem 1.5rem;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -261,7 +261,7 @@
 
 .results-title {
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #1a1a4e;
     margin-bottom: 2rem;
@@ -295,7 +295,7 @@
 }
 
 .result-value {
-    font-size: 2.5rem;
+    font-size: 2.7rem;
     font-weight: 900;
     color: #1a1a4e;
     margin-bottom: 0.5rem;
@@ -303,7 +303,7 @@
 }
 
 .result-label {
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: #666;
     line-height: 1.4;
 }
@@ -338,11 +338,12 @@
     color: #1a1a4e;
     font-weight: 600;
     margin-bottom: 0.8rem;
+    font-size: 1.2rem;
 }
 
 .about-card p {
     color: #666;
-    font-size: 0.95rem;
+    font-size: 1rem;
     line-height: 1.5;
 }
 
@@ -478,16 +479,16 @@
     color: rgba(255,255,255,0.6);
     text-align: center;
     padding: 2rem;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 /* ===== Адаптивность ===== */
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
     }
     .hero-subtitle {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
     }
     .hero-features {
         gap: 1rem;
@@ -495,6 +496,30 @@
     .hero-feature {
         min-width: 140px;
         padding: 1rem 1.5rem;
+    }
+
+    .teacher-name {
+        font-size: 1.6rem;
+    }
+
+    .teacher-tagline {
+        font-size: 1.05rem;
+    }
+
+    .teacher-goal {
+        font-size: 1.05rem;
+        padding: 0.8rem 1rem;
+        text-align: left;
+    }
+
+    .result-value {
+        font-size: 2.2rem;
+    }
+
+    .results-grid {
+        grid-template-columns: 1fr;
+        max-width: 320px;
+        margin: 0 auto;
     }
 
     .review-card {
