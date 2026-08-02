@@ -460,6 +460,67 @@ class ProbnikFile(models.Model):
         verbose_name_plural = 'Файлы пробников'
 
 
+class TelegramUser(models.Model):
+    """
+    Хранит соответствие между Telegram chat_id и пользователями системы.
+    
+    Позволяет идентифицировать пользователей даже без @username:
+    - Когда кто-то пишет боту /start, мы сохраняем его chat_id
+    - При отправке уведомления мы можем найти пользователя по chat_id,
+      даже если у него нет @username
+    """
+    chat_id = models.BigIntegerField(
+        unique=True,
+        verbose_name='Telegram Chat ID',
+        help_text='Числовой ID чата в Telegram'
+    )
+    username = models.CharField(
+        max_length=100, blank=True,
+        verbose_name='Telegram @username',
+        help_text='Username в Telegram (может быть пустым, если скрыт)'
+    )
+    first_name = models.CharField(
+        max_length=100, blank=True,
+        verbose_name='Имя в Telegram'
+    )
+    last_name = models.CharField(
+        max_length=100, blank=True,
+        verbose_name='Фамилия в Telegram'
+    )
+    student = models.ForeignKey(
+        Student, null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='telegram_users',
+        verbose_name='Связанный ученик'
+    )
+    teacher = models.ForeignKey(
+        Teacher, null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='telegram_users',
+        verbose_name='Связанный преподаватель'
+    )
+    is_parent = models.BooleanField(
+        default=False,
+        verbose_name='Это родитель',
+        help_text='True, если этот chat_id принадлежит родителю ученика'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата первой записи')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата последнего обновления')
+    
+    def __str__(self):
+        role = 'родитель' if self.is_parent else 'ученик'
+        if self.teacher:
+            role = 'преподаватель'
+        name_parts = [p for p in [self.first_name, self.last_name] if p]
+        name = ' '.join(name_parts) if name_parts else (f'@{self.username}' if self.username else f'id:{self.chat_id}')
+        return f'{name} ({role})'
+    
+    class Meta:
+        verbose_name = 'Telegram пользователь'
+        verbose_name_plural = 'Telegram пользователи'
+        ordering = ['-updated_at']
+
+
 class Application(models.Model):
     """Модель заявки на пробное занятие с лендинга"""
     

@@ -183,12 +183,39 @@ def _send_telegram_raw(token, chat_id, text, parse_mode='HTML'):
         return json.loads(e.read().decode('utf-8', errors='replace'))
 
 
+def _save_telegram_user(chat_id, username, first_name, last_name, student=None, teacher=None, is_parent=False):
+    """
+    Сохраняет или обновляет запись в TelegramUser.
+    
+    Эта функция гарантирует, что у нас есть запись о каждом chat_id,
+    который когда-либо писал боту, даже если у пользователя нет @username.
+    """
+    from students.models import TelegramUser
+    
+    defaults = {
+        'username': username or '',
+        'first_name': first_name or '',
+        'last_name': last_name or '',
+    }
+    if student:
+        defaults['student'] = student
+    if teacher:
+        defaults['teacher'] = teacher
+    defaults['is_parent'] = is_parent
+    
+    tg_user, created = TelegramUser.objects.update_or_create(
+        chat_id=chat_id,
+        defaults=defaults
+    )
+    return tg_user, created
+
+
 def process_single_update(update_data):
     """
     Обрабатывает одно входящее обновление от Telegram.
 
     - На команду /start отправляет приветственное сообщение с инструкцией
-    - Сохраняет chat_id пользователей
+    - Сохраняет chat_id пользователей в TelegramUser (даже без @username)
 
     Может быть вызвана как из polling, так и из webhook.
 
@@ -198,7 +225,7 @@ def process_single_update(update_data):
     Returns:
         bool: True если обработано успешно
     """
-    from students.models import Student, Teacher
+    from students.models import Student, Teacher, TelegramUser
 
     token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
     if not token:
@@ -211,6 +238,8 @@ def process_single_update(update_data):
     chat_id = chat.get('id')
     text = msg.get('text', '')
     username = (msg.get('from', {}).get('username') or '').lower()
+    from_first_name = (msg.get('from', {}).get('first_name') or '')
+    from_last_name = (msg.get('from', {}).get('last_name') or '')
 
     if not chat_id:
         return False
@@ -223,7 +252,7 @@ def process_single_update(update_data):
         student = None
         parent_student = None
 
-        # Сначала ищем по @username (самый надёжный способ)
+        # 1. Ищем по @username (самый надёжный способ)
         if username:
             teacher = Teacher.objects.filter(telegram__iexact=f'@{username}').first()
             if teacher:
@@ -241,16 +270,52 @@ def process_single_update(update_data):
                 if parent_student:
                     user_role = 'parent'
 
-        # Если не нашли по @username, пробуем найти по chat_id
-        # (полезно для родителей без @username, которые уже писали боту)
+        # 2. Если не нашли по @username — ищем по chat_id в TelegramUser
+        if user_role is None:
+            tg_user = TelegramUser.objects.filter(chat_id=chat_id).first()
+            if tg_user:
+                if tg_user.teacher:
+                    teacher = tg_user.teacher
+                    user_role = 'teacher'
+                    logger.info(f'Identified teacher by TelegramUser chat_id={chat_id}')
+                elif tg_user.student and not tg_user.is_parent:
+                    student = tg_user.student
+                    user_role = 'student'
+                    logger.info(f'Identified student by TelegramUser chat_id={chat_id}')
+                elif tg_user.student and tg_user.is_parent:
+                    parent_student = tg_user.student
+                    user_role = 'parent'
+                    logger.info(f'Identified parent by TelegramUser chat_id={chat_id}')
+
+        # 3. Если всё ещё не нашли — ищем по chat_id напрямую в моделях
         if user_role is None:
             # Ищем среди учеников по parent_telegram_chat_id
             parent_student = Student.objects.filter(parent_telegram_chat_id=chat_id).first()
             if parent_student:
                 user_role = 'parent'
                 logger.info(
-                    f'Identified parent by chat_id={chat_id} for student '
+                    f'Identified parent by parent_telegram_chat_id={chat_id} for student '
                     f'{parent_student.first_name} {parent_student.last_name}'
+                )
+
+        # 4. Если всё ещё не нашли — ищем среди учеников по telegram_chat_id
+        if user_role is None:
+            student = Student.objects.filter(telegram_chat_id=chat_id).first()
+            if student:
+                user_role = 'student'
+                logger.info(
+                    f'Identified student by telegram_chat_id={chat_id} for '
+                    f'{student.first_name} {student.last_name}'
+                )
+
+        # 5. Если всё ещё не нашли — ищем среди учителей по telegram_chat_id
+        if user_role is None:
+            teacher = Teacher.objects.filter(telegram_chat_id=chat_id).first()
+            if teacher:
+                user_role = 'teacher'
+                logger.info(
+                    f'Identified teacher by telegram_chat_id={chat_id} for '
+                    f'{teacher.user.username}'
                 )
 
         # Выбираем приветствие в зависимости от роли
@@ -277,7 +342,7 @@ def process_single_update(update_data):
         if result.get('ok'):
             logger.info(f'Sent welcome to @{username} (chat_id={chat_id}, role={user_role})')
 
-        # Сохраняем chat_id в модели
+        # Сохраняем chat_id в модели Student/Teacher
         if teacher:
             if teacher.telegram_chat_id != chat_id:
                 teacher.telegram_chat_id = chat_id
@@ -298,6 +363,20 @@ def process_single_update(update_data):
                     f'Saved parent_telegram_chat_id for parent of '
                     f'{parent_student.first_name} {parent_student.last_name}'
                 )
+
+        # ВАЖНО: Всегда сохраняем в TelegramUser, даже если роль не определена
+        # Это гарантирует, что при следующем /start мы сможем найти пользователя
+        # по chat_id, даже если у него нет @username
+        _save_telegram_user(
+            chat_id=chat_id,
+            username=username,
+            first_name=from_first_name,
+            last_name=from_last_name,
+            student=student or parent_student,
+            teacher=teacher,
+            is_parent=(user_role == 'parent')
+        )
+        logger.info(f'Saved/updated TelegramUser for chat_id={chat_id}')
 
         return True
 
@@ -345,15 +424,16 @@ def process_updates():
 
 def sync_telegram_chat_ids():
     """
-    Синхронизирует chat_id из getUpdates с моделями Student и Teacher.
+    Синхронизирует chat_id из getUpdates с моделями Student, Teacher и TelegramUser.
     
     Запускается через management command:
         python manage.py sync_telegram_chat_ids
     
     Ищет пользователей, которые писали боту, и сохраняет их числовой chat_id
     в соответствующие модели (по совпадению @username).
+    Также заполняет TelegramUser для всех, кто писал боту (даже без @username).
     """
-    from students.models import Student, Teacher
+    from students.models import Student, Teacher, TelegramUser
     
     token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
     if not token:
@@ -376,20 +456,28 @@ def sync_telegram_chat_ids():
     
     # Собираем уникальные пары username -> chat_id
     chat_map = {}  # username -> chat_id
+    # Также собираем все chat_id для TelegramUser (даже без username)
+    all_chat_ids = set()
+    
     for update in data.get('result', []):
         # Из message
         msg = update.get('message', {})
-        if msg.get('from', {}).get('username'):
-            username = msg['from']['username'].lower()
-            chat_id = msg['from']['id']
-            chat_map[username] = chat_id
+        from_user = msg.get('from', {})
+        if from_user.get('id'):
+            chat_id = from_user['id']
+            all_chat_ids.add(chat_id)
+            if from_user.get('username'):
+                username = from_user['username'].lower()
+                chat_map[username] = chat_id
         
         # Из my_chat_member
         mcm = update.get('my_chat_member', {})
-        if mcm.get('chat', {}).get('username'):
-            username = mcm['chat']['username'].lower()
+        if mcm.get('chat', {}).get('id'):
             chat_id = mcm['chat']['id']
-            chat_map[username] = chat_id
+            all_chat_ids.add(chat_id)
+            if mcm.get('chat', {}).get('username'):
+                username = mcm['chat']['username'].lower()
+                chat_map[username] = chat_id
     
     updated_count = 0
     
@@ -431,6 +519,14 @@ def sync_telegram_chat_ids():
                         f'{student.first_name} {student.last_name}: chat_id={chat_id}'
                     )
                     updated_count += 1
+    
+    # Заполняем TelegramUser для всех chat_id, которые писали боту
+    # Это гарантирует, что даже пользователи без @username будут сохранены
+    for chat_id in all_chat_ids:
+        TelegramUser.objects.update_or_create(
+            chat_id=chat_id,
+            defaults={'username': ''}  # username может быть пустым
+        )
     
     logger.info(f'Sync complete. Updated {updated_count} records.')
     return updated_count
