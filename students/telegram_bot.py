@@ -31,9 +31,13 @@ def _resolve_chat_id(recipient):
     1. Числовой chat_id (если есть)
     2. @username (если chat_id нет)
     
+    Для Student:
+    - Сначала проверяется telegram_chat_id (чат ученика)
+    - parent_telegram_chat_id НЕ используется — для отправки родителю
+      используйте _send_to_parent()
+    
     Args:
-        recipient: объект с полями telegram/telegram_username и telegram_chat_id
-                   или строка с @username
+        recipient: объект Student/Teacher или строка с @username
     
     Returns:
         str: chat_id для передачи в Telegram API, или None
@@ -41,15 +45,8 @@ def _resolve_chat_id(recipient):
     if hasattr(recipient, 'telegram_chat_id') and recipient.telegram_chat_id:
         return str(recipient.telegram_chat_id)
     
-    if hasattr(recipient, 'parent_telegram_chat_id') and recipient.parent_telegram_chat_id:
-        return str(recipient.parent_telegram_chat_id)
-    
     if hasattr(recipient, 'telegram_username') and recipient.telegram_username:
         username = recipient.telegram_username.lstrip('@')
-        return f'@{username}'
-    
-    if hasattr(recipient, 'parent_telegram') and recipient.parent_telegram:
-        username = recipient.parent_telegram.lstrip('@')
         return f'@{username}'
     
     if hasattr(recipient, 'telegram') and recipient.telegram:
@@ -225,53 +222,81 @@ def process_single_update(update_data):
         student = None
         parent_student = None
 
+        # Сначала ищем по @username (самый надёжный способ)
         if username:
             teacher = Teacher.objects.filter(telegram__iexact=f'@{username}').first()
             if teacher:
                 user_role = 'teacher'
 
-            student = Student.objects.filter(telegram_username__iexact=f'@{username}').first()
-            if student:
-                user_role = 'student'
+            # Важно: проверяем student только если ещё не определён как teacher
+            if user_role != 'teacher':
+                student = Student.objects.filter(telegram_username__iexact=f'@{username}').first()
+                if student:
+                    user_role = 'student'
 
-            parent_student = Student.objects.filter(parent_telegram__iexact=f'@{username}').first()
             # Родитель — только если не ученик и не преподаватель
-            if parent_student and user_role is None:
+            if user_role is None:
+                parent_student = Student.objects.filter(parent_telegram__iexact=f'@{username}').first()
+                if parent_student:
+                    user_role = 'parent'
+
+        # Если не нашли по @username, пробуем найти по chat_id
+        # (полезно для родителей без @username, которые уже писали боту)
+        if user_role is None:
+            # Ищем среди учеников по parent_telegram_chat_id
+            parent_student = Student.objects.filter(parent_telegram_chat_id=chat_id).first()
+            if parent_student:
                 user_role = 'parent'
+                logger.info(
+                    f'Identified parent by chat_id={chat_id} for student '
+                    f'{parent_student.first_name} {parent_student.last_name}'
+                )
 
         # Выбираем приветствие в зависимости от роли
         if user_role == 'parent':
             welcome_text = PARENT_WELCOME_MESSAGE.format(base_url=base_url)
-        else:
+        elif user_role == 'teacher':
             welcome_text = WELCOME_MESSAGE.format(base_url=base_url)
+        elif user_role == 'student':
+            welcome_text = WELCOME_MESSAGE.format(base_url=base_url)
+        else:
+            # Если роль не определена — отправляем общее приветствие без персонализации
+            welcome_text = (
+                "👋 <b>Добро пожаловать в MathPhysEdu Bot!</b>\n\n"
+                "Я не смог определить вашу роль. Пожалуйста, убедитесь, что:\n\n"
+                "🔹 <b>Ученики:</b> ваш @username указан в профиле на сайте\n"
+                "🔹 <b>Родители:</b> @username родителя указан в профиле ученика\n"
+                "🔹 <b>Преподаватели:</b> ваш @username указан в профиле\n\n"
+                "После этого напишите /start ещё раз.\n\n"
+                "🔗 <a href=\"{base_url}/students/login/\">Войти в личный кабинет</a>"
+            ).format(base_url=base_url)
 
         # Отправляем приветствие
         result = _send_telegram_raw(token, chat_id, welcome_text)
         if result.get('ok'):
             logger.info(f'Sent welcome to @{username} (chat_id={chat_id}, role={user_role})')
 
-        # Сохраняем chat_id в модели (если есть username)
-        if username:
-            if teacher:
-                if teacher.telegram_chat_id != chat_id:
-                    teacher.telegram_chat_id = chat_id
-                    teacher.save(update_fields=['telegram_chat_id'])
-                    logger.info(f'Saved chat_id for teacher {teacher.user.username}')
+        # Сохраняем chat_id в модели
+        if teacher:
+            if teacher.telegram_chat_id != chat_id:
+                teacher.telegram_chat_id = chat_id
+                teacher.save(update_fields=['telegram_chat_id'])
+                logger.info(f'Saved chat_id for teacher {teacher.user.username}')
 
-            if student:
-                if student.telegram_chat_id != chat_id:
-                    student.telegram_chat_id = chat_id
-                    student.save(update_fields=['telegram_chat_id'])
-                    logger.info(f'Saved chat_id for student {student.first_name} {student.last_name}')
+        if student:
+            if student.telegram_chat_id != chat_id:
+                student.telegram_chat_id = chat_id
+                student.save(update_fields=['telegram_chat_id'])
+                logger.info(f'Saved chat_id for student {student.first_name} {student.last_name}')
 
-            if parent_student:
-                if parent_student.parent_telegram_chat_id != chat_id:
-                    parent_student.parent_telegram_chat_id = chat_id
-                    parent_student.save(update_fields=['parent_telegram_chat_id'])
-                    logger.info(
-                        f'Saved parent_telegram_chat_id for parent of '
-                        f'{parent_student.first_name} {parent_student.last_name}'
-                    )
+        if parent_student:
+            if parent_student.parent_telegram_chat_id != chat_id:
+                parent_student.parent_telegram_chat_id = chat_id
+                parent_student.save(update_fields=['parent_telegram_chat_id'])
+                logger.info(
+                    f'Saved parent_telegram_chat_id for parent of '
+                    f'{parent_student.first_name} {parent_student.last_name}'
+                )
 
         return True
 
@@ -429,7 +454,11 @@ def _send_to_parent(student, text: str) -> bool:
     Returns:
         True если отправлено успешно
     """
-    if not student.parent_telegram:
+    if not student.parent_telegram and not student.parent_telegram_chat_id:
+        logger.debug(
+            f'No parent contact for student {student.first_name} {student.last_name}: '
+            f'no parent_telegram and no parent_telegram_chat_id'
+        )
         return False
     
     token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
@@ -443,10 +472,21 @@ def _send_to_parent(student, text: str) -> bool:
         )
         if result.get('ok'):
             return True
+        else:
+            # Если отправка по chat_id не удалась (например, бот заблокирован),
+            # пробуем отправить по @username
+            logger.warning(
+                f'Failed to send to parent_telegram_chat_id={student.parent_telegram_chat_id} '
+                f'for student {student.first_name} {student.last_name}, '
+                f'falling back to @username'
+            )
     
     # Пробуем отправить по @username
-    result = _send_telegram_message(student.parent_telegram, text)
-    return result
+    if student.parent_telegram:
+        result = _send_telegram_message(student.parent_telegram, text)
+        return result
+    
+    return False
 
 
 def notify_student_new_homework(homework) -> bool:
@@ -474,9 +514,9 @@ def notify_student_new_homework(homework) -> bool:
     # Отправляем ученику (используем объект student для определения chat_id)
     sent_to_student = _send_telegram_message(student, text)
 
-    # Отправляем родителю, если указан
+    # Отправляем родителю, если указан Telegram родителя
     sent_to_parent = False
-    if student.parent_telegram:
+    if student.parent_telegram or student.parent_telegram_chat_id:
         parent_text = (
             f"📚 <b>Новое домашнее задание для {student.first_name}!</b>\n\n"
             f"<b>Предмет:</b> {subject_display}\n"
@@ -519,7 +559,7 @@ def notify_student_homework_checked(homework) -> bool:
     sent_to_student = _send_telegram_message(student, text)
 
     sent_to_parent = False
-    if student.parent_telegram:
+    if student.parent_telegram or student.parent_telegram_chat_id:
         parent_text = (
             f"✅ <b>Домашнее задание {student.first_name} проверено!</b>\n\n"
             f"<b>Предмет:</b> {subject_display}\n"
@@ -567,7 +607,7 @@ def notify_student_new_probnik(probnik) -> bool:
     sent_to_student = _send_telegram_message(student, text)
 
     sent_to_parent = False
-    if student.parent_telegram:
+    if student.parent_telegram or student.parent_telegram_chat_id:
         parent_text = (
             f"📝 <b>Новый пробник для {student.first_name}!</b>\n\n"
             f"<b>Предмет:</b> {subject_display}\n"
@@ -617,7 +657,7 @@ def notify_student_probnik_checked(probnik) -> bool:
     sent_to_student = _send_telegram_message(student, text)
 
     sent_to_parent = False
-    if student.parent_telegram:
+    if student.parent_telegram or student.parent_telegram_chat_id:
         parent_text = (
             f"✅ <b>Пробник {student.first_name} проверен!</b>\n\n"
             f"<b>Предмет:</b> {subject_display}\n"
