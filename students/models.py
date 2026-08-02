@@ -21,6 +21,22 @@ class Teacher(models.Model):
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username}"
     
+    def save(self, *args, **kwargs):
+        """
+        При изменении @username очищаем chat_id, чтобы бот не пытался
+        отправить сообщение по старому chat_id, который может принадлежать
+        другому пользователю.
+        """
+        if self.pk:
+            try:
+                old = Teacher.objects.get(pk=self.pk)
+                if old.telegram != self.telegram:
+                    # @username изменился — старый chat_id больше не актуален
+                    self.telegram_chat_id = None
+            except Teacher.DoesNotExist:
+                pass
+        super().save(*args, **kwargs)
+    
     class Meta:
         verbose_name = 'Преподаватель'
         verbose_name_plural = 'Преподаватели'
@@ -91,6 +107,28 @@ class Student(models.Model):
     
     def __str__(self):
         return f"{self.first_name} {self.last_name} - {self.class_name}"
+    
+    def save(self, *args, **kwargs):
+        """
+        При изменении @username ученика или родителя очищаем соответствующий chat_id.
+        
+        Это гарантирует, что:
+        - Если учитель изменил telegram_username — старый chat_id ученика очищается,
+          и бот не отправит уведомление чужому человеку
+        - Если учитель изменил parent_telegram — старый chat_id родителя очищается,
+          и бот не отправит уведомление старому родителю
+        - Если учитель удалил telegram_username или parent_telegram — chat_id тоже очищается
+        """
+        if self.pk:
+            try:
+                old = Student.objects.get(pk=self.pk)
+                if old.telegram_username != self.telegram_username:
+                    self.telegram_chat_id = None
+                if old.parent_telegram != self.parent_telegram:
+                    self.parent_telegram_chat_id = None
+            except Student.DoesNotExist:
+                pass
+        super().save(*args, **kwargs)
     
     def get_exam_types_display(self):
         """Получить отображаемые названия выбранных типов подготовки"""
