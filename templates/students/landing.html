@@ -850,7 +850,7 @@
 <!-- Секция прайс-листа -->
 <div class="pricing-section">
     <div class="container">
-        <h2 class="section-title">💰 Стоимость занятий в группах</h2>
+        <h2 class="section-title">💰 Стоимость занятий</h2>
         <div class="pricing-cards">
             <div class="pricing-card pricing-card-group">
                 <div class="pricing-card-icon">👥</div>
@@ -867,6 +867,26 @@
                     <li>✅ Поддержка преподавателя</li>
                 </ul>
                 <button class="pricing-trial-btn" id="trialBtn">
+                    🎯 Записаться на пробное занятие
+                </button>
+            </div>
+
+            <div class="pricing-card pricing-card-individual">
+                <span class="pricing-card-badge">⭐</span>
+                <div class="pricing-card-icon">👤</div>
+                <h5>Индивидуальное занятие</h5>
+                <div class="pricing-subtitle">(1 на 1 с преподавателем)</div>
+                <div class="pricing-amount">
+                    <span class="pricing-price">от 1 100</span>
+                    <span class="pricing-currency">₽</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>✅ Полное внимание преподавателя</li>
+                    <li>✅ Индивидуальный план подготовки</li>
+                    <li>✅ Гибкий график занятий</li>
+                    <li>✅ Проработка самых сложных тем</li>
+                </ul>
+                <button class="pricing-trial-btn" id="trialBtnIndividual">
                     🎯 Записаться на пробное занятие
                 </button>
             </div>
@@ -1083,6 +1103,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (trialBtn && modal) {
         trialBtn.addEventListener('click', openModal);
+    }
+
+    // Кнопка "Записаться" в карточке индивидуальных занятий
+    const trialBtnIndividual = document.getElementById('trialBtnIndividual');
+    if (trialBtnIndividual && modal) {
+        trialBtnIndividual.addEventListener('click', openModal);
     }
 
     if (modalClose) {
