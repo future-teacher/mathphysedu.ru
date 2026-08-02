@@ -282,13 +282,19 @@ def homework_create(request):
             # Отправляем уведомление ученику о новом ДЗ
             notify_student_new_homework(homework)
             
-            # Проверяем, указан ли Telegram у ученика
+            # Проверяем, указан ли Telegram у ученика или родителя
             student = homework.student
-            if not student.telegram_username:
+            if not student.telegram_username and not student.parent_telegram:
                 messages.warning(
                     request,
-                    f'У ученика {student.first_name} {student.last_name} не указан Telegram. '
-                    f'Уведомление не будет отправлено.'
+                    f'У ученика {student.first_name} {student.last_name} не указан Telegram '
+                    f'(ни ученик, ни родитель). Уведомления не будут отправлены.'
+                )
+            elif not student.telegram_username:
+                messages.info(
+                    request,
+                    f'У ученика {student.first_name} {student.last_name} не указан личный Telegram, '
+                    f'но указан Telegram родителя — уведомление будет отправлено родителю.'
                 )
             
             messages.success(request, f'🚀 Задание "{homework.title}" создано!')
@@ -462,13 +468,19 @@ def teacher_probnik_create(request):
             # Отправляем уведомление ученику о новом пробнике
             notify_student_new_probnik(probnik)
             
-            # Проверяем, указан ли Telegram у ученика
+            # Проверяем, указан ли Telegram у ученика или родителя
             student = probnik.student
-            if not student.telegram_username:
+            if not student.telegram_username and not student.parent_telegram:
                 messages.warning(
                     request,
-                    f'У ученика {student.first_name} {student.last_name} не указан Telegram. '
-                    f'Уведомление не будет отправлено.'
+                    f'У ученика {student.first_name} {student.last_name} не указан Telegram '
+                    f'(ни ученик, ни родитель). Уведомления не будут отправлены.'
+                )
+            elif not student.telegram_username:
+                messages.info(
+                    request,
+                    f'У ученика {student.first_name} {student.last_name} не указан личный Telegram, '
+                    f'но указан Telegram родителя — уведомление будет отправлено родителю.'
                 )
             
             messages.success(request, f'🎯 Пробник "{probnik.title}" успешно создан!')
