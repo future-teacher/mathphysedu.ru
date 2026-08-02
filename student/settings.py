@@ -109,8 +109,12 @@ LOGIN_REDIRECT_URL = '/students/dashboard/'
 LOGOUT_REDIRECT_URL = '/students/login/'
 
 # File upload settings
-FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+# Максимальный размер файла в памяти (50MB) — если файл больше, Django пишет его на диск
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
+# Максимальный размер всего тела запроса (200MB) — включает все поля + файлы
+DATA_UPLOAD_MAX_MEMORY_SIZE = 209715200  # 200MB
+# Максимальное количество полей в форме (для множественной загрузки файлов)
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 
 # Security settings for production (disable in development)
 if not DEBUG:
