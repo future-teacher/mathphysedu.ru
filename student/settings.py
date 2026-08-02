@@ -1,18 +1,23 @@
-"""
-Django settings for student project.
-"""
-
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ===== ЗАГРУЗКА .env С ЯВНЫМ ПУТЁМ =====
 BASE_DIR = Path(__file__).resolve().parent.parent
+env_file = BASE_DIR / '.env'
+
+if env_file.exists():
+    load_dotenv(env_file)
+    print(f"✅ .env загружен из: {env_file}")
+else:
+    print(f"⚠️ .env НЕ НАЙДЕН по пути: {env_file}")
+# =========================================
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qwerty123'  # Замените на свой ключ для продакшена
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-key-for-dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['mathphysedu.ru', 'www.mathphysedu.ru', 'localhost', '127.0.0.1', '77.221.145.35']
 
@@ -125,27 +130,19 @@ if not DEBUG:
 # ========================
 # TELEGRAM BOT SETTINGS
 # ========================
-# Получите токен у @BotFather в Telegram
-# Токен можно задать через переменную окружения TELEGRAM_BOT_TOKEN
-# Если не задан, используется значение по умолчанию (для разработки)
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8450426977:AAFn3mwjW-hAxW0Sa5GuRTdAxdSDgkfzGnI')
+# Токен бота — берётся из .env
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 # Включить/выключить уведомления в Telegram
 TELEGRAM_BOT_ENABLED = bool(TELEGRAM_BOT_TOKEN)
 
-
-# Базовый URL сайта для ссылок в уведомлениях (без слеша на конце)
-# На сервере можно переопределить через: export BASE_URL='https://mathphysedu.ru'
+# Базовый URL сайта для ссылок в уведомлениях
 BASE_URL = os.environ.get('BASE_URL', 'https://mathphysedu.ru')
 
 # ========================
 # YANDEX SMARTCAPTCHA SETTINGS
 # ========================
-# Получите ключи в кабинете разработчика Yandex SmartCaptcha:
-# https://smartcaptcha.yandexcloud.net/
-# Ключи можно задать через переменные окружения:
-#   YANDEX_SMARTCAPTCHA_SITE_KEY   — ключ для виджета (на клиенте)
-#   YANDEX_SMARTCAPTCHA_SERVER_KEY — ключ для проверки (на сервере)
+# Ключи берутся из .env
 YANDEX_SMARTCAPTCHA_SITE_KEY = os.environ.get(
     'YANDEX_SMARTCAPTCHA_SITE_KEY',
     'ysc1_placeholder_site_key'
