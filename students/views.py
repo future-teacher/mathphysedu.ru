@@ -49,6 +49,7 @@ def landing(request):
     
     return render(request, 'students/landing.html', {
         'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+        'captcha_disabled': settings.DEBUG,
     })
 
 
@@ -62,6 +63,7 @@ def student_login(request):
             return render(request, 'students/login.html', {
                 'form': form,
                 'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+                'captcha_disabled': settings.DEBUG,
                 'captcha_error': True,
             })
 
@@ -95,12 +97,14 @@ def student_login(request):
                 return render(request, 'students/login.html', {
                     'form': form,
                     'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+                    'captcha_disabled': settings.DEBUG,
                 })
         else:
             messages.error(request, 'Неверное имя пользователя или пароль.')
             return render(request, 'students/login.html', {
                 'form': form,
                 'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+                'captcha_disabled': settings.DEBUG,
             })
     else:
         form = AuthenticationForm()
@@ -108,6 +112,7 @@ def student_login(request):
     return render(request, 'students/login.html', {
         'form': form,
         'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
+        'captcha_disabled': settings.DEBUG,
     })
 
 

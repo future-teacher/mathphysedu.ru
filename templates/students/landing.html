@@ -75,6 +75,20 @@
     color: #1a1a2e;
 }
 
+.landing-nav .bonus-balance-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+    color: #5b3a00;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 2px 10px rgba(255, 179, 0, 0.5);
+    white-space: nowrap;
+}
+
 .landing-nav .nav-dashboard-btn {
     display: inline-flex;
     align-items: center;
@@ -128,6 +142,10 @@
         font-size: 14px;
     }
     .landing-nav .nav-user-name {
+        font-size: 13px;
+    }
+    .landing-nav .bonus-balance-badge {
+        padding: 5px 12px;
         font-size: 13px;
     }
     .landing-nav .nav-dashboard-btn {
@@ -714,6 +732,11 @@
                 {{ user.username }}
             {% endif %}
         </span>
+        {% if user.student_profile %}
+        <span class="bonus-balance-badge" title="Ваши бонусные рубли">
+            🪙 {{ user.student_profile.bonus_balance }} ₽
+        </span>
+        {% endif %}
         <a href="
             {% if user.student_profile %}{% url 'dashboard' %}
             {% elif user.teacher_profile %}{% url 'teacher_dashboard' %}
@@ -1010,7 +1033,16 @@ function onSmartCaptchaLoad() {
     
     const siteKey = '{{ captcha_site_key }}';
     console.log('SiteKey:', siteKey);
-    
+
+    // В режиме разработки каптчу проходить не нужно
+    {% if captcha_disabled %}
+        console.warn('⚠️ Капча отключена (режим разработки DEBUG=True).');
+        container.innerHTML = '<p style="color:orange;">⚠️ Капча отключена в режиме разработки</p>';
+        if (submitBtn) submitBtn.disabled = false;
+        if (tokenInput) tokenInput.value = 'dev-skip-captcha';
+        return;
+    {% endif %}
+
     if (!siteKey || siteKey.includes('placeholder')) {
         console.warn('⚠️ Используется placeholder-ключ!');
         container.innerHTML = '<p style="color:orange;">⚠️ Капча в режиме разработки</p>';
@@ -1135,6 +1167,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (trialForm) {
         trialForm.addEventListener('submit', function(e) {
+            {% if captcha_disabled %}
+                console.log('✅ Капча отключена (режим разработки), форма отправляется.');
+                return true;
+            {% endif %}
             const smartToken = document.getElementById('smart-token');
             if (!smartToken || !smartToken.value) {
                 e.preventDefault();

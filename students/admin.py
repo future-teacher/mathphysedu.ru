@@ -86,8 +86,8 @@ class TeacherAdmin(admin.ModelAdmin):
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     form = StudentAdminForm
-    list_display = ('first_name', 'last_name', 'class_name', 'telegram_username', 
-                    'display_exam_types', 'current_level', 'start_date')
+    list_display = ('first_name', 'last_name', 'class_name', 'telegram_username',
+                    'display_exam_types', 'current_level', 'start_date', 'bonus_balance')
     list_filter = ('class_name', 'current_level', 'start_date')
     search_fields = ('first_name', 'last_name', 'telegram_username', 'parent_telegram')
     inlines = [StudyFileInline]
@@ -110,7 +110,7 @@ class StudentAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Дополнительно', {
-            'fields': ('notes',),
+            'fields': ('notes', 'bonus_balance'),
             'classes': ('collapse',)
         }),
     )

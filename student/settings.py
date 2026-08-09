@@ -17,7 +17,12 @@ else:
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-key-for-dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Если .env отсутствует — считаем, что это локальная разработка (DEBUG=True).
+# В production обязательно создайте .env с DJANGO_DEBUG=False.
+if env_file.exists():
+    DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ['mathphysedu.ru', 'www.mathphysedu.ru', 'localhost', '127.0.0.1', '77.221.145.35']
 

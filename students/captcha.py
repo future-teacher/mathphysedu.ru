@@ -27,6 +27,11 @@ def check_captcha(token: str, ip: str | None = None) -> bool:
     Возвращает:
         True, если капча пройдена успешно, иначе False.
     """
+    # В режиме разработки каптчу проходить не нужно
+    if settings.DEBUG:
+        logger.info('Yandex SmartCaptcha: режим разработки (DEBUG=True). Капча пропущена.')
+        return True
+
     if not token:
         logger.warning('Yandex SmartCaptcha: пустой токен')
         return False

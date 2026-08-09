@@ -102,6 +102,13 @@ class Student(models.Model):
     )
     
     notes = models.TextField(verbose_name='Заметки', blank=True)
+    
+    bonus_balance = models.IntegerField(
+        default=0,
+        verbose_name='Бонусные рубли',
+        help_text='Бонусные рубли, которые ученик получает за проделанную работу'
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

@@ -33,6 +33,7 @@ urlpatterns = [
     path('teacher/students/create/', teacher_views.student_create, name='teacher_student_create'),
     path('teacher/students/<int:student_id>/', teacher_views.student_detail, name='teacher_student_detail'),
     path('teacher/students/<int:student_id>/edit/', teacher_views.student_edit, name='teacher_student_edit'),
+    path('teacher/students/<int:student_id>/bonuses/', teacher_views.student_bonuses, name='teacher_student_bonuses'),
     
     # Преподаватели - домашние задания
     path('teacher/homework/', teacher_views.homework_list, name='teacher_homework_list'),

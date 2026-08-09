@@ -251,6 +251,66 @@ def student_edit(request, student_id):
 
 @login_required
 @user_passes_test(is_teacher, login_url='/students/login/')
+def student_bonuses(request, student_id):
+    """Начисление / списание бонусных рублей ученику"""
+    teacher = get_teacher_or_admin(request.user)
+    if not teacher:
+        messages.error(request, 'У вас нет прав преподавателя')
+        return redirect('login')
+    
+    if request.user.is_staff or request.user.is_superuser:
+        student = get_object_or_404(Student, id=student_id)
+    else:
+        student = get_object_or_404(Student, id=student_id, teacher=teacher)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            amount = request.POST.get('amount')
+            try:
+                amount = int(amount)
+            except (TypeError, ValueError):
+                amount = 0
+            
+            if amount <= 0:
+                messages.error(request, 'Введите корректную сумму бонусов (больше нуля).')
+            else:
+                student.bonus_balance += amount
+                student.save(update_fields=['bonus_balance'])
+                messages.success(
+                    request,
+                    f'✅ Ученику {student} начислено +{amount} бонусных рублей. '
+                    f'Баланс: {student.bonus_balance} ₽'
+                )
+        
+        elif action == 'subtract':
+            amount = request.POST.get('amount')
+            try:
+                amount = int(amount)
+            except (TypeError, ValueError):
+                amount = 0
+            
+            if amount <= 0:
+                messages.error(request, 'Введите корректную сумму бонусов (больше нуля).')
+            else:
+                student.bonus_balance -= amount
+                if student.bonus_balance < 0:
+                    student.bonus_balance = 0
+                student.save(update_fields=['bonus_balance'])
+                messages.success(
+                    request,
+                    f'➖ У ученика {student} списано {amount} бонусных рублей. '
+                    f'Баланс: {student.bonus_balance} ₽'
+                )
+        
+        return redirect('teacher_student_detail', student_id=student.id)
+    
+    return redirect('teacher_student_detail', student_id=student.id)
+
+
+@login_required
+@user_passes_test(is_teacher, login_url='/students/login/')
 def homework_create(request):
     """Создание домашнего задания"""
     teacher = get_teacher_or_admin(request.user)

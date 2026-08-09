@@ -353,7 +353,16 @@
             
             const siteKey = '{{ captcha_site_key }}';
             console.log('SiteKey:', siteKey);
-            
+
+            // В режиме разработки каптчу проходить не нужно
+            {% if captcha_disabled %}
+                console.warn('⚠️ Капча отключена (режим разработки DEBUG=True).');
+                container.innerHTML = '<p style="color:orange;font-size:13px;">⚠️ Капча отключена в режиме разработки</p>';
+                if (submitBtn) submitBtn.disabled = false;
+                if (tokenInput) tokenInput.value = 'dev-skip-captcha';
+                return;
+            {% endif %}
+
             if (!siteKey || siteKey.includes('placeholder')) {
                 console.warn('⚠️ Используется placeholder-ключ!');
                 container.innerHTML = '<p style="color:orange;font-size:13px;">⚠️ Капча в режиме разработки</p>';
@@ -409,6 +418,10 @@
 
             if (loginForm) {
                 loginForm.addEventListener('submit', function(e) {
+                    {% if captcha_disabled %}
+                        console.log('✅ Капча отключена (режим разработки), форма отправляется.');
+                        return true;
+                    {% endif %}
                     const smartToken = document.getElementById('smart-token');
                     if (!smartToken || !smartToken.value) {
                         e.preventDefault();
