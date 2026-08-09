@@ -122,7 +122,43 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- ===== БОНУСНЫЕ РУБЛИ (свёрнуто по умолчанию) ===== -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">🪙 Бонусные рубли</h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-success">💰 {{ student.bonus_balance }} ₽</span>
+                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#studentBonusesCollapse" aria-expanded="false">
+                                <span>👁️‍🗨️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="collapse" id="studentBonusesCollapse">
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">
+                                Начисляйте бонусы за выполненные ДЗ и достижения.
+                            </p>
+                            <form method="post" action="{% url 'teacher_student_bonuses' student.id %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label small mb-1">Сумма:</label>
+                                    <input type="number" name="amount" min="1" step="1" class="form-control"
+                                           placeholder="Например: 10" required>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" name="action" value="add" class="btn btn-success">
+                                        ➕ Начислить
+                                    </button>
+                                    <button type="submit" name="action" value="subtract" class="btn btn-outline-danger">
+                                        ➖ Списать
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 {% if student.google_sheet_url %}
                 <div class="card mb-4">
                     <div class="card-header bg-light">
@@ -138,35 +174,6 @@
                     </div>
                 </div>
                 {% endif %}
-
-                <!-- ===== БОНУСНЫЕ РУБЛИ ===== -->
-                <div class="card mb-4">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">🪙 Бонусные рубли</h5>
-                        <span class="badge bg-success fs-6">💰 {{ student.bonus_balance }} ₽</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted small mb-3">
-                            Начисляйте бонусы за выполненные ДЗ и достижения.
-                        </p>
-                        <form method="post" action="{% url 'teacher_student_bonuses' student.id %}">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="form-label small mb-1">Сумма:</label>
-                                <input type="number" name="amount" min="1" step="1" class="form-control"
-                                       placeholder="Например: 10" required>
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button type="submit" name="action" value="add" class="btn btn-success">
-                                    ➕ Начислить
-                                </button>
-                                <button type="submit" name="action" value="subtract" class="btn btn-outline-danger">
-                                    ➖ Списать
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
             </div>
             
             <div class="col-md-8">
