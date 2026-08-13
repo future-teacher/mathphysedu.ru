@@ -1011,31 +1011,54 @@
 </div>
 
 <!-- ===== YANDEX SMARTCAPTCHA SCRIPTS ===== -->
-<script src="https://smartcaptcha.yandexcloud.net/captcha.js?render=onload&onload=onSmartCaptchaLoad" defer></script>
-
 <script>
+// Глобальный флаг, что капча уже инициализирована
 let smartCaptchaWidgetId = null;
+let smartCaptchaRendered = false;
 
-function onSmartCaptchaLoad() {
+// Функция загрузки скрипта капчи (с повторной попыткой при сбое сети)
+function loadSmartCaptchaScript(callback) {
+    if (window.smartCaptcha) {
+        callback();
+        return;
+    }
+    const existing = document.querySelector('script[data-smartcaptcha]');
+    if (existing) {
+        existing.addEventListener('load', function() { callback(); });
+        existing.addEventListener('error', function() { callback(); });
+        return;
+    }
+    const s = document.createElement('script');
+    s.src = 'https://smartcaptcha.yandexcloud.net/captcha.js';
+    s.async = true;
+    s.setAttribute('data-smartcaptcha', '1');
+    s.onload = function() { callback(); };
+    s.onerror = function() {
+        console.error('❌ Не удалось загрузить скрипт SmartCaptcha.');
+        const container = document.getElementById('captcha-container');
+        if (container && !smartCaptchaRendered) {
+            container.innerHTML = '<p style="color:red;">⚠️ Ошибка загрузки капчи. Проверьте интернет-соединение.</p>';
+        }
+    };
+    document.head.appendChild(s);
+}
+
+// Рендерим капчу только когда модальное окно открыто (контейнер видим)
+function renderSmartCaptcha() {
     const container = document.getElementById('captcha-container');
     const tokenInput = document.getElementById('smart-token');
     const submitBtn = document.getElementById('submitBtn');
-    
+
     console.log('🔍 Инициализация капчи...');
     console.log('Контейнер найден:', !!container);
     console.log('SmartCaptcha загружен:', typeof window.smartCaptcha !== 'undefined');
-    
+
+    // Если контейнера ещё нет — выходим (модалка не открыта)
     if (!container) {
-        console.error('❌ Контейнер капчи не найден!');
+        console.log('ℹ️ Контейнер капчи ещё не виден, пропускаем.');
         return;
     }
-    
-    if (!window.smartCaptcha) {
-        console.error('❌ SmartCaptcha не загружен!');
-        container.innerHTML = '<p style="color:red;">⚠️ Ошибка загрузки капчи</p>';
-        return;
-    }
-    
+
     const siteKey = '{{ captcha_site_key }}';
     console.log('SiteKey:', siteKey);
 
@@ -1045,6 +1068,7 @@ function onSmartCaptchaLoad() {
         container.innerHTML = '<p style="color:orange;">⚠️ Капча отключена в режиме разработки</p>';
         if (submitBtn) submitBtn.disabled = false;
         if (tokenInput) tokenInput.value = 'dev-skip-captcha';
+        smartCaptchaRendered = true;
         return;
     {% endif %}
 
@@ -1052,9 +1076,24 @@ function onSmartCaptchaLoad() {
         console.warn('⚠️ Используется placeholder-ключ!');
         container.innerHTML = '<p style="color:orange;">⚠️ Капча в режиме разработки</p>';
         if (submitBtn) submitBtn.disabled = false;
+        smartCaptchaRendered = true;
         return;
     }
-    
+
+    // Если капча уже отрендерена — не дублируем
+    if (smartCaptchaRendered) {
+        return;
+    }
+
+    // Если скрипт ещё не загрузился — ждём его загрузку и пробуем снова
+    if (!window.smartCaptcha) {
+        console.log('ℹ️ SmartCaptcha ещё не загружен, ждём...');
+        loadSmartCaptchaScript(function() {
+            setTimeout(renderSmartCaptcha, 50);
+        });
+        return;
+    }
+
     try {
         smartCaptchaWidgetId = window.smartCaptcha.render(container, {
             sitekey: siteKey,
@@ -1091,6 +1130,7 @@ function onSmartCaptchaLoad() {
                 console.log('✅ Капча успешно решена');
             }
         });
+        smartCaptchaRendered = true;
         console.log('✅ Виджет капчи создан, ID:', smartCaptchaWidgetId);
     } catch (error) {
         console.error('❌ Ошибка создания виджета:', error);
@@ -1131,6 +1171,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function openModal() {
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
+        // Рендерим капчу только когда модалка открыта и контейнер видим
+        setTimeout(renderSmartCaptcha, 100);
     }
 
     function closeModal() {
@@ -1199,7 +1241,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    console.log('✅ Страница загружена, капча инициализируется...');
+    console.log('✅ Страница загружена.');
 });
 </script>
 {% endblock %}

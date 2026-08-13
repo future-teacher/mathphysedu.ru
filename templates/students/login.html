@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход в систему</title>
     
-    <!-- Yandex SmartCaptcha -->
-    <script src="https://smartcaptcha.yandexcloud.net/captcha.js?render=onload&onload=onSmartCaptchaLoad" defer></script>
-    
     <style>
         * {
             margin: 0;
@@ -332,8 +329,36 @@
     <!-- ===== YANDEX SMARTCAPTCHA SCRIPT ===== -->
     <script>
         let smartCaptchaWidgetId = null;
+        let smartCaptchaRendered = false;
 
-        function onSmartCaptchaLoad() {
+        // Функция загрузки скрипта капчи (динамически, чтобы избежать гонки загрузки)
+        function loadSmartCaptchaScript(callback) {
+            if (window.smartCaptcha) {
+                callback();
+                return;
+            }
+            const existing = document.querySelector('script[data-smartcaptcha]');
+            if (existing) {
+                existing.addEventListener('load', function() { callback(); });
+                existing.addEventListener('error', function() { callback(); });
+                return;
+            }
+            const s = document.createElement('script');
+            s.src = 'https://smartcaptcha.yandexcloud.net/captcha.js';
+            s.async = true;
+            s.setAttribute('data-smartcaptcha', '1');
+            s.onload = function() { callback(); };
+            s.onerror = function() {
+                console.error('❌ Не удалось загрузить скрипт SmartCaptcha.');
+                const container = document.getElementById('captcha-container');
+                if (container && !smartCaptchaRendered) {
+                    container.innerHTML = '<p style="color:red;font-size:13px;">⚠️ Ошибка загрузки капчи. Проверьте интернет-соединение.</p>';
+                }
+            };
+            document.head.appendChild(s);
+        }
+
+        function renderSmartCaptcha() {
             const container = document.getElementById('captcha-container');
             const tokenInput = document.getElementById('smart-token');
             const submitBtn = document.getElementById('submitBtn');
@@ -344,13 +369,7 @@
                 console.error('❌ Контейнер капчи не найден!');
                 return;
             }
-            
-            if (!window.smartCaptcha) {
-                console.error('❌ SmartCaptcha не загружен!');
-                container.innerHTML = '<p style="color:red;font-size:13px;">⚠️ Ошибка загрузки капчи</p>';
-                return;
-            }
-            
+
             const siteKey = '{{ captcha_site_key }}';
             console.log('SiteKey:', siteKey);
 
@@ -360,6 +379,7 @@
                 container.innerHTML = '<p style="color:orange;font-size:13px;">⚠️ Капча отключена в режиме разработки</p>';
                 if (submitBtn) submitBtn.disabled = false;
                 if (tokenInput) tokenInput.value = 'dev-skip-captcha';
+                smartCaptchaRendered = true;
                 return;
             {% endif %}
 
@@ -367,6 +387,21 @@
                 console.warn('⚠️ Используется placeholder-ключ!');
                 container.innerHTML = '<p style="color:orange;font-size:13px;">⚠️ Капча в режиме разработки</p>';
                 if (submitBtn) submitBtn.disabled = false;
+                smartCaptchaRendered = true;
+                return;
+            }
+
+            // Если капча уже отрендерена — не дублируем
+            if (smartCaptchaRendered) {
+                return;
+            }
+
+            // Если скрипт ещё не загрузился — ждём его и пробуем снова
+            if (!window.smartCaptcha) {
+                console.log('ℹ️ SmartCaptcha ещё не загружен, ждём...');
+                loadSmartCaptchaScript(function() {
+                    setTimeout(renderSmartCaptcha, 50);
+                });
                 return;
             }
             
@@ -404,6 +439,7 @@
                         console.log('✅ Капча успешно решена');
                     }
                 });
+                smartCaptchaRendered = true;
                 console.log('✅ Виджет капчи создан, ID:', smartCaptchaWidgetId);
             } catch (error) {
                 console.error('❌ Ошибка создания виджета:', error);
@@ -431,6 +467,9 @@
                     console.log('✅ Форма входа отправляется с токеном');
                 });
             }
+
+            // Рендерим капчу после полной загрузки DOM
+            renderSmartCaptcha();
 
             // Если есть ошибка капчи — показываем
             if (document.querySelector('.captcha-error')) {
