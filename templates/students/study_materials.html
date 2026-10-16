@@ -41,7 +41,7 @@
                                 {% for file in math_files %}
                                 <div class="list-group-item px-0">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <div class="me-2" style="flex: 1;">
+                                        <div class="me-2 flex-1">
                                             <h6 class="mb-1 small">{{ file.title|truncatechars:30 }}</h6>
                                             <small class="text-muted">
                                                 <span class="badge bg-info">{{ file.get_file_type_display }}</span>
@@ -66,7 +66,7 @@
                                 {% for file in physics_files %}
                                 <div class="list-group-item px-0">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <div class="me-2" style="flex: 1;">
+                                        <div class="me-2 flex-1">
                                             <h6 class="mb-1 small">{{ file.title|truncatechars:30 }}</h6>
                                             <small class="text-muted">
                                                 <span class="badge bg-info">{{ file.get_file_type_display }}</span>
@@ -91,7 +91,7 @@
                                 {% for file in general_files %}
                                 <div class="list-group-item px-0">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <div class="me-2" style="flex: 1;">
+                                        <div class="me-2 flex-1">
                                             <h6 class="mb-1 small">{{ file.title|truncatechars:30 }}</h6>
                                             <small class="text-muted">
                                                 <span class="badge bg-info">{{ file.get_file_type_display }}</span>
@@ -114,28 +114,6 @@
         </div>
     </div>
 </div>
-<style>
-/* Mobile-friendly tabs */
-@media (max-width: 575.98px) {
-    .nav-tabs .nav-link {
-        padding: 0.4rem 0.5rem;
-        font-size: 0.75rem;
-    }
-    .nav-tabs .nav-link .badge {
-        font-size: 0.55rem;
-    }
-    .tab-content {
-        padding: 0.75rem !important;
-    }
-    .list-group-item h6 {
-        font-size: 0.75rem !important;
-    }
-    .list-group-item .btn-sm {
-        font-size: 0.65rem;
-        padding: 0.15rem 0.4rem;
-    }
-}
-</style>
 {% else %}
 <div class="row justify-content-center">
     <div class="col-12 col-md-6">

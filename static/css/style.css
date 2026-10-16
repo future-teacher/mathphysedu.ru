@@ -1,715 +1,1150 @@
-/* ===== Общие стили ===== */
-:root {
-    --math-color: #00d2ff;
-    --physics-color: #ff6b6b;
-    --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --success-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --warning-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --sidebar-width: 250px;
-    --sidebar-bg: #1a1d23;
-    --sidebar-hover: #2a2d35;
-    --sidebar-active: #0d6efd;
-    --sidebar-text: #a0a4b0;
-    --sidebar-text-active: #ffffff;
+/* ============================================================
+   MathPhysEdu — общий слой (Bootstrap override + каркас)
+   Все значения берутся из tokens.css. Подключается из base.html
+   ПОСЛЕ Bootstrap и tokens.css.
+   ============================================================ */
+
+/* ---------- База ---------- */
+
+* {
+    font-family: var(--font-sans);
 }
 
 body {
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 1.05rem;
-    padding-bottom: 20px;
+    background-color: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-/* Карточки */
+::selection {
+    background: var(--accent-soft-strong);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+a {
+    color: var(--accent-text);
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* ---------- Карточки ---------- */
+
 .card {
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
     margin-bottom: 20px;
-    backdrop-filter: blur(10px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-2);
 }
 
 .card-header {
-    background: var(--accent-gradient) !important;
-    color: white;
-    border-radius: 20px 20px 0 0 !important;
-    border: none;
-    padding: 18px 22px;
+    background-color: var(--surface);
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
 }
 
-.card-header h4, .card-header h5 {
+.card-header h4,
+.card-header h5 {
     margin-bottom: 0;
-    font-size: 1.15rem;
-}
-
-.card-header.bg-success {
-    background: var(--success-gradient) !important;
-}
-
-.card-header.bg-warning {
-    background: var(--warning-gradient) !important;
-    color: #fff !important;
-}
-
-.card-header.bg-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-}
-
-.card-header.bg-danger {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
-}
-
-.card-header.bg-info {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    font-size: 1.1rem;
+    font-weight: 700;
 }
 
 .card-body {
-    padding: 22px;
+    padding: 1.25rem;
 }
 
-/* Навбар */
+/* Цветные варианты шапок — сплошные заливки с мягким текстом */
+.card-header.bg-primary {
+    background-color: var(--accent) !important;
+    color: #fff !important;
+    border-bottom-color: transparent;
+}
+
+.card-header.bg-success {
+    background-color: var(--success) !important;
+    color: #fff !important;
+    border-bottom-color: transparent;
+}
+
+.card-header.bg-danger {
+    background-color: var(--danger) !important;
+    color: #fff !important;
+    border-bottom-color: transparent;
+}
+
+.card-header.bg-warning {
+    background-color: var(--warning) !important;
+    color: #fff !important;
+    border-bottom-color: transparent;
+}
+
+.card-header.bg-info {
+    background-color: var(--info) !important;
+    color: #fff !important;
+    border-bottom-color: transparent;
+}
+
+.card-header.bg-light {
+    background-color: var(--surface-2) !important;
+    color: var(--text) !important;
+    border-bottom-color: var(--border);
+}
+
+.bg-light {
+    background-color: var(--surface-2) !important;
+}
+
+.bg-transparent {
+    background-color: transparent !important;
+}
+
+.border-success {
+    border-color: var(--success) !important;
+}
+
+.border-primary {
+    border-color: var(--accent) !important;
+}
+
+/* ---------- Кнопки ---------- */
+
+.btn {
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    padding: 0.55rem 1.15rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease,
+        color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 3px var(--accent-soft-strong);
+}
+
+.btn-primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #fff;
+}
+
+.btn-success {
+    background-color: var(--success);
+    border-color: var(--success);
+    color: #fff;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
+    background-color: var(--success-hover);
+    border-color: var(--success-hover);
+    color: #fff;
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:active {
+    background-color: var(--danger-hover);
+    border-color: var(--danger-hover);
+    color: #fff;
+}
+
+.btn-warning {
+    background-color: var(--warning);
+    border-color: var(--warning);
+    color: #fff;
+}
+
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-warning:active {
+    background-color: var(--warning-hover);
+    border-color: var(--warning-hover);
+    color: #fff;
+}
+
+.btn-info {
+    background-color: var(--info);
+    border-color: var(--info);
+    color: #fff;
+}
+
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active {
+    background-color: var(--info-hover);
+    border-color: var(--info-hover);
+    color: #fff;
+}
+
+.btn-outline-primary {
+    color: var(--accent-text);
+    border-color: var(--accent);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.btn-outline-secondary {
+    color: var(--text-secondary);
+    border-color: var(--border-strong);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-secondary:active {
+    background-color: var(--surface-3);
+    border-color: var(--border-strong);
+    color: var(--text);
+}
+
+.btn-outline-danger {
+    color: var(--danger-text);
+    border-color: var(--danger);
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus,
+.btn-outline-danger:active {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.btn-outline-light {
+    color: var(--text);
+    border-color: var(--border-strong);
+}
+
+.btn-outline-light:hover,
+.btn-outline-light:focus,
+.btn-outline-light:active {
+    background-color: var(--surface-3);
+    border-color: var(--border-strong);
+    color: var(--text);
+}
+
+.btn-light {
+    background-color: var(--surface);
+    border-color: var(--surface);
+    color: var(--text);
+}
+
+.btn-light:hover,
+.btn-light:focus,
+.btn-light:active {
+    background-color: var(--surface-3);
+    border-color: var(--surface-3);
+    color: var(--text);
+}
+
+.btn-secondary {
+    background-color: var(--surface-3);
+    border-color: var(--surface-3);
+    color: var(--text);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+    background-color: var(--border-strong);
+    border-color: var(--border-strong);
+    color: var(--text);
+}
+
+.btn-close {
+    filter: none;
+    opacity: 0.6;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* ---------- Бейджи ---------- */
+
+.badge {
+    font-weight: 600;
+    font-size: 0.78rem;
+    padding: 0.4em 0.8em;
+    border-radius: var(--radius-pill);
+}
+
+.badge.bg-primary {
+    background-color: var(--accent-soft) !important;
+    color: var(--accent-text) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--success-soft) !important;
+    color: var(--success-text) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-soft) !important;
+    color: var(--danger-text) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-soft) !important;
+    color: var(--warning-text) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--info-soft) !important;
+    color: var(--info-text) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--surface-3) !important;
+    color: var(--text-secondary) !important;
+}
+
+.badge.bg-light {
+    background-color: var(--surface-2) !important;
+    color: var(--text) !important;
+}
+
+.badge-math {
+    background-color: var(--math-soft) !important;
+    color: var(--math) !important;
+}
+
+.badge-physics {
+    background-color: var(--physics-soft) !important;
+    color: var(--physics) !important;
+}
+
+/* ---------- Таблицы ---------- */
+
+.table {
+    color: var(--text);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text);
+    --bs-table-border-color: var(--border);
+    margin-bottom: 0;
+}
+
+.table > :not(caption) > * > * {
+    background-color: transparent;
+    color: inherit;
+    padding: 0.75rem 1rem;
+    border-bottom-color: var(--border);
+}
+
+.table th {
+    background-color: var(--surface-2);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom-width: 1px;
+}
+
+.table-hover > tbody > tr:hover > * {
+    background-color: var(--surface-2);
+    color: var(--text);
+}
+
+.table tr.table-danger > * {
+    background-color: var(--danger-soft);
+    color: var(--danger-text);
+}
+
+.table tr.table-success > * {
+    background-color: var(--success-soft);
+    color: var(--success-text);
+}
+
+.table-responsive {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+}
+
+/* ---------- List group ---------- */
+
+.list-group {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.list-group-item {
+    background-color: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.list-group-item:hover {
+    background-color: var(--surface-2);
+}
+
+.list-group-item.px-0 {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+}
+
+.list-group-flush .list-group-item {
+    border-left: 0;
+    border-right: 0;
+}
+
+.list-group-flush .list-group-item:first-child {
+    border-top: 0;
+}
+
+.list-group-flush .list-group-item:last-child {
+    border-bottom: 0;
+}
+
+/* ---------- Алерты ---------- */
+
+.alert {
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    padding: 0.9rem 1.15rem;
+}
+
+.alert-info {
+    background-color: var(--info-soft);
+    color: var(--info-text);
+    border-color: transparent;
+}
+
+.alert-success {
+    background-color: var(--success-soft);
+    color: var(--success-text);
+    border-color: transparent;
+}
+
+.alert-warning {
+    background-color: var(--warning-soft);
+    color: var(--warning-text);
+    border-color: transparent;
+}
+
+.alert-danger,
+.alert-error {
+    background-color: var(--danger-soft);
+    color: var(--danger-text);
+    border-color: transparent;
+}
+
+/* ---------- Формы ---------- */
+
+.form-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+}
+
+.form-control,
+.form-select {
+    background-color: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 0.55rem 0.9rem;
+    font-size: 0.95rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--surface);
+    color: var(--text);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.form-control[type="file"] {
+    padding: 0.45rem;
+}
+
+.form-text {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.text-danger {
+    color: var(--danger-text) !important;
+}
+
+.errorlist {
+    color: var(--danger-text);
+    list-style: none;
+    padding: 0;
+    margin: 0.35rem 0 0;
+    font-size: 0.88rem;
+}
+
+.input-group-text {
+    background-color: var(--surface-2);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+}
+
+.input-group > .form-control {
+    border-radius: var(--radius-md);
+}
+
+.form-check-input {
+    background-color: var(--surface);
+    border-color: var(--border-strong);
+}
+
+.form-check-input:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.form-check-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.form-check-label {
+    color: var(--text);
+}
+
+/* ---------- Табы ---------- */
+
+.nav-tabs {
+    border-bottom-color: var(--border);
+}
+
+.nav-tabs .nav-link {
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--text);
+    border-color: transparent;
+    background-color: var(--surface-2);
+}
+
+.nav-tabs .nav-link.active {
+    background-color: var(--surface);
+    color: var(--accent-text);
+    border-color: var(--border) var(--border) var(--surface);
+    border-bottom-color: var(--surface);
+}
+
+.tab-content {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    padding: 1rem;
+}
+
+/* ---------- Дропдауны и пагинация ---------- */
+
+.dropdown-menu {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-3);
+    padding: 0.4rem;
+}
+
+.dropdown-item {
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.93rem;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--surface-2);
+    color: var(--text);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: var(--accent-soft);
+    color: var(--accent-text);
+}
+
+.pagination {
+    --bs-pagination-bg: var(--surface);
+    --bs-pagination-border-color: var(--border);
+    --bs-pagination-color: var(--text-secondary);
+    --bs-pagination-hover-bg: var(--surface-2);
+    --bs-pagination-hover-border-color: var(--border-strong);
+    --bs-pagination-hover-color: var(--text);
+    --bs-pagination-active-bg: var(--accent);
+    --bs-pagination-active-border-color: var(--accent);
+    --bs-pagination-active-color: #fff;
+    --bs-pagination-disabled-bg: var(--surface-2);
+    --bs-pagination-disabled-border-color: var(--border);
+    --bs-pagination-disabled-color: var(--text-muted);
+    gap: 0.35rem;
+}
+
+.page-link {
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-width: 38px;
+    text-align: center;
+}
+
+/* ---------- Collapse ---------- */
+
+.accordion-button {
+    background-color: var(--surface);
+    color: var(--text);
+    border-radius: var(--radius-md) !important;
+    box-shadow: none !important;
+    font-weight: 600;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--surface-2);
+    color: var(--text);
+    box-shadow: none !important;
+}
+
+.accordion-item {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md) !important;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.accordion-body {
+    background-color: var(--surface);
+    color: var(--text);
+}
+
+/* ---------- Navbar (для гостей) ---------- */
+
 .navbar {
-    background: var(--accent-gradient);
-    padding: 0.6rem 1rem;
+    background: var(--shell-sidebar-bg);
+    padding: 0.7rem 1rem;
 }
 
 .navbar-brand {
-    font-weight: bold;
-    color: white !important;
+    font-weight: 700;
+    color: #fff !important;
     font-size: 1.2rem;
 }
 
 .navbar-nav .nav-link {
-    color: rgba(255,255,255,0.9) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
     padding: 0.5rem 1rem !important;
-    border-radius: 5px;
-    font-size: 1.05rem;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 .navbar-nav .nav-link:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff !important;
 }
 
 .logout-btn {
     background: none;
     border: none;
-    color: rgba(255,255,255,0.9);
+    color: var(--sidebar-text);
     padding: 0.5rem 1rem;
     cursor: pointer;
-    font-size: 1.05rem;
-}
-
-.logout-btn:hover {
-    background-color: rgba(255,255,255,0.1);
-    border-radius: 5px;
-}
-
-/* Кнопки */
-.btn {
     font-size: 1rem;
 }
 
-.btn-primary {
-    background: var(--accent-gradient);
-    border: none;
+/* ---------- Утилиты ---------- */
+
+.flex-1 {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-    transform: scale(1.02);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+.section-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
 }
 
-.btn-success {
-    background: var(--success-gradient);
-    border: none;
-}
-
-.btn-success:hover {
-    transform: scale(1.02);
-    box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
-}
-
-.btn-warning {
-    background: var(--warning-gradient);
-    border: none;
-    color: #fff;
-}
-
-.btn-warning:hover {
-    transform: scale(1.02);
-    box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
-    color: #fff;
-}
-
-/* Badges */
-.badge {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.6rem;
-}
-
-.badge-math {
-    background: var(--math-color);
-    color: #000;
-}
-
-.badge-physics {
-    background: var(--physics-color);
-    color: #fff;
-}
-
-/* Таблицы */
-.table {
-    margin-bottom: 0;
-}
-
-.table th {
-    border-top: none;
-    background-color: #f8f9fa;
-}
-
-.table th, .table td {
-    padding: 0.85rem 0.75rem;
-    font-size: 0.95rem;
-}
-
-/* Цитата */
-.motivation-quote {
-    font-style: italic;
-    color: #666;
-    margin: 20px 0;
-    padding-left: 20px;
-    border-left: 4px solid #667eea;
-    font-size: 1.05rem;
-}
-
-/* Футер */
-footer {
-    margin-top: 40px;
-    padding: 20px 0;
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-    font-size: 0.95rem;
-}
-
-/* Offcanvas */
-.offcanvas {
-    max-width: 300px;
-}
-
-.offcanvas-header {
-    background: var(--accent-gradient);
-    color: white;
-}
-
-.offcanvas-title {
-    color: white;
-}
-
-.btn-close-white {
-    filter: invert(1) grayscale(100%) brightness(200%);
-}
-
-/* Аватар */
-.avatar-circle {
-    width: 80px;
-    height: 80px;
-    background: var(--accent-gradient);
-    border-radius: 50%;
+.page-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+.page-header h2,
+.page-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2.5rem 1.5rem;
+}
+
+.empty-state .empty-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.avatar-circle,
+.td-student-avatar,
+.tsl-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: var(--accent-soft);
+    color: var(--accent-text);
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    margin: 0 auto;
-}
-
-.initials {
-    font-size: 2rem;
-    color: white;
-    font-weight: bold;
-}
-
-/* Список */
-.list-group-item {
-    border: none;
-    padding: 14px 18px;
+    font-weight: 700;
     font-size: 1rem;
+    flex-shrink: 0;
 }
 
-.list-group-item i.emoji {
-    margin-right: 10px;
-    font-style: normal;
+.motivation-quote {
+    font-style: italic;
+    color: var(--text-secondary);
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 0 0.5rem 1rem;
+    margin: 0;
 }
 
-/* ===== Студент карточки (для списка учеников преподавателя) ===== */
+.messages {
+    margin-bottom: 1rem;
+}
 
-.student-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
+/* Темная кнопка переключения темы */
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+    background-color: var(--surface-2);
+    color: var(--text);
+    transform: rotate(15deg);
+}
+
+/* ---------- Сайдбар ---------- */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width, 260px);
+    height: 100vh;
+    background: var(--shell-sidebar-bg);
+    border-right: 1px solid var(--shell-sidebar-border);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-brand {
+    padding: 1.2rem 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid var(--shell-sidebar-border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+.sidebar-brand:hover {
+    color: #fff;
+}
+
+.sidebar-user {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--shell-sidebar-border);
+    color: var(--shell-sidebar-text);
+    font-size: 0.9rem;
+}
+
+.sidebar-user .user-name {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.02rem;
+}
+
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
     padding: 0.5rem 0;
 }
 
-.student-card {
-    width: 100%;
-    max-width: 260px;
-    height: 300px;
-    background: #3405a3;
-    border-radius: 15px;
-    box-shadow: 1px 5px 60px 0px #100a886b;
-    margin: 0 auto;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    position: relative;
-    display: flex;
-    flex-direction: column;
+.sidebar-nav .nav-section {
+    padding: 0.75rem 1.25rem 0.25rem;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 700;
 }
 
-.student-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 1px 8px 70px 0px #100a88b0;
-}
-
-.student-card .card-border-top {
-    width: 60%;
-    height: 8px;
-    background: #6b64f3;
-    margin: 0 auto;
-    border-radius: 0px 0px 15px 15px;
-    flex-shrink: 0;
-}
-
-.student-card .img {
-    width: 70px;
-    height: 70px;
-    background: #6b64f3;
-    border-radius: 50%;
-    margin: 20px auto 0;
+.sidebar-nav a {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
+    gap: 0.75rem;
+    padding: 0.62rem 1.25rem;
+    color: var(--shell-sidebar-text);
+    text-decoration: none;
+    font-size: 0.93rem;
+    font-weight: 500;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    border-left: 3px solid transparent;
+    margin: 1px 0.5rem 1px 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.sidebar-nav a:hover {
+    background: var(--shell-sidebar-hover);
+    color: var(--shell-sidebar-text-active);
+}
+
+.sidebar-nav a.active {
+    background: var(--sidebar-active-bg);
+    color: var(--shell-sidebar-text-active);
+    border-left-color: var(--sidebar-active-border);
+}
+
+.sidebar-nav a .icon {
+    width: 1.3rem;
+    text-align: center;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+}
+
+.sidebar-nav a .badge {
+    margin-left: auto;
+    font-size: 0.72rem;
+}
+
+.sidebar-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--shell-sidebar-border);
+}
+
+.sidebar-footer a,
+.sidebar-footer form button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: var(--shell-sidebar-text);
+    text-decoration: none;
+    font-size: 0.93rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.sidebar-footer a:hover,
+.sidebar-footer form button:hover {
+    color: #f87171;
+}
+
+/* ---------- Топбар ---------- */
+
+.topbar {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width, 260px);
+    right: 0;
+    height: 60px;
+    background: var(--topbar-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--topbar-border);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 1rem;
+}
+
+.topbar .sidebar-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 1.2rem;
+    color: var(--topbar-text);
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    line-height: 1;
+}
+
+.topbar .topbar-title {
     font-weight: 700;
-    color: white;
-    flex-shrink: 0;
+    font-size: 1.05rem;
+    color: var(--topbar-text);
 }
 
-.student-card .student-name {
-    font-weight: 600;
-    color: white;
-    text-align: center;
-    display: block;
-    padding: 10px 12px 0;
-    font-size: 17px;
-    line-height: 1.2;
-    flex-shrink: 0;
-}
-
-.student-card .student-class {
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.8);
-    display: block;
-    text-align: center;
-    padding: 3px 12px 0;
-    font-size: 13px;
-    flex-shrink: 0;
-}
-
-.student-card .exam-badges {
+.topbar .topbar-right {
+    margin-left: auto;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* ---------- Контент ---------- */
+
+.main-content {
+    margin-left: var(--sidebar-width, 260px);
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+    padding: 1.75rem;
+    background: var(--bg);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 999;
+}
+
+.sidebar-overlay.show {
+    display: block;
+}
+
+/* ---------- Спиннер загрузки ---------- */
+
+.loading-spinner-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: none;
     justify-content: center;
-    align-content: flex-start;
-    gap: 4px;
-    padding: 8px 12px 0;
-    flex: 1 1 auto;
-    min-height: 0;
+    align-items: center;
 }
 
-.student-card .exam-badges .badge {
-    font-size: 0.75rem !important;
-    padding: 3px 7px !important;
-    background: rgba(107, 100, 243, 0.5) !important;
-    color: white !important;
-    border-radius: 8px !important;
-    white-space: nowrap !important;
-}
-
-.student-card .card-actions {
+.loading-spinner-overlay.show {
     display: flex;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 12px 14px;
-    margin-top: auto;
 }
 
-.student-card .card-actions .btn-card {
-    padding: 7px 18px;
-    border-radius: 8px;
-    border: none;
-    background: #6b64f3;
-    color: white;
+.loading-content {
+    text-align: center;
+    color: #fff;
+    padding: 2rem;
+}
+
+.loading-content .spinner {
+    width: 56px;
+    height: 56px;
+    border: 4px solid rgba(255, 255, 255, 0.15);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1.25rem;
+}
+
+.loading-content .loading-emoji {
+    font-size: 2.75rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.loading-content .loading-text {
+    font-size: 1.15rem;
     font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.loading-content .loading-sub {
     font-size: 0.9rem;
-    text-decoration: none;
-    transition: background 0.15s ease;
-    cursor: pointer;
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 0.4rem;
 }
 
-.student-card .card-actions .btn-card:hover {
-    background: #534bf3;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
-.student-card .card-actions .btn-card-outline {
-    padding: 7px 18px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: transparent;
-    color: white;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.15s ease;
-    cursor: pointer;
-}
-
-.student-card .card-actions .btn-card-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.5);
-}
-
-/* ===== Быстрые действия (Quick Actions) ===== */
-.quick-action-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: none;
-    border-radius: 1rem;
-    cursor: pointer;
-}
-
-.quick-action-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
-}
-
-.quick-action-card .card-body {
-    padding: 1.5rem 1rem;
-}
-
-.quick-action-card .display-4 {
-    font-size: 2.5rem;
-    line-height: 1.2;
-}
-
-/* ===== Градиентные карточки для дашборда ===== */
-.bg-gradient-dark {
-    background: linear-gradient(145deg, #1e1e2e 0%, #2a2a3e 100%);
-}
-
-.bg-gradient-success {
-    background: var(--success-gradient);
-}
-
-.bg-gradient-warning {
-    background: var(--warning-gradient);
-}
-
-/* ===== Анимация загрузки ===== */
-@keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
-}
-
-.shimmer-loading {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-}
-
-/* ===== Трекер экзаменов ===== */
-.exam-timer {
-    font-size: 4rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* ===== Адаптивность ===== */
-@media (min-width: 992px) {
-    .navbar-collapse {
-        display: flex !important;
-    }
-    .offcanvas {
-        display: none;
-    }
-    .btn-group .btn {
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
-    }
-    .table th, .table td {
-        padding: 1rem 0.75rem;
-    }
-    .badge {
-        font-size: 0.9rem;
-        padding: 0.5rem 0.7rem;
-    }
-    .display-4 {
-        font-size: 2.5rem;
-    }
-    .filter-buttons-full {
-        width: auto !important;
-        display: inline-flex !important;
-    }
-    .filter-buttons-full .btn {
-        flex: none !important;
-        width: auto !important;
-    }
-}
+/* ---------- Адаптив ---------- */
 
 @media (max-width: 991.98px) {
-    .navbar-collapse {
-        display: none !important;
+    .sidebar {
+        transform: translateX(-100%);
+        max-width: 280px;
+        width: 85vw;
     }
-    .navbar-toggler {
-        display: block !important;
+
+    .sidebar.open {
+        transform: translateX(0);
     }
-    .card {
-        border-radius: 14px;
-        margin-bottom: 12px;
+
+    .topbar {
+        left: 0;
+        height: 52px;
+        padding: 0 0.75rem;
     }
-    .card-body {
-        padding: 14px;
+
+    .topbar .sidebar-toggle {
+        display: block;
     }
-    .card-header {
-        padding: 12px 16px;
-        border-radius: 14px 14px 0 0 !important;
+
+    .topbar .topbar-title {
+        font-size: 0.98rem;
     }
-    .card-header h4, .card-header h5 {
-        font-size: 1.05rem;
-    }
-    .table th, .table td {
-        padding: 0.6rem 0.4rem;
-        font-size: 0.85rem;
-    }
-    .filter-buttons-full {
-        width: 100% !important;
-        display: flex !important;
-    }
-    .filter-buttons-full .btn {
-        flex: 1 !important;
-        font-size: 0.85rem;
-        padding: 0.4rem 0.5rem;
-    }
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.3rem 0.4rem;
-    }
-    h4 {
-        font-size: 1.2rem;
-    }
-    h5 {
-        font-size: 1.1rem;
-    }
-    .display-4 {
-        font-size: 1.7rem;
-    }
-    .table th:nth-child(3),
-    .table td:nth-child(3) {
-        display: none;
-    }
-    .btn {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.85rem;
-    }
-    .btn-lg {
-        font-size: 1rem;
-        padding: 0.55rem 1.1rem;
-    }
-    .student-card-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 1rem;
-    }
-    .student-card {
-        max-width: 100%;
-        height: 260px;
-    }
-    .student-card .student-name {
-        font-size: 15px;
-    }
-    .motivation-quote {
-        margin: 12px 0;
-        padding-left: 12px;
-        font-size: 0.95rem;
-    }
-    .exam-timer {
-        font-size: 2.5rem;
-    }
-    .avatar-circle {
-        width: 60px;
-        height: 60px;
-    }
-    .initials {
-        font-size: 1.5rem;
-    }
-    .list-group-item {
-        padding: 12px 14px;
-        font-size: 0.9rem;
-    }
-    .quick-action-card .card-body {
-        padding: 1rem 0.75rem;
-    }
-    .quick-action-card .display-4 {
-        font-size: 2rem;
+
+    .main-content {
+        margin-left: 0;
+        margin-top: 52px;
+        padding: 1rem;
+        min-height: calc(100vh - 52px);
     }
 }
 
 @media (max-width: 575.98px) {
-    .container {
-        padding-left: 8px;
-        padding-right: 8px;
+    .main-content {
+        padding: 0.75rem;
     }
-    .card {
-        border-radius: 12px;
-        margin-bottom: 10px;
+
+    .topbar {
+        height: 48px;
+        padding: 0 0.6rem;
     }
-    .card-body {
-        padding: 12px;
+
+    .main-content {
+        margin-top: 48px;
+        min-height: calc(100vh - 48px);
     }
-    .card-header {
-        padding: 10px 14px;
-        border-radius: 12px 12px 0 0 !important;
-    }
-    .card-header h4, .card-header h5 {
-        font-size: 0.95rem;
-    }
-    .table th, .table td {
-        padding: 0.4rem 0.2rem;
-        font-size: 0.78rem;
-    }
-    .btn-sm {
-        padding: 0.2rem 0.4rem;
-        font-size: 0.72rem;
-    }
-    .btn {
-        font-size: 0.85rem;
-        padding: 0.35rem 0.7rem;
-    }
-    .btn-lg {
+
+    .topbar .topbar-title {
         font-size: 0.9rem;
-        padding: 0.45rem 0.85rem;
     }
-    .table th:nth-child(4),
-    .table td:nth-child(4) {
-        display: none;
-    }
-    h4 {
+
+    .sidebar-brand {
+        padding: 0.9rem 1rem;
         font-size: 1.1rem;
     }
-    h5 {
-        font-size: 1rem;
+
+    .sidebar-user {
+        padding: 0.6rem 1rem;
     }
-    .display-4 {
-        font-size: 1.4rem;
+
+    .sidebar-user .user-name {
+        font-size: 0.95rem;
     }
-    .display-6 {
-        font-size: 1.6rem;
-    }
-    .badge {
-        font-size: 0.68rem;
-        padding: 0.25rem 0.35rem;
-    }
-    .student-card-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 0.75rem;
-    }
-    .student-card {
-        height: 240px;
-        border-radius: 12px;
-    }
-    .student-card .img {
-        width: 55px;
-        height: 55px;
-        font-size: 1.4rem;
-        margin-top: 14px;
-    }
-    .student-card .student-name {
-        font-size: 13px;
-        padding: 6px 8px 0;
-    }
-    .student-card .student-class {
-        font-size: 11px;
-        padding: 2px 8px 0;
-    }
-    .student-card .exam-badges {
-        padding: 4px 8px 0;
-        gap: 3px;
-    }
-    .student-card .exam-badges .badge {
-        font-size: 0.62rem !important;
-        padding: 2px 5px !important;
-    }
-    .student-card .card-actions {
-        padding: 6px 8px 10px;
-        gap: 6px;
-    }
-    .student-card .card-actions .btn-card,
-    .student-card .card-actions .btn-card-outline {
-        padding: 5px 12px;
-        font-size: 0.78rem;
-    }
-    .exam-timer {
-        font-size: 2rem;
-    }
-    .avatar-circle {
-        width: 50px;
-        height: 50px;
-    }
-    .initials {
-        font-size: 1.2rem;
-    }
-    .list-group-item {
-        padding: 10px 12px;
-        font-size: 0.85rem;
-    }
-    .quick-action-card .card-body {
-        padding: 0.75rem 0.5rem;
-    }
-    .quick-action-card .display-4 {
-        font-size: 1.5rem;
-    }
-    .motivation-quote {
-        margin: 8px 0;
-        padding-left: 10px;
+
+    .sidebar-nav a {
+        padding: 0.5rem 1rem;
         font-size: 0.9rem;
     }
-    footer {
-        margin-top: 20px;
-        padding: 12px 0;
-        font-size: 0.85rem;
+
+    .sidebar-footer {
+        padding: 0.6rem 1rem;
     }
-    .input-group .form-control,
-    .input-group .btn {
-        font-size: 0.85rem;
+
+    .card-body {
+        padding: 1rem;
     }
-    .input-group .form-control {
-        padding: 0.35rem 0.7rem;
-    }
-    .rounded-pill {
-        border-radius: 50rem !important;
-    }
-    .btn.rounded-pill {
-        padding-left: 0.85rem !important;
-        padding-right: 0.85rem !important;
-    }
+}
+
+/* Темный вариант топбара (если используется .topbar-dark) */
+.topbar-dark .topbar {
+    background: var(--shell-sidebar-bg);
+    border-bottom-color: var(--shell-sidebar-border);
+}
+
+.topbar-dark .topbar .topbar-title,
+.topbar-dark .topbar .topbar-right {
+    color: #fff;
 }

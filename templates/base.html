@@ -4,356 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Личный кабинет ученика{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        // Применяем сохранённую тему до отрисовки, чтобы избежать мигания
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('mathphysedu-theme'); } catch (e) {}
+            var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     {% load static %}
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% block extra_css %}{% endblock %}
-    <style>
-        :root {
-            --sidebar-width: 250px;
-            --sidebar-bg: #1a1d23;
-            --sidebar-hover: #2a2d35;
-            --sidebar-active: #0d6efd;
-            --sidebar-text: #a0a4b0;
-            --sidebar-text-active: #ffffff;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--sidebar-bg);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-brand {
-            padding: 1.2rem 1.25rem;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #fff;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .sidebar-brand:hover {
-            color: #fff;
-        }
-
-        .sidebar-user {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            color: var(--sidebar-text);
-            font-size: 0.95rem;
-        }
-
-        .sidebar-user .user-name {
-            color: #fff;
-            font-weight: 600;
-            font-size: 1.05rem;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0.5rem 0;
-        }
-
-        .sidebar-nav .nav-section {
-            padding: 0.5rem 1.25rem 0.25rem;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: rgba(255,255,255,0.3);
-            font-weight: 600;
-        }
-
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.7rem 1.25rem;
-            color: var(--sidebar-text);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: all 0.15s ease;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar-nav a:hover {
-            background: var(--sidebar-hover);
-            color: var(--sidebar-text-active);
-        }
-
-        .sidebar-nav a.active {
-            background: rgba(13, 110, 253, 0.12);
-            color: var(--sidebar-text-active);
-            border-left-color: var(--sidebar-active);
-        }
-
-        .sidebar-nav a .icon {
-            width: 1.3rem;
-            text-align: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        .sidebar-nav a .badge {
-            margin-left: auto;
-            font-size: 0.78rem;
-        }
-
-        .sidebar-footer {
-            padding: 0.75rem 1.25rem;
-            border-top: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .sidebar-footer a,
-        .sidebar-footer form button {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.5rem 0;
-            color: var(--sidebar-text);
-            text-decoration: none;
-            font-size: 0.95rem;
-            background: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-            transition: color 0.15s ease;
-        }
-
-        .sidebar-footer a:hover,
-        .sidebar-footer form button:hover {
-            color: #dc3545;
-        }
-
-        /* Top navbar (simplified) */
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: var(--sidebar-width);
-            right: 0;
-            height: 56px;
-            background: #fff;
-            border-bottom: 1px solid #e9ecef;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            padding: 0 1.5rem;
-            gap: 1rem;
-        }
-
-        .topbar .sidebar-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #333;
-            cursor: pointer;
-            padding: 0.25rem;
-        }
-
-        .topbar .topbar-title {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #333;
-        }
-
-        .topbar .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        /* Main content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            margin-top: 56px;
-            min-height: calc(100vh - 56px);
-            padding: 1.5rem;
-            background: #f8f9fa;
-        }
-
-        /* Overlay for mobile */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.show {
-            display: block;
-        }
-
-        /* ===== СПИННЕР С ЮМОРОМ ===== */
-        .loading-spinner-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .loading-spinner-overlay.show {
-            display: flex;
-        }
-
-        .loading-content {
-            text-align: center;
-            color: #fff;
-            padding: 2rem;
-        }
-
-        .loading-content .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top-color: #6366f1;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 1.5rem;
-        }
-
-        .loading-content .loading-emoji {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 1rem;
-        }
-
-        .loading-content .loading-text {
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: rgba(255,255,255,0.9);
-        }
-
-        .loading-content .loading-sub {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.5);
-            margin-top: 0.5rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 991.98px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .topbar {
-                left: 0;
-                height: 48px;
-                padding: 0 0.75rem;
-            }
-
-            .topbar .sidebar-toggle {
-                display: block;
-                font-size: 1.3rem;
-            }
-
-            .topbar .topbar-title {
-                font-size: 1rem;
-            }
-
-            .main-content {
-                margin-left: 0;
-                margin-top: 48px;
-                padding: 0.75rem;
-                min-height: calc(100vh - 48px);
-            }
-
-            .sidebar-overlay.show {
-                display: block;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .main-content {
-                padding: 0.5rem;
-            }
-
-            .topbar {
-                height: 44px;
-                padding: 0 0.5rem;
-            }
-
-            .main-content {
-                margin-top: 44px;
-                min-height: calc(100vh - 44px);
-            }
-
-            .topbar .topbar-title {
-                font-size: 0.9rem;
-            }
-
-            .sidebar {
-                max-width: 280px;
-                width: 85vw;
-            }
-
-            .sidebar-brand {
-                padding: 0.8rem 1rem;
-                font-size: 1.1rem;
-            }
-
-            .sidebar-user {
-                padding: 0.6rem 1rem;
-            }
-
-            .sidebar-user .user-name {
-                font-size: 0.95rem;
-            }
-
-            .sidebar-nav a {
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-            }
-
-            .sidebar-footer {
-                padding: 0.5rem 1rem;
-            }
-        }
-
-        /* Dark topbar for authenticated pages */
-        .topbar-dark .topbar {
-            background: #1a1d23;
-            border-bottom-color: rgba(255,255,255,0.06);
-        }
-
-        .topbar-dark .topbar .topbar-title,
-        .topbar-dark .topbar .topbar-right {
-            color: #fff;
-        }
-
-        /* Messages */
-        .messages {
-            margin-bottom: 1rem;
-        }
-    </style>
 </head>
 <body>
     <!-- ===== СПИННЕР ЗАГРУЗКИ ===== -->
@@ -454,6 +121,7 @@
         <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
         <span class="topbar-title">{% block topbar_title %}MathPhysEdu{% endblock %}</span>
         <div class="topbar-right">
+            <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">🌙</button>
         </div>
     </header>
 
@@ -468,6 +136,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <button class="theme-toggle me-2" id="themeToggle" aria-label="Переключить тему">🌙</button>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">🔑 Войти</a>
                     </li>
@@ -497,7 +168,33 @@
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ =====
+        (function () {
+            var toggle = document.getElementById('themeToggle');
+            if (!toggle) return;
+
+            function currentTheme() {
+                return document.documentElement.getAttribute('data-theme') || 'light';
+            }
+
+            function updateIcon() {
+                toggle.textContent = currentTheme() === 'dark' ? '☀️' : '🌙';
+            }
+
+            toggle.addEventListener('click', function () {
+                var next = currentTheme() === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                try { localStorage.setItem('mathphysedu-theme', next); } catch (e) {}
+                updateIcon();
+            });
+
+            updateIcon();
+        })();
+    </script>
+
     {% block extra_js %}{% endblock %}
 
     {% if user.is_authenticated %}

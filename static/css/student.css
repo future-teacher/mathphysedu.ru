@@ -1,0 +1,587 @@
+/* ============================================================
+   MathPhysEdu — компоненты ученика
+   Дашборд, списки ДЗ и пробников, бонусы, достижения.
+   Вынесено из inline <style> шаблонов; всё на токенах темы.
+   ============================================================ */
+
+/* ===== Бонусный баланс ===== */
+
+.bonus-balance-block {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--bonus-from) 0%, var(--bonus-to) 100%);
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);
+    color: var(--bonus-text);
+}
+
+.bonus-balance-block .bonus-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.bonus-balance-block .bonus-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+/* ===== Карточки-напоминания (дашборд) ===== */
+
+.reminder-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    transition: all 200ms ease-in-out;
+}
+
+.reminder-card {
+    transition: all 200ms ease-in-out;
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75em 1.25em;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    box-shadow: var(--shadow-1);
+}
+
+.reminder-card .icon-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.reminder-card .icon-container svg {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+.reminder-card .icon-container .card-label {
+    font-size: 0.9em;
+    font-weight: 400;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.reminder-card .card-count {
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.reminder-card .card-sub {
+    font-size: 0.75em;
+    opacity: 0.85;
+    margin: 0;
+}
+
+.card-math {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #fff;
+}
+
+.card-physics {
+    background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    color: #fff;
+}
+
+.card-overdue {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    color: #fff;
+}
+
+.reminder-card:hover {
+    transform: scale(1.03);
+    z-index: 1;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.reminder-cards:hover > .reminder-card:not(:hover) {
+    filter: blur(3px);
+}
+
+/* ===== Трекер экзаменов ===== */
+
+.exam-timer-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-1);
+}
+
+.exam-timer-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+    animation: pulse-rotate 10s linear infinite;
+}
+
+@keyframes pulse-rotate {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.2); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+.exam-timer-number {
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--accent-text);
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.exam-timer-label {
+    position: relative;
+    z-index: 1;
+    color: var(--text-muted);
+}
+
+/* ===== Достижения ===== */
+
+.achievement-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    background: var(--bonus-soft);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: var(--radius-pill);
+    color: var(--bonus-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.achievement-badge:hover {
+    background: rgba(245, 158, 11, 0.25);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+}
+
+/* ===== Прогресс-бар (стекло) ===== */
+
+.progress-glass {
+    background: var(--surface-3);
+    border-radius: var(--radius-pill);
+    height: 20px;
+    overflow: hidden;
+}
+
+.progress-glass .progress-bar {
+    font-weight: 600;
+    font-size: 0.7rem;
+}
+
+/* ============================================================
+   Карточки-плитки (унифицированный паттерн для ДЗ и пробников)
+   Используются: .hw-* (ученик ДЗ), .probnik-* (ученик пробники),
+   .thw-* (преподаватель ДЗ), .tp-* (преподаватель пробники).
+   Тема светлая — карточки на токенах surface, акценты через border.
+   ============================================================ */
+
+.hw-card,
+.probnik-card,
+.thw-card,
+.tp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 10.5rem;
+    min-height: 14rem;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 1rem 0.75rem;
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow-1);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    overflow: hidden;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.hw-card:hover,
+.probnik-card:hover,
+.thw-card:hover,
+.tp-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-soft-strong);
+    transform: translateY(-0.4rem);
+    color: var(--text);
+    text-decoration: none;
+}
+
+/* Предметные акценты */
+.hw-card-math:hover,
+.probnik-card-math:hover,
+.thw-card-math:hover,
+.tp-card-math:hover {
+    border-color: var(--math);
+    box-shadow: 0 0 20px var(--math-soft);
+}
+
+.hw-card-physics:hover,
+.probnik-card-physics:hover,
+.thw-card-physics:hover,
+.tp-card-physics:hover {
+    border-color: var(--physics);
+    box-shadow: 0 0 20px var(--physics-soft);
+}
+
+/* Проверенные */
+.hw-card-checked:hover,
+.probnik-card-checked:hover,
+.thw-card-checked:hover,
+.tp-card-checked:hover {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 20px var(--success-soft) !important;
+}
+
+/* Просроченные */
+.hw-card-overdue,
+.probnik-card-overdue,
+.thw-card-overdue,
+.tp-card-overdue {
+    border-color: var(--danger);
+}
+
+/* Индикатор статуса (точка) */
+.hw-status-dot,
+.probnik-status-dot,
+.thw-status-dot,
+.tp-status-dot {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.hw-card:hover .hw-status-dot,
+.probnik-card:hover .probnik-status-dot,
+.thw-card:hover .thw-status-dot,
+.tp-card:hover .tp-status-dot {
+    animation: tile-pulse 1.5s infinite;
+}
+
+.hw-status-assigned { background: var(--text-muted); }
+.hw-status-progress { background: var(--math); }
+.hw-card:hover .hw-status-progress { background: #60a5fa; }
+.hw-status-checked { background: var(--success); }
+.hw-card:hover .hw-status-checked { background: #4ade80; }
+
+.probnik-status-active { background: var(--warning); }
+.probnik-card:hover .probnik-status-active { background: #fbbf24; }
+.probnik-status-checked { background: var(--success); }
+.probnik-card:hover .probnik-status-checked { background: #4ade80; }
+
+.thw-status-assigned { background: var(--text-muted); }
+.thw-status-progress { background: var(--math); }
+.thw-card:hover .thw-status-progress { background: #60a5fa; }
+.thw-status-checked { background: var(--success); }
+.thw-card:hover .thw-status-checked { background: #4ade80; }
+
+.tp-status-active { background: var(--warning); }
+.tp-card:hover .tp-status-active { background: #fbbf24; }
+.tp-status-checked { background: var(--success); }
+.tp-card:hover .tp-status-checked { background: #4ade80; }
+
+/* Иконка предмета */
+.hw-icon,
+.probnik-icon,
+.thw-icon,
+.tp-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-soft);
+    border: 2px solid var(--accent-soft-strong);
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+    margin-top: 0.25rem;
+}
+
+.hw-card-math .hw-icon,
+.probnik-card-math .probnik-icon,
+.thw-card-math .thw-icon,
+.tp-card-math .tp-icon {
+    background: var(--math-soft);
+    border-color: rgba(37, 99, 235, 0.3);
+}
+
+.hw-card-physics .hw-icon,
+.probnik-card-physics .probnik-icon,
+.thw-card-physics .thw-icon,
+.tp-card-physics .tp-icon {
+    background: var(--physics-soft);
+    border-color: rgba(234, 88, 12, 0.3);
+}
+
+.hw-card-checked .hw-icon,
+.probnik-card-checked .probnik-icon,
+.thw-card-checked .thw-icon,
+.tp-card-checked .tp-icon {
+    background: var(--success-soft);
+    border-color: rgba(22, 163, 74, 0.3);
+}
+
+.hw-icon-emoji,
+.probnik-icon-emoji {
+    font-size: 1.5rem;
+}
+
+.thw-icon-emoji,
+.tp-icon-emoji {
+    font-size: 1.7rem;
+}
+
+/* Название */
+.hw-title,
+.probnik-title,
+.thw-title,
+.tp-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.hw-card-math:hover .hw-title { color: var(--math); }
+.hw-card-physics:hover .hw-title { color: var(--physics); }
+.hw-card-checked:hover .hw-title { color: var(--success); }
+.probnik-card-math:hover .probnik-title { color: var(--math); }
+.probnik-card-physics:hover .probnik-title { color: var(--physics); }
+.probnik-card-checked:hover .probnik-title { color: var(--success); }
+.thw-card-math:hover .thw-title { color: var(--math); }
+.thw-card-physics:hover .thw-title { color: var(--physics); }
+.thw-card-checked:hover .thw-title { color: var(--success); }
+.tp-card-math:hover .tp-title { color: var(--math); }
+.tp-card-physics:hover .tp-title { color: var(--physics); }
+.tp-card-checked:hover .tp-title { color: var(--success); }
+
+/* Ученик (виден на карточках преподавателя) */
+.thw-student,
+.tp-student {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: center;
+    background: var(--surface-2);
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--radius-pill);
+}
+
+/* Оценка */
+.hw-grade,
+.thw-grade {
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+}
+
+.hw-grade-z,
+.thw-grade-z { background: var(--success-soft); color: var(--success-text); }
+.hw-grade-nz,
+.thw-grade-2 { background: var(--danger-soft); color: var(--danger-text); }
+
+/* Результат пробника */
+.probnik-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.probnik-percentage {
+    font-size: 1.3rem;
+    font-weight: 800;
+    transition: color 0.3s ease;
+}
+
+.probnik-percentage-high { color: var(--success); }
+.probnik-percentage-mid { color: var(--math); }
+.probnik-percentage-low { color: var(--warning); }
+.probnik-percentage-bad { color: var(--danger); }
+
+.probnik-score {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.tp-result {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.tp-score {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Мета-информация */
+.hw-meta,
+.probnik-meta,
+.thw-meta,
+.tp-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    width: 100%;
+    padding: 0 0.25rem;
+}
+
+.hw-meta-item,
+.probnik-meta-item,
+.thw-meta-item,
+.tp-meta-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    transition: opacity 0.3s ease;
+}
+
+.hw-meta-danger,
+.probnik-meta-danger,
+.thw-meta-danger,
+.tp-meta-danger {
+    color: var(--danger-text) !important;
+    font-weight: 600;
+}
+
+/* Бейдж просрочки */
+.hw-badge,
+.probnik-badge,
+.thw-badge,
+.tp-badge {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+.hw-badge-overdue,
+.probnik-badge-overdue,
+.thw-badge-overdue,
+.tp-badge-overdue {
+    background: var(--danger-soft);
+    color: var(--danger-text);
+}
+
+@keyframes tile-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Адаптив карточек-плиток */
+@media (max-width: 991.98px) {
+    .hw-card, .probnik-card, .thw-card, .tp-card {
+        width: 9rem;
+        min-height: 13rem;
+        padding: 0.75rem 0.5rem;
+        gap: 0.35rem;
+    }
+    .hw-icon, .probnik-icon, .thw-icon, .tp-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: var(--radius-md);
+    }
+    .hw-icon-emoji, .probnik-icon-emoji { font-size: 1.25rem; }
+    .thw-icon-emoji, .tp-icon-emoji { font-size: 1.35rem; }
+    .hw-title, .probnik-title, .thw-title, .tp-title { font-size: 0.72rem; min-height: 1.6rem; }
+    .hw-meta-item, .probnik-meta-item, .thw-meta-item, .tp-meta-item { font-size: 0.6rem; }
+    .hw-grade, .thw-grade { font-size: 0.9rem; padding: 0.1rem 0.4rem; }
+    .probnik-percentage { font-size: 1.2rem; }
+    .hw-status-dot, .probnik-status-dot, .thw-status-dot, .tp-status-dot { width: 0.45rem; height: 0.45rem; top: 0.4rem; right: 0.5rem; }
+    .hw-badge, .probnik-badge, .thw-badge, .tp-badge { font-size: 0.5rem; padding: 0.1rem 0.4rem; bottom: 0.35rem; }
+}
+
+@media (max-width: 575.98px) {
+    .hw-card, .probnik-card, .thw-card, .tp-card {
+        width: 7.5rem;
+        min-height: 11rem;
+        padding: 0.6rem 0.4rem;
+        gap: 0.25rem;
+        border-radius: var(--radius-md);
+    }
+    .hw-icon, .probnik-icon, .thw-icon, .tp-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: var(--radius-sm);
+        margin-top: 0.25rem;
+    }
+    .hw-icon-emoji, .probnik-icon-emoji { font-size: 1.1rem; }
+    .thw-icon-emoji, .tp-icon-emoji { font-size: 1.2rem; }
+    .hw-title, .probnik-title, .thw-title, .tp-title { font-size: 0.65rem; min-height: 1.4rem; }
+    .hw-meta-item, .probnik-meta-item, .thw-meta-item, .tp-meta-item { font-size: 0.55rem; gap: 0.2rem; }
+    .hw-grade, .thw-grade { font-size: 0.8rem; padding: 0.05rem 0.35rem; }
+    .probnik-percentage { font-size: 1.05rem; }
+    .hw-status-dot, .probnik-status-dot, .thw-status-dot, .tp-status-dot { width: 0.4rem; height: 0.4rem; top: 0.3rem; right: 0.4rem; }
+    .hw-badge, .probnik-badge, .thw-badge, .tp-badge { font-size: 0.45rem; padding: 0.05rem 0.3rem; bottom: 0.25rem; }
+
+    /* Дашборд: мелкая адаптация */
+    .bonus-balance-block { padding: 6px 12px; gap: 6px; }
+    .bonus-balance-block .bonus-label { font-size: 0.75rem; }
+    .bonus-balance-block .bonus-value { font-size: 0.95rem; }
+    .exam-timer-number { font-size: 2.2rem; }
+    .exam-timer-card { padding: 0.75rem; border-radius: var(--radius-md); }
+    .reminder-card { max-width: 100%; padding: 0.5em 0.75em; border-radius: var(--radius-sm); }
+    .reminder-card .icon-container svg { width: 22px; height: 22px; }
+    .reminder-card .icon-container .card-label { font-size: 0.7em; }
+    .reminder-card .card-count { font-size: 0.8em; }
+    .reminder-card .card-sub { font-size: 0.6em; }
+    .achievement-badge { padding: 0.25rem 0.5rem; margin: 0.15rem; font-size: 0.65rem; }
+    .progress-glass { height: 16px; }
+    .progress-glass .progress-bar { font-size: 0.6rem; line-height: 16px; }
+}
+
+@media (max-width: 991.98px) {
+    .exam-timer-number { font-size: 3rem; }
+    .exam-timer-card { padding: 1rem; }
+    .reminder-card { max-width: 100%; padding: 0.6em 1em; }
+    .reminder-card .icon-container .card-label { font-size: 0.8em; }
+    .reminder-card .card-count { font-size: 0.9em; }
+    .achievement-badge { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+}

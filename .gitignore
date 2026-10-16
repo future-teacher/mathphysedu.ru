@@ -47,3 +47,5 @@ logs/
 local_settings.py
 *.local.py
 EOF
+.zcode
+.devcerts

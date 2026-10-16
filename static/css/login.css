@@ -1,72 +1,238 @@
-/* ===== Кнопка входа (glow-on-hover) ===== */
-.glow-on-hover {
-    width: 240px;
-    height: 54px;
+/* ============================================================
+   MathPhysEdu — страница входа
+   Самостоятельная страница (не наследует base.html), но токены
+   и шрифт подключаются, чтобы тема была единой.
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+}
+
+body.login-page {
+    background: linear-gradient(135deg, var(--accent-soft) 0%, var(--bg) 100%), var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 16px;
+    transition: color 0.2s ease;
+    align-self: flex-start;
+}
+
+.back-link:hover {
+    color: var(--accent-text);
+}
+
+.back-link svg {
+    width: 18px;
+    height: 18px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 30px;
+    width: 480px;
+    max-width: 100%;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-3);
+    transition: box-shadow 0.3s ease;
+}
+
+.form:hover {
+    box-shadow: 0 25px 60px rgba(16, 24, 40, 0.14);
+}
+
+.form input::placeholder {
+    font-family: var(--font-sans);
+    color: var(--text-muted);
+}
+
+.form button {
+    align-self: flex-end;
+}
+
+.flex-column > label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.inputForm {
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    transition: 0.2s ease-in-out;
+    background-color: var(--surface-2);
+}
+
+.inputForm svg {
+    color: var(--text-muted);
+}
+
+.input {
+    margin-left: 10px;
+    border-radius: 10rem;
     border: none;
-    outline: none;
-    color: #fff;
-    background: linear-gradient(-45deg, #2196F3, #1976D2, #0D47A1, #42A5F5, #2196F3);
-    background-size: 400% 400%;
-    animation: gradientFlow 4s ease infinite;
-    cursor: pointer;
-    position: relative;
-    z-index: 0;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: 500;
-}
-
-.glow-on-hover:before {
-    content: '';
-    background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-    position: absolute;
-    top: -2px;
-    left:-2px;
-    background-size: 400%;
-    z-index: -1;
-    filter: blur(5px);
-    width: calc(100% + 4px);
-    height: calc(100% + 4px);
-    animation: glowing 20s linear infinite;
-    opacity: 0;
-    transition: opacity .3s ease-in-out;
-    border-radius: 10px;
-}
-
-.glow-on-hover:active {
-    color: #000;
-}
-
-.glow-on-hover:active:after {
-    background: transparent;
-}
-
-.glow-on-hover:hover:before {
-    opacity: 1;
-}
-
-.glow-on-hover:after {
-    z-index: -1;
-    content: '';
-    position: absolute;
     width: 100%;
     height: 100%;
-    background: linear-gradient(-45deg, #2196F3, #1976D2, #0D47A1, #42A5F5, #2196F3);
-    background-size: 400% 400%;
-    animation: gradientFlow 4s ease infinite;
-    left: 0;
-    top: 0;
-    border-radius: 10px;
+    background: transparent;
+    color: var(--text);
+    font-size: 0.95rem;
 }
 
-@keyframes glowing {
-    0% { background-position: 0 0; }
-    50% { background-position: 400% 0; }
-    100% { background-position: 0 0; }
+.input:focus {
+    outline: none;
 }
 
-@keyframes gradientFlow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+.inputForm:focus-within {
+    border: 1.5px solid var(--accent);
+    background-color: var(--surface);
+}
+
+.button-submit {
+    position: relative;
+    display: inline-block;
+    padding: 15px 30px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-decoration: none;
+    background: var(--accent);
+    transition: all 0.3s ease;
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-pill);
+    margin: 20px 0 10px 0;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    height: 50px;
+    width: 100%;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.button-submit:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.button-submit:active {
+    transform: scale(0.98);
+}
+
+.button-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.p {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+/* Ошибки Django-формы */
+.form .alert {
+    background-color: var(--danger-soft);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    color: var(--danger-text);
+    padding: 10px 15px;
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.form .helptext {
+    display: none;
+}
+
+.form .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: var(--danger-text);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* Yandex SmartCaptcha */
+.captcha-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70px;
+    margin: 5px 0;
+    background: var(--surface-2);
+    border-radius: var(--radius-md);
+    padding: 2px;
+}
+
+.captcha-container > div {
+    transform: scale(0.75);
+    transform-origin: center center;
+}
+
+.captcha-container .SmartCaptcha-Overlay {
+    min-height: 70px;
+}
+
+.captcha-error {
+    color: var(--danger-text);
+    font-size: 13px;
+    text-align: center;
+    margin-top: 5px;
+    padding: 8px;
+    background: var(--danger-soft);
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+}
+
+/* Адаптив */
+@media (max-width: 500px) {
+    .form {
+        width: 100%;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .captcha-container > div {
+        transform: scale(0.65);
+        transform-origin: center center;
+    }
+}
+
+@media (max-width: 380px) {
+    .captcha-container > div {
+        transform: scale(0.55);
+        transform-origin: center center;
+    }
 }

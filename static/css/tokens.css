@@ -1,0 +1,185 @@
+/* ============================================================
+   MathPhysEdu — дизайн-токены
+   Единственный источник цветов/радиусов/теней/шрифтов.
+   Тема переключается атрибутом <html data-theme="light|dark">.
+   ============================================================ */
+
+:root,
+[data-theme="light"] {
+    color-scheme: light;
+
+    /* Фоны и поверхности */
+    --bg: #f5f7fb;
+    --bg-subtle: #eef1f7;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --surface-3: #eef2f7;
+    --border: #e4e8f0;
+    --border-strong: #d4dae5;
+
+    /* Текст */
+    --text: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #8a94a6;
+    --text-invert: #ffffff;
+
+    /* Акцент и семантика */
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.10);
+    --accent-soft-strong: rgba(37, 99, 235, 0.18);
+    --accent-text: #1d4ed8;
+
+    --success: #16a34a;
+    --success-hover: #15803d;
+    --success-soft: rgba(22, 163, 74, 0.12);
+    --success-text: #15803d;
+
+    --danger: #dc2626;
+    --danger-hover: #b91c1c;
+    --danger-soft: rgba(220, 38, 38, 0.10);
+    --danger-text: #b91c1c;
+
+    --warning: #d97706;
+    --warning-hover: #b45309;
+    --warning-soft: rgba(217, 119, 6, 0.14);
+    --warning-text: #b45309;
+
+    --info: #0891b2;
+    --info-hover: #0e7490;
+    --info-soft: rgba(8, 145, 178, 0.12);
+    --info-text: #0e7490;
+
+    /* Предметные цвета */
+    --math: #2563eb;
+    --math-soft: rgba(37, 99, 235, 0.10);
+    --physics: #ea580c;
+    --physics-soft: rgba(234, 88, 12, 0.10);
+
+    /* Бонусы */
+    --bonus: #f59e0b;
+    --bonus-from: #fbbf24;
+    --bonus-to: #f59e0b;
+    --bonus-soft: rgba(245, 158, 11, 0.16);
+    --bonus-text: #92400e;
+
+    /* Каркас: сайдбар и топбар */
+    --sidebar-bg: #ffffff;
+    --sidebar-border: #e4e8f0;
+    --sidebar-hover: #eef2f7;
+    --sidebar-text: #4b5563;
+    --sidebar-text-active: #1d4ed8;
+    --sidebar-active-bg: rgba(37, 99, 235, 0.09);
+    --sidebar-active-border: #2563eb;
+    --sidebar-brand: #111827;
+
+    --topbar-bg: rgba(255, 255, 255, 0.85);
+    --topbar-border: #e4e8f0;
+    --topbar-text: #111827;
+
+    /* Тёмный вариант сайдбара в светлой теме (контрастный) */
+    --shell-sidebar-bg: #101725;
+    --shell-sidebar-border: rgba(255, 255, 255, 0.07);
+    --shell-sidebar-hover: rgba(255, 255, 255, 0.06);
+    --shell-sidebar-text: #9aa4b8;
+    --shell-sidebar-text-active: #ffffff;
+
+    /* Скругления */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-pill: 999px;
+
+    /* Тени */
+    --shadow-1: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --shadow-2: 0 4px 14px rgba(16, 24, 40, 0.07);
+    --shadow-3: 0 12px 32px rgba(16, 24, 40, 0.10);
+
+    /* Прочее */
+    --font-sans: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --overlay: rgba(15, 23, 42, 0.55);
+    --glass-bg: rgba(255, 255, 255, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #0b1020;
+    --bg-subtle: #0f1628;
+    --surface: #121a2e;
+    --surface-2: #172038;
+    --surface-3: #1d2742;
+    --border: #22304f;
+    --border-strong: #2c3b60;
+
+    --text: #e7ecf5;
+    --text-secondary: #b3bdd1;
+    --text-muted: #7c879e;
+    --text-invert: #0b1020;
+
+    --accent: #3b82f6;
+    --accent-hover: #60a5fa;
+    --accent-soft: rgba(59, 130, 246, 0.16);
+    --accent-soft-strong: rgba(59, 130, 246, 0.28);
+    --accent-text: #93c5fd;
+
+    --success: #22c55e;
+    --success-hover: #4ade80;
+    --success-soft: rgba(34, 197, 94, 0.16);
+    --success-text: #86efac;
+
+    --danger: #ef4444;
+    --danger-hover: #f87171;
+    --danger-soft: rgba(239, 68, 68, 0.16);
+    --danger-text: #fca5a5;
+
+    --warning: #f59e0b;
+    --warning-hover: #fbbf24;
+    --warning-soft: rgba(245, 158, 11, 0.16);
+    --warning-text: #fcd34d;
+
+    --info: #06b6d4;
+    --info-hover: #22d3ee;
+    --info-soft: rgba(6, 182, 212, 0.16);
+    --info-text: #67e8f9;
+
+    --math: #60a5fa;
+    --math-soft: rgba(96, 165, 250, 0.16);
+    --physics: #fb923c;
+    --physics-soft: rgba(251, 146, 60, 0.16);
+
+    --bonus: #fbbf24;
+    --bonus-from: #fcd34d;
+    --bonus-to: #f59e0b;
+    --bonus-soft: rgba(251, 191, 36, 0.16);
+    --bonus-text: #fde68a;
+
+    --sidebar-bg: #101725;
+    --sidebar-border: #22304f;
+    --sidebar-hover: #1a2440;
+    --sidebar-text: #9aa4b8;
+    --sidebar-text-active: #ffffff;
+    --sidebar-active-bg: rgba(59, 130, 246, 0.16);
+    --sidebar-active-border: #3b82f6;
+    --sidebar-brand: #f3f6fc;
+
+    --topbar-bg: rgba(11, 16, 32, 0.85);
+    --topbar-border: #22304f;
+    --topbar-text: #e7ecf5;
+
+    --shell-sidebar-bg: #101725;
+    --shell-sidebar-border: rgba(255, 255, 255, 0.07);
+    --shell-sidebar-hover: rgba(255, 255, 255, 0.06);
+    --shell-sidebar-text: #9aa4b8;
+    --shell-sidebar-text-active: #ffffff;
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --shadow-2: 0 4px 14px rgba(0, 0, 0, 0.4);
+    --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.5);
+
+    --overlay: rgba(2, 6, 16, 0.7);
+    --glass-bg: rgba(18, 26, 46, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
