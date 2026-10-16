@@ -1111,6 +1111,32 @@ a:hover {
         font-size: 0.9rem;
     }
 
+    /* Увеличиваем зоны нажатия на телефоне */
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .topbar .sidebar-toggle {
+        padding: 0.25rem 0.6rem;
+        font-size: 1.2rem;
+    }
+
+    /* Предотвращаем обрезку длинных заголовков страниц */
+    .topbar .topbar-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+
+    /* Таблицы прокручиваются горизонтально, не ломая вёрстку */
+    .table-responsive {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+    }
+
     .sidebar-brand {
         padding: 0.9rem 1rem;
         font-size: 1.1rem;

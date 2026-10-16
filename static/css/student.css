@@ -207,7 +207,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.4rem;
-    width: 10.5rem;
+    width: min(100%, 10.5rem);
     min-height: 14rem;
     background: var(--surface);
     border-radius: var(--radius-lg);
@@ -518,7 +518,7 @@
 /* Адаптив карточек-плиток */
 @media (max-width: 991.98px) {
     .hw-card, .probnik-card, .thw-card, .tp-card {
-        width: 9rem;
+        width: min(100%, 9rem);
         min-height: 13rem;
         padding: 0.75rem 0.5rem;
         gap: 0.35rem;
@@ -539,27 +539,32 @@
 }
 
 @media (max-width: 575.98px) {
+    /* Современные телефоны: плитки занимают всю ширину колонки (2 в ряд),
+       на узких (<360px) автоматически перестраиваются в одну. */
     .hw-card, .probnik-card, .thw-card, .tp-card {
-        width: 7.5rem;
+        width: 100%;
+        max-width: 11rem;
         min-height: 11rem;
-        padding: 0.6rem 0.4rem;
-        gap: 0.25rem;
+        padding: 0.7rem 0.55rem;
+        gap: 0.3rem;
         border-radius: var(--radius-md);
     }
     .hw-icon, .probnik-icon, .thw-icon, .tp-icon {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.8rem;
+        height: 2.8rem;
         border-radius: var(--radius-sm);
         margin-top: 0.25rem;
     }
-    .hw-icon-emoji, .probnik-icon-emoji { font-size: 1.1rem; }
-    .thw-icon-emoji, .tp-icon-emoji { font-size: 1.2rem; }
-    .hw-title, .probnik-title, .thw-title, .tp-title { font-size: 0.65rem; min-height: 1.4rem; }
-    .hw-meta-item, .probnik-meta-item, .thw-meta-item, .tp-meta-item { font-size: 0.55rem; gap: 0.2rem; }
-    .hw-grade, .thw-grade { font-size: 0.8rem; padding: 0.05rem 0.35rem; }
-    .probnik-percentage { font-size: 1.05rem; }
-    .hw-status-dot, .probnik-status-dot, .thw-status-dot, .tp-status-dot { width: 0.4rem; height: 0.4rem; top: 0.3rem; right: 0.4rem; }
-    .hw-badge, .probnik-badge, .thw-badge, .tp-badge { font-size: 0.45rem; padding: 0.05rem 0.3rem; bottom: 0.25rem; }
+    .hw-icon-emoji, .probnik-icon-emoji { font-size: 1.25rem; }
+    .thw-icon-emoji, .tp-icon-emoji { font-size: 1.35rem; }
+    .hw-title, .probnik-title, .thw-title, .tp-title { font-size: 0.78rem; min-height: 1.6rem; }
+    .hw-meta-item, .probnik-meta-item, .thw-meta-item, .tp-meta-item { font-size: 0.66rem; gap: 0.25rem; }
+    .hw-grade, .thw-grade { font-size: 0.9rem; padding: 0.08rem 0.4rem; }
+    .probnik-percentage { font-size: 1.15rem; }
+    .probnik-score, .tp-score { font-size: 0.72rem; }
+    .thw-student, .tp-student { font-size: 0.72rem; }
+    .hw-status-dot, .probnik-status-dot, .thw-status-dot, .tp-status-dot { width: 0.45rem; height: 0.45rem; top: 0.35rem; right: 0.5rem; }
+    .hw-badge, .probnik-badge, .thw-badge, .tp-badge { font-size: 0.55rem; padding: 0.08rem 0.4rem; bottom: 0.3rem; }
 
     /* Дашборд: мелкая адаптация */
     .bonus-balance-block { padding: 6px 12px; gap: 6px; }

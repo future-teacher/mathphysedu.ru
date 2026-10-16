@@ -217,9 +217,19 @@ body.login-page {
 
 /* Адаптив */
 @media (max-width: 500px) {
+    body.login-page {
+        align-items: flex-start;
+        padding: 12px 0;
+    }
+    .login-wrapper {
+        padding: 12px;
+    }
     .form {
         width: 100%;
-        padding: 20px;
+        padding: 22px 18px;
+    }
+    .back-link {
+        margin-bottom: 12px;
     }
 }
 
@@ -231,6 +241,9 @@ body.login-page {
 }
 
 @media (max-width: 380px) {
+    .form {
+        padding: 18px 14px;
+    }
     .captcha-container > div {
         transform: scale(0.55);
         transform-origin: center center;

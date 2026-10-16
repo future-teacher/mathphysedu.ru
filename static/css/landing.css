@@ -102,15 +102,21 @@
 
 @media (max-width: 768px) {
     .landing-nav {
-        padding: 12px 20px;
+        padding: 12px 16px;
+        gap: 10px;
     }
     .landing-nav .nav-brand {
-        font-size: 19px;
+        font-size: 18px;
     }
     .landing-nav .nav-login-btn,
     .landing-nav .nav-dashboard-btn {
-        padding: 8px 18px;
-        font-size: 14px;
+        padding: 8px 16px;
+        font-size: 13.5px;
+    }
+    .landing-nav .nav-user-info {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
     .landing-nav .nav-user-name {
         font-size: 13px;
@@ -118,6 +124,19 @@
     .landing-nav .bonus-balance-badge {
         padding: 5px 12px;
         font-size: 13px;
+    }
+}
+
+@media (max-width: 420px) {
+    .landing-nav .nav-login-btn svg,
+    .landing-nav .nav-dashboard-btn svg {
+        display: none;
+    }
+    .landing-nav .nav-login-btn,
+    .landing-nav .nav-dashboard-btn {
+        padding: 8px 13px;
+        font-size: 13px;
+        gap: 0;
     }
 }
 
@@ -1051,8 +1070,10 @@
 /* ===== Общая адаптивность лендинга ===== */
 
 @media (max-width: 768px) {
-    .hero-title { font-size: 2.4rem; }
-    .hero-subtitle { font-size: 1.15rem; }
+    .hero-section { min-height: auto; padding: 90px 0 48px; border-radius: 0 0 28px 28px; }
+    .hero-content { padding: 1rem 1.25rem; }
+    .hero-title { font-size: 2.2rem; }
+    .hero-subtitle { font-size: 1.05rem; margin-bottom: 1.5rem; }
     .hero-features { gap: 1rem; }
     .hero-feature { min-width: 140px; padding: 1rem 1.5rem; }
 
@@ -1066,9 +1087,11 @@
     .teacher-avatar { width: 120px; height: 120px; }
     .teacher-name { font-size: 1.5rem; }
     .teacher-tagline { font-size: 1rem; }
-    .teacher-goal { font-size: 1rem; padding: 0.8rem 1rem; text-align: left; }
+    .teacher-card-body { font-size: 1rem; }
+    .teacher-goal { font-size: 0.95rem; padding: 0.8rem 1rem; text-align: left; }
 
-    .section-title { font-size: 1.8rem; margin-bottom: 2rem; }
+    .section-title { font-size: 1.6rem; margin-bottom: 2rem; }
+    .results-title { font-size: 1.3rem; }
     .result-value { font-size: 2rem; }
     .results-grid { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; }
 
@@ -1080,6 +1103,22 @@
 
     .about-section { padding: 3rem 0; }
     .about-cards { gap: 1rem; }
+    .about-card { padding: 1.5rem; }
+
+    .modal-overlay { padding: 0.5rem; align-items: flex-end; }
+    .modal-container { max-height: 92vh; overflow-y: auto; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 
     .pricing-fab { bottom: 1.2rem; right: 1.2rem; }
+    .pricing-fab-label { display: none; }
+    .pricing-fab-btn .fab-tooltip { display: none; }
+}
+
+@media (max-width: 420px) {
+    .hero-title { font-size: 1.9rem; }
+    .hero-subtitle { font-size: 0.98rem; }
+    .section-title { font-size: 1.4rem; }
+    .teacher-card { padding: 1.25rem; }
+    .review-card { flex: 0 0 260px; height: 347px; }
+    .modal-header h3 { font-size: 1.1rem; }
+    .exam-options { flex-direction: column; gap: 0.4rem; }
 }
