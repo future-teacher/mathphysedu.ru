@@ -1174,3 +1174,218 @@ a:hover {
 .topbar-dark .topbar .topbar-right {
     color: #fff;
 }
+
+/* ============================================================
+   Тёмная тема: контрастность WCAG AA
+   Обычный текст ≥4.5:1, крупный/UI-элементы ≥3:1.
+   Учтены состояния hover, focus-visible и disabled.
+   ============================================================ */
+
+/* Серые Bootstrap-утилиты → токены темы (иначе нечитаемы на тёмном фоне) */
+[data-theme="dark"] .text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .text-dark {
+    color: var(--text) !important;
+}
+
+/* Bootstrap закрепляет #212529 за <p>/<strong> (в тёмной теме это ≈1.1:1
+   на поверхностях) — возвращаем цвет темы. Утилиты .text-muted/.text-danger
+   с !important остаются в приоритете. */
+[data-theme="dark"] p,
+[data-theme="dark"] strong,
+[data-theme="dark"] b {
+    color: var(--text);
+}
+
+/* Шапки карточек: глубокие сплошные заливки + белый текст (≥4.5:1) */
+[data-theme="dark"] .card-header.bg-primary {
+    background-color: var(--accent-solid) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .card-header.bg-success {
+    background-color: var(--success-solid) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .card-header.bg-danger {
+    background-color: var(--danger-solid) !important;
+    color: #fff !important;
+}
+
+/* Светлые заливки (amber/cyan): тёмный текст (≥4.5:1) */
+[data-theme="dark"] .card-header.bg-warning {
+    background-color: var(--warning) !important;
+    color: var(--text-invert) !important;
+}
+
+[data-theme="dark"] .card-header.bg-info {
+    background-color: var(--info) !important;
+    color: var(--text-invert) !important;
+}
+
+/* Заголовки внутри цветных шапок: свойство h1-h6 задаёт им var(--text),
+   которое ломает контраст на светлых заливках (amber/cyan) — возвращаем
+   голос шапки. */
+[data-theme="dark"] .card-header.bg-primary h4,
+[data-theme="dark"] .card-header.bg-primary h5,
+[data-theme="dark"] .card-header.bg-success h4,
+[data-theme="dark"] .card-header.bg-success h5,
+[data-theme="dark"] .card-header.bg-danger h4,
+[data-theme="dark"] .card-header.bg-danger h5 {
+    color: #fff;
+}
+
+[data-theme="dark"] .card-header.bg-warning h4,
+[data-theme="dark"] .card-header.bg-warning h5,
+[data-theme="dark"] .card-header.bg-info h4,
+[data-theme="dark"] .card-header.bg-info h5 {
+    color: var(--text-invert);
+}
+
+/* Мелкий текст на тёмных цветных шапках: убираем opacity-затемнение */
+[data-theme="dark"] .card-header.bg-primary .opacity-75,
+[data-theme="dark"] .card-header.bg-success .opacity-75,
+[data-theme="dark"] .card-header.bg-danger .opacity-75 {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* Кнопки: сплошные глубокие заливки вместо ярких (белый текст ≥4.5:1) */
+[data-theme="dark"] .btn-primary {
+    background-color: var(--accent-solid) !important;
+    border-color: var(--accent-solid) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .btn-primary:hover,
+[data-theme="dark"] .btn-primary:focus,
+[data-theme="dark"] .btn-primary:active {
+    background-color: var(--accent-solid-hover) !important;
+    border-color: var(--accent-solid-hover) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .btn-success {
+    background-color: var(--success-solid) !important;
+    border-color: var(--success-solid) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .btn-success:hover,
+[data-theme="dark"] .btn-success:focus,
+[data-theme="dark"] .btn-success:active {
+    background-color: var(--success-solid-hover) !important;
+    border-color: var(--success-solid-hover) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .btn-danger {
+    background-color: var(--danger-solid) !important;
+    border-color: var(--danger-solid) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .btn-danger:hover,
+[data-theme="dark"] .btn-danger:focus,
+[data-theme="dark"] .btn-danger:active {
+    background-color: var(--danger-solid-hover) !important;
+    border-color: var(--danger-solid-hover) !important;
+    color: #fff !important;
+}
+
+/* Amber/cyan кнопки: тёмный текст на яркой заливке (≥4.5:1) */
+[data-theme="dark"] .btn-warning {
+    background-color: var(--warning) !important;
+    border-color: var(--warning) !important;
+    color: var(--text-invert) !important;
+}
+
+[data-theme="dark"] .btn-warning:hover,
+[data-theme="dark"] .btn-warning:focus,
+[data-theme="dark"] .btn-warning:active {
+    background-color: var(--warning-hover) !important;
+    border-color: var(--warning-hover) !important;
+    color: var(--text-invert) !important;
+}
+
+[data-theme="dark"] .btn-info {
+    background-color: var(--info) !important;
+    border-color: var(--info) !important;
+    color: var(--text-invert) !important;
+}
+
+[data-theme="dark"] .btn-info:hover,
+[data-theme="dark"] .btn-info:focus,
+[data-theme="dark"] .btn-info:active {
+    background-color: var(--info-hover) !important;
+    border-color: var(--info-hover) !important;
+    color: var(--text-invert) !important;
+}
+
+/* Плитки-действия преподавателя (.td-btn / .tsl-btn) */
+[data-theme="dark"] .td-btn-primary,
+[data-theme="dark"] .tsl-btn-primary {
+    background-color: var(--accent-solid) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .td-btn-primary:hover,
+[data-theme="dark"] .tsl-btn-primary:hover {
+    background-color: var(--accent-solid-hover) !important;
+    color: #fff !important;
+}
+
+/* Outline-кнопки на цветных шапках карточек: читаемые белые контуры */
+[data-theme="dark"] .card-header .btn-outline-light {
+    background-color: transparent !important;
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .card-header .btn-outline-light:hover,
+[data-theme="dark"] .card-header .btn-outline-light:focus,
+[data-theme="dark"] .card-header .btn-outline-light:active {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    border-color: #fff !important;
+    color: #fff !important;
+}
+
+/* Disabled: явное состояние, без полупрозрачности (цвет отдельно от активных) */
+[data-theme="dark"] .btn:disabled,
+[data-theme="dark"] .btn.disabled,
+[data-theme="dark"] .form-control:disabled,
+[data-theme="dark"] .form-select:disabled {
+    opacity: 1 !important;
+    background-color: var(--surface-3) !important;
+    border-color: var(--border) !important;
+    color: var(--text-disabled) !important;
+    cursor: not-allowed;
+}
+
+/* Фокус: кольцо ≥3:1 относительно фона (видимое в обеих темах) */
+[data-theme="dark"] .btn:focus-visible {
+    box-shadow: 0 0 0 3px var(--accent-hover) !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--accent-hover) !important;
+}
+
+[data-theme="dark"] .form-check-input:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--accent-hover) !important;
+}
+
+[data-theme="dark"] a:focus-visible,
+[data-theme="dark"] button:focus-visible,
+[data-theme="dark"] input:focus-visible,
+[data-theme="dark"] select:focus-visible,
+[data-theme="dark"] textarea:focus-visible {
+    outline: 3px solid var(--accent-hover);
+    outline-offset: 2px;
+}

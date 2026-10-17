@@ -12,9 +12,23 @@
     gap: 10px;
     background: linear-gradient(135deg, var(--bonus-from) 0%, var(--bonus-to) 100%);
     padding: 8px 16px;
+    border: none;
     border-radius: var(--radius-pill);
     box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);
     color: var(--bonus-text);
+    font: inherit;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.bonus-balance-block:hover {
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+    transform: translateY(-1px);
+}
+
+.bonus-balance-block:focus-visible {
+    outline: 2px solid var(--bonus);
+    outline-offset: 2px;
 }
 
 .bonus-balance-block .bonus-label {
@@ -25,6 +39,46 @@
 .bonus-balance-block .bonus-value {
     font-size: 1.1rem;
     font-weight: 800;
+}
+
+.bonus-balance-block .bonus-caret {
+    font-size: 0.7rem;
+    transition: transform 200ms ease;
+}
+
+.bonus-balance-block[aria-expanded="true"] .bonus-caret {
+    transform: rotate(180deg);
+}
+
+/* ===== Расшифровка бонусов (история начислений) ===== */
+
+.bonus-history {
+    background: var(--bg-soft, rgba(127, 127, 127, 0.06));
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.bonus-history-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px dashed rgba(127, 127, 127, 0.2);
+}
+
+.bonus-history-item:last-child {
+    border-bottom: none;
+}
+
+.bonus-history-reason {
+    font-size: 0.9rem;
+    color: var(--text-muted, #666);
 }
 
 /* ===== Карточки-напоминания (дашборд) ===== */
@@ -589,4 +643,11 @@
     .reminder-card .icon-container .card-label { font-size: 0.8em; }
     .reminder-card .card-count { font-size: 0.9em; }
     .achievement-badge { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+}
+
+/* Тёмная тема: контрастность WCAG AA.
+   Жёлто-оранжевый градиент слишком светлый для светлого текста (#fde68a —
+   1.2–1.7:1), поэтому на заливке используем тёмный текст (≥8.8:1). */
+[data-theme="dark"] .bonus-balance-block {
+    color: var(--text-invert);
 }

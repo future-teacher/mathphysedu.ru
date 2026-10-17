@@ -76,6 +76,11 @@ def student_login(request):
             
             if user is not None:
                 login(request, user)
+                # Сбрасываем устаревшие сообщения из сессии (например, ошибку
+                # предыдущей неудачной попытки входа), чтобы они не всплывали
+                # в личном кабинете после успешного входа.
+                storage = messages.get_messages(request)
+                storage.used = True
                 # Проверяем, является ли пользователь учеником
                 if hasattr(user, 'student_profile') and user.student_profile:
                     return redirect('dashboard')
@@ -93,14 +98,12 @@ def student_login(request):
                 messages.error(request, 'У вас нет доступа к системе')
                 return redirect('login')
             else:
-                messages.error(request, 'Неверное имя пользователя или пароль.')
                 return render(request, 'students/login.html', {
                     'form': form,
                     'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
                     'captcha_disabled': settings.DEBUG,
                 })
         else:
-            messages.error(request, 'Неверное имя пользователя или пароль.')
             return render(request, 'students/login.html', {
                 'form': form,
                 'captcha_site_key': settings.YANDEX_SMARTCAPTCHA_SITE_KEY,
@@ -222,8 +225,12 @@ def dashboard(request):
     if not any(student.probniks.filter(status='in_progress')):
         achievements.append('📚 Все пробники сданы!')
     
+    # История бонусных операций (расшифровка начислений для ученика)
+    bonus_transactions = student.bonus_transactions.all()[:30]
+    
     return render(request, 'students/dashboard.html', {
         'student': student,
+        'bonus_transactions': bonus_transactions,
         'recent_checked_homework': recent_checked_homework,
         'active_homework': active_homework,
         'math_homework': math_homework,

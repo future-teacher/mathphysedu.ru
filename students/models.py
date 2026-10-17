@@ -189,6 +189,37 @@ class Student(models.Model):
         ordering = ['last_name', 'first_name']
 
 
+class BonusTransaction(models.Model):
+    """Операция по бонусным рублям (начисление / списание) с пояснением.
+
+    Хранит историю, за что ученику начислены или с чем списаны бонусы,
+    чтобы ученик в личном кабинете мог видеть расшифровку начислений.
+    """
+    student = models.ForeignKey(
+        Student, on_delete=models.CASCADE, related_name='bonus_transactions'
+    )
+    teacher = models.ForeignKey(
+        Teacher, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='bonus_transactions', verbose_name='Преподаватель'
+    )
+    amount = models.IntegerField(verbose_name='Сумма',
+                                 help_text='Положительное число — начисление, отрицательное — списание')
+    reason = models.CharField(
+        max_length=500, blank=True, verbose_name='За что',
+        help_text='Пояснение, за что начислены/списаны бонусы (ученик видит это в личном кабинете)'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата')
+
+    def __str__(self):
+        sign = '+' if self.amount > 0 else ''
+        return f"{self.student}: {sign}{self.amount} ₽ ({self.created_at:%d.%m.%Y %H:%M})"
+
+    class Meta:
+        verbose_name = 'Операция по бонусам'
+        verbose_name_plural = 'Операции по бонусам'
+        ordering = ['-created_at']
+
+
 class Homework(models.Model):
     """Домашнее задание"""
     

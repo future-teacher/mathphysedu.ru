@@ -203,14 +203,14 @@
                 </div>
                 {% endif %}
                 
-                <div class="mt-4 d-flex justify-content-between">
-                    <a href="{% url 'homework_list' %}" class="btn btn-primary">
+                <div class="mt-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <a href="{% url 'homework_list' %}" class="btn btn-primary text-wrap">
                         ← Назад к списку заданий
                     </a>
                     
                     <div>
                         {% if homework.status == 'checked' and homework.grade == 'nz' %}
-                        <a href="#" class="btn btn-warning" onclick="alert('Обратитесь к преподавателю для обсуждения ошибок');">
+                        <a href="#" class="btn btn-warning text-wrap" onclick="alert('Обратитесь к преподавателю для обсуждения ошибок');">
                             💬 Нужна помощь
                         </a>
                         {% endif %}

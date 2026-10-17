@@ -146,6 +146,12 @@
                                     <input type="number" name="amount" min="1" step="1" class="form-control"
                                            placeholder="Например: 10" required>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label small mb-1">За что:</label>
+                                    <textarea name="reason" rows="2" class="form-control"
+                                              placeholder="Например: отличная работа над ДЗ по математике, 5/5 решённых задач"></textarea>
+                                    <div class="form-text">Пояснение увидит ученик в личном кабинете.</div>
+                                </div>
                                 <div class="d-grid gap-2">
                                     <button type="submit" name="action" value="add" class="btn btn-success">
                                         ➕ Начислить
@@ -155,6 +161,28 @@
                                     </button>
                                 </div>
                             </form>
+
+                            <hr>
+                            <h6 class="mb-2">📜 История операций</h6>
+                            {% if bonus_transactions %}
+                            <ul class="list-group list-group-flush small">
+                                {% for t in bonus_transactions %}
+                                <li class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <span class="badge {% if t.amount > 0 %}bg-success{% else %}bg-danger{% endif %} me-1">
+                                                {% if t.amount > 0 %}+{% endif %}{{ t.amount }} ₽
+                                            </span>
+                                            <span>{{ t.reason|default:"—" }}</span>
+                                        </div>
+                                        <small class="text-muted text-nowrap ms-2">{{ t.created_at|date:"d.m.Y H:i" }}</small>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p class="text-muted small mb-0">Операций пока нет.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

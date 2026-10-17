@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .models import Student, Probnik, ProbnikFile, StudyFile, Homework, HomeworkFile, Teacher, Application
+from .models import Student, Probnik, ProbnikFile, StudyFile, Homework, HomeworkFile, Teacher, Application, BonusTransaction
 
 
 # --- Базовый класс для инлайнов с файлами ---
@@ -239,3 +239,11 @@ class ApplicationAdmin(admin.ModelAdmin):
     search_fields = ('name', 'phone')
     readonly_fields = ('created_at',)
     list_editable = ('is_viewed',)
+
+
+@admin.register(BonusTransaction)
+class BonusTransactionAdmin(admin.ModelAdmin):
+    list_display = ('student', 'amount', 'reason', 'teacher', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('student__first_name', 'student__last_name', 'reason')
+    readonly_fields = ('created_at',)

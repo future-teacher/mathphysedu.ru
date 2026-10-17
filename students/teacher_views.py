@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from .models import Teacher, Student, Homework, Probnik, ProbnikFile, StudyFile, HomeworkFile, Application
+from .models import Teacher, Student, Homework, Probnik, ProbnikFile, StudyFile, HomeworkFile, Application, BonusTransaction
 from .forms import StudentForm, HomeworkForm, ProbnikForm, StudyFileForm, TeacherProfileForm
 from .telegram_bot import (
     notify_student_new_homework,
@@ -202,6 +202,9 @@ def student_detail(request, student_id):
     physics_files = all_study_files.filter(subject='physics')[:10]
     general_files = all_study_files.filter(subject='general')[:10]
     
+    # История бонусных операций (для преподавателя)
+    bonus_transactions = student.bonus_transactions.all()[:20]
+    
     context = {
         'teacher': teacher,
         'student': student,
@@ -213,6 +216,7 @@ def student_detail(request, student_id):
         'physics_files': physics_files,
         'general_files': general_files,
         'all_study_files': all_study_files,
+        'bonus_transactions': bonus_transactions,
     }
     
     return render(request, 'students/teacher_student_detail.html', context)
@@ -265,6 +269,8 @@ def student_bonuses(request, student_id):
     
     if request.method == 'POST':
         action = request.POST.get('action')
+        # Пояснение «за что» (ученик видит его в личном кабинете)
+        reason = request.POST.get('reason', '').strip()
         
         if action == 'add':
             amount = request.POST.get('amount')
@@ -278,6 +284,12 @@ def student_bonuses(request, student_id):
             else:
                 student.bonus_balance += amount
                 student.save(update_fields=['bonus_balance'])
+                BonusTransaction.objects.create(
+                    student=student,
+                    teacher=teacher,
+                    amount=amount,
+                    reason=reason or 'Бонус за проделанную работу',
+                )
                 messages.success(
                     request,
                     f'✅ Ученику {student} начислено +{amount} бонусных рублей. '
@@ -298,6 +310,12 @@ def student_bonuses(request, student_id):
                 if student.bonus_balance < 0:
                     student.bonus_balance = 0
                 student.save(update_fields=['bonus_balance'])
+                BonusTransaction.objects.create(
+                    student=student,
+                    teacher=teacher,
+                    amount=-amount,
+                    reason=reason or 'Списание бонусов',
+                )
                 messages.success(
                     request,
                     f'➖ У ученика {student} списано {amount} бонусных рублей. '
