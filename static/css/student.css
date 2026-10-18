@@ -645,6 +645,46 @@
     .achievement-badge { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
 }
 
+/* ============================================================
+   Кнопки действий внизу карточки (Назад / Нужна помощь)
+   Проблема: на мобильных кнопка «Назад» выходила за границы
+   карточки — Safari считает min-width: auto у flex-элементов как
+   max-content и не даёт тексту переноситься, а системное
+   масштабирование шрифта увеличивает текст.
+   Решение: min-width: 0 у flex-элементов, принудительный перенос
+   текста в любом месте, на телефонах — колонка на всю ширину.
+   ============================================================ */
+
+.detail-actions > * {
+    min-width: 0;      /* Safari flexbox: разрешаем сжатие ниже контента */
+    max-width: 100%;   /* страховка: элемент никогда не шире контейнера */
+}
+
+.detail-actions .btn {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word; /* fallback для старых Safari */
+    text-align: center;
+}
+
+@media (max-width: 575.98px) {
+    /* Bootstrap-утилиты (d-flex/flex-wrap/justify-content-between/
+       align-items-center) используют !important — переопределяем их.
+       Переводим контейнер в блочный режим: кнопки гарантированно
+       занимают всю ширину карточки и складываются в колонку. */
+    .detail-actions {
+        display: block !important;
+    }
+    .detail-actions .btn {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+    .detail-actions .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
 /* Тёмная тема: контрастность WCAG AA.
    Жёлто-оранжевый градиент слишком светлый для светлого текста (#fde68a —
    1.2–1.7:1), поэтому на заливке используем тёмный текст (≥8.8:1). */
