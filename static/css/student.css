@@ -136,17 +136,20 @@
 
 .reminder-card .card-sub {
     font-size: 0.75em;
-    opacity: 0.85;
+    /* 0.85 белого на верхней кромке карточки давал ≈4.3:1 (FAIL AA) — поднято */
+    opacity: 0.95;
     margin: 0;
 }
 
+/* Градиенты затемнены: белый текст держит ≥4.5:1 на всей площади
+   (было 3.68:1 у математики и 2.26–3.56:1 у физики — FAIL) */
 .card-math {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: #fff;
 }
 
 .card-physics {
-    background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    background: linear-gradient(135deg, #c2410c 0%, #9a3412 100%);
     color: #fff;
 }
 

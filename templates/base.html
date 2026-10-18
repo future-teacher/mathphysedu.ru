@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Личный кабинет ученика{% endblock %}</title>
     <script>
-        // Применяем сохранённую тему до отрисовки, чтобы избежать мигания
+        // Применяем сохранённую тему до отрисовки, чтобы избежать мигания.
+        // Параметр ?theme=dark|light позволяет принудительно задать тему
+        // (удобно для тестирования и распространения ссылок).
         (function () {
+            var q = null;
+            try { q = new URLSearchParams(window.location.search).get('theme'); } catch (e) {}
             var saved = null;
             try { saved = localStorage.getItem('mathphysedu-theme'); } catch (e) {}
-            var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            var theme = (q === 'light' || q === 'dark')
+                ? q
+                : (saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>

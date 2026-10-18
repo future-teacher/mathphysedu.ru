@@ -249,3 +249,15 @@ body.login-page {
         transform-origin: center center;
     }
 }
+
+/* Тёмная тема: var(--accent) = #3b82f6 с белым текстом даёт 3.68:1
+   (FAIL 4.5:1) — глубокий синий accent-solid даёт 6.7:1 */
+[data-theme="dark"] .button-submit {
+    background-color: var(--accent-solid);
+    border-color: var(--accent-solid);
+}
+
+[data-theme="dark"] .button-submit:hover {
+    background-color: var(--accent-solid-hover);
+    border-color: var(--accent-solid-hover);
+}

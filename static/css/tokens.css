@@ -61,7 +61,8 @@
     --bonus-from: #fbbf24;
     --bonus-to: #f59e0b;
     --bonus-soft: rgba(245, 158, 11, 0.16);
-    --bonus-text: #92400e;
+    /* #92400e даёт лишь 3.6–4.3:1 на янтарных градиентах — затемнён до AA */
+    --bonus-text: #581c07;
 
     /* Каркас: сайдбар и топбар */
     --sidebar-bg: #ffffff;

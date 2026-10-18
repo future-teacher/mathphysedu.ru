@@ -337,7 +337,7 @@ function loadSmartCaptchaScript(callback) {
         console.error('❌ Не удалось загрузить скрипт SmartCaptcha.');
         const container = document.getElementById('captcha-container');
         if (container && !smartCaptchaRendered) {
-            container.innerHTML = '<p style="color:red;">⚠️ Ошибка загрузки капчи. Проверьте интернет-соединение.</p>';
+            container.innerHTML = '<p style="color:var(--danger-text);">⚠️ Ошибка загрузки капчи. Проверьте интернет-соединение.</p>';
         }
     };
     document.head.appendChild(s);
@@ -365,7 +365,7 @@ function renderSmartCaptcha() {
     // В режиме разработки каптчу проходить не нужно
     {% if captcha_disabled %}
         console.warn('⚠️ Капча отключена (режим разработки DEBUG=True).');
-        container.innerHTML = '<p style="color:orange;">⚠️ Капча отключена в режиме разработки</p>';
+        container.innerHTML = '<p style="color:var(--warning-text);">⚠️ Капча отключена в режиме разработки</p>';
         if (submitBtn) submitBtn.disabled = false;
         if (tokenInput) tokenInput.value = 'dev-skip-captcha';
         smartCaptchaRendered = true;
@@ -374,7 +374,7 @@ function renderSmartCaptcha() {
 
     if (!siteKey || siteKey.includes('placeholder')) {
         console.warn('⚠️ Используется placeholder-ключ!');
-        container.innerHTML = '<p style="color:orange;">⚠️ Капча в режиме разработки</p>';
+        container.innerHTML = '<p style="color:var(--warning-text);">⚠️ Капча в режиме разработки</p>';
         if (submitBtn) submitBtn.disabled = false;
         smartCaptchaRendered = true;
         return;
@@ -421,7 +421,7 @@ function renderSmartCaptcha() {
                 if (tokenInput) {
                     tokenInput.value = '';
                 }
-                container.innerHTML = '<p style="color:red;">⚠️ Ошибка капчи. Обновите страницу.</p>';
+                container.innerHTML = '<p style="color:var(--danger-text);">⚠️ Ошибка капчи. Обновите страницу.</p>';
             },
             onChallenge: function() {
                 console.log('🔄 Задание капчи начато');
@@ -434,7 +434,7 @@ function renderSmartCaptcha() {
         console.log('✅ Виджет капчи создан, ID:', smartCaptchaWidgetId);
     } catch (error) {
         console.error('❌ Ошибка создания виджета:', error);
-        container.innerHTML = '<p style="color:red;">⚠️ Ошибка загрузки капчи</p>';
+        container.innerHTML = '<p style="color:var(--danger-text);">⚠️ Ошибка загрузки капчи</p>';
         if (submitBtn) submitBtn.disabled = false;
     }
 }

@@ -316,7 +316,8 @@
 
 .teacher-tagline {
     font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.75);
+    /* 0.75 белого на #1d4ed8 = 4.48:1 (FAIL AA) — поднято до 4.89:1 */
+    color: rgba(255, 255, 255, 0.8);
     margin: 0.3rem 0 0;
 }
 
@@ -1121,4 +1122,63 @@
     .review-card { flex: 0 0 260px; height: 347px; }
     .modal-header h3 { font-size: 1.1rem; }
     .exam-options { flex-direction: column; gap: 0.4rem; }
+}
+
+/* ============================================================
+   Тёмная тема: контрастность WCAG AA (лендинг)
+   var(--accent) в тёмной теме = #3b82f6, белый текст даёт 3.68:1
+   (FAIL 4.5:1) — используем глубокие токены accent-solid.
+   Жёлтые градиенты в тёмной теме со светлым bonus-text дают
+   1.2–1.7:1 (FAIL) — переключаем на тёмный текст (≥8.8:1).
+   ============================================================ */
+
+[data-theme="dark"] .landing-nav .nav-login-btn,
+[data-theme="dark"] .landing-nav .nav-dashboard-btn {
+    background-color: var(--accent-solid);
+    box-shadow: 0 4px 15px rgba(29, 78, 216, 0.35);
+}
+
+[data-theme="dark"] .landing-nav .nav-login-btn:hover,
+[data-theme="dark"] .landing-nav .nav-dashboard-btn:hover,
+[data-theme="dark"] .landing-nav .nav-login-btn:focus-visible,
+[data-theme="dark"] .landing-nav .nav-dashboard-btn:focus-visible {
+    background-color: var(--accent-solid-hover);
+}
+
+[data-theme="dark"] .glow-on-hover {
+    background-color: var(--accent-solid);
+}
+
+[data-theme="dark"] .glow-on-hover:hover {
+    background-color: var(--accent-solid-hover);
+}
+
+[data-theme="dark"] .pricing-fab-btn {
+    background-color: var(--accent-solid);
+}
+
+[data-theme="dark"] .pricing-fab-btn:hover {
+    background-color: var(--accent-solid-hover);
+}
+
+[data-theme="dark"] .pricing-fab-btn.is-open {
+    background-color: var(--danger-solid);
+}
+
+[data-theme="dark"] .pricing-fab-btn.is-open:hover {
+    background-color: var(--danger-solid-hover);
+}
+
+[data-theme="dark"] .modal-submit-btn {
+    background-color: var(--accent-solid);
+    box-shadow: 0 4px 15px rgba(29, 78, 216, 0.35);
+}
+
+[data-theme="dark"] .modal-submit-btn:hover {
+    background-color: var(--accent-solid-hover);
+}
+
+[data-theme="dark"] .pricing-trial-btn,
+[data-theme="dark"] .bonus-balance-badge {
+    color: var(--text-invert);
 }

@@ -43,7 +43,9 @@
             <div class="col-md-4 mb-2 mb-md-0">
                 <div class="application-name">{{ app.name }}</div>
                 <div class="application-phone">
-                    <a href="tel:{{ app.phone }}" style="color: rgba(255,255,255,0.7); text-decoration: none;">
+                    <!-- Инлайн rgba(255,255,255,0.7) давал 1.0:1 на светлой теме —
+                         убран: .application-phone a наследует токен темы -->
+                    <a href="tel:{{ app.phone }}" style="text-decoration: none;">
                         📞 {{ app.phone }}
                     </a>
                 </div>
