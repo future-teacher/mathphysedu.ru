@@ -144,6 +144,52 @@ TELEGRAM_BOT_ENABLED = bool(TELEGRAM_BOT_TOKEN)
 # Базовый URL сайта для ссылок в уведомлениях
 BASE_URL = os.environ.get('BASE_URL', 'https://mathphysedu.ru')
 
+# Имя бота для подсказок в интерфейсе (например, @MathPhyseduBot)
+TELEGRAM_BOT_USERNAME = os.environ.get('TELEGRAM_BOT_USERNAME', '@MathPhyseduBot')
+
+# ========================
+# LOGGING
+# ========================
+# Без этой настройки сообщения (logger.info/warning/error) из students.telegram_bot
+# не отображаются в консоли/логах, поэтому ошибки бота «исчезают» бесследно.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'students.telegram_bot': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'students.management.commands.telegram_polling': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}
+
 # ========================
 # YANDEX SMARTCAPTCHA SETTINGS
 # ========================

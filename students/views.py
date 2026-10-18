@@ -1,4 +1,5 @@
 import json
+import logging
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -17,6 +18,8 @@ from .telegram_bot import (
 )
 from .captcha import check_captcha
 from django.core.paginator import Paginator
+
+logger = logging.getLogger(__name__)
 
 
 def landing(request):
@@ -576,7 +579,13 @@ def telegram_webhook(request):
     except json.JSONDecodeError:
         return HttpResponse('Invalid JSON', status=400)
     
-    process_single_update(update_data)
+    try:
+        process_single_update(update_data)
+    except Exception:
+        # Никогда не отдаём 5xx на webhook: Telegram ретраит ошибки, из-за чего
+        # одно и то же обновление обрабатывается повторно (дубли уведомлений)
+        # либо накапливается pending_update_count. Логируем и отвечаем 200.
+        logger.exception('Error processing Telegram webhook update')
     
     # Telegram ожидает ответ 200 OK
     return HttpResponse('ok')

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -13,9 +14,15 @@ from .telegram_bot import (
     notify_student_new_probnik,
     notify_student_probnik_checked,
     notify_teacher_homework_submitted,
+    send_welcome_to_student,
+    send_welcome_to_parent,
+    link_telegram_users_for_student,
 )
 import random
 import string
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def is_teacher(user):
@@ -150,6 +157,40 @@ def student_create(request):
                 }
             
             student.save()
+
+            # === Telegram: приветствие сразу после регистрации ===
+            # 1. Привязываем ранее отправленные боту /start (записи TelegramUser)
+            #    к профилю ученика/родителя по @username — тогда становятся
+            #    известны числовые chat_id.
+            # 2. Если chat_id уже известен — немедленно отправляем персональное
+            #    приветствие ученику и/или родителю.
+            # 3. Если chat_id ещё нет — пользователь должен нажать /start у бота;
+            #    приветствие придёт автоматически (обрабатывает process_single_update).
+            bot_username = getattr(settings, 'TELEGRAM_BOT_USERNAME', '@MathPhyseduBot')
+
+            try:
+                link_telegram_users_for_student(student)
+            except Exception:
+                logger.exception('Failed to link TelegramUser records for new student')
+
+            student_welcome = send_welcome_to_student(student)
+            if not student_welcome['sent'] and student.telegram_username:
+                messages.info(
+                    request,
+                    f'ℹ️ Ученик {student.first_name} {student.last_name} получит приветствие '
+                    f'в Telegram, когда напишет боту {bot_username} и нажмёт /start '
+                    f'(аккаунт: @{student.telegram_username.lstrip("@")}).'
+                )
+
+            parent_welcome = send_welcome_to_parent(student)
+            if not parent_welcome['sent'] and student.parent_telegram:
+                messages.info(
+                    request,
+                    f'ℹ️ Родитель получит приветствие в Telegram, когда напишет боту '
+                    f'{bot_username} и нажмёт /start '
+                    f'(аккаунт: @{student.parent_telegram.lstrip("@")}).'
+                )
+
             messages.success(request, f'🎉 Ученик {student} успешно создан!')
             
             credentials = request.session.get('new_student_credentials')
@@ -240,6 +281,19 @@ def student_edit(request, student_id):
         form = StudentForm(request.POST, instance=student, teacher=teacher)
         if form.is_valid():
             form.save()
+
+            # После обновления профиля (например, @username или telegram родителя)
+            # заново привязываем записи TelegramUser и пытаемся доставить приветствия.
+            # note: Student.save() очищает chat_id при смене @username, поэтому
+            # приветствие уйдёт только если новый аккаунт уже нажимал /start.
+            try:
+                link_telegram_users_for_student(student)
+            except Exception:
+                logger.exception('Failed to link TelegramUser records when editing student')
+
+            send_welcome_to_student(student)
+            send_welcome_to_parent(student)
+
             messages.success(request, f'✅ Данные ученика {student} обновлены!')
             return redirect('teacher_student_detail', student_id=student.id)
     else:

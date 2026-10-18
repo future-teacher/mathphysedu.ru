@@ -85,7 +85,20 @@ class Command(BaseCommand):
                 data = json.loads(response.read().decode('utf-8'))
         except HTTPError as e:
             error_body = e.read().decode('utf-8', errors='replace')
-            logger.error(f'Telegram API error: {error_body}')
+            if e.code == 409 or 'Conflict' in error_body:
+                # Webhook установлен: getUpdates не работает, Telegram отдаёт 409.
+                # Это типичная причина «бота нет» при одновременном использовании
+                # polling и webhook — нужно оставить только один режим.
+                logger.error(
+                    'Telegram возвращает 409 Conflict: у бота установлен webhook, '
+                    'поэтому polling (getUpdates) не принимает обновления.\n'
+                    'Решение: либо удалите webhook командой\n'
+                    '    python manage.py telegram_webhook --unset\n'
+                    'и перезапустите polling, либо остановите polling и настройте webhook:\n'
+                    '    python manage.py telegram_webhook --set https://mathphysedu.ru/students/telegram/webhook/'
+                )
+            else:
+                logger.error(f'Telegram API error ({e.code}): {error_body}')
             return offset
         except URLError as e:
             logger.error(f'Network error: {e}')

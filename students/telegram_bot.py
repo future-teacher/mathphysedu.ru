@@ -180,34 +180,275 @@ def _send_telegram_raw(token, chat_id, text, parse_mode='HTML'):
         with urllib_request.urlopen(req, timeout=10) as resp:
             return json.loads(resp.read().decode('utf-8'))
     except HTTPError as e:
-        return json.loads(e.read().decode('utf-8', errors='replace'))
+        # Тело ответа может быть не-JSON — не даём JSONDecodeError всплыть
+        # наверх (иначе webhook вернёт 500 и Telegram будет бесконечно ретраить).
+        try:
+            return json.loads(e.read().decode('utf-8', errors='replace'))
+        except (json.JSONDecodeError, ValueError):
+            return {'ok': False, 'description': f'HTTP {e.code}: {e.reason}'}
+    except URLError as e:
+        return {'ok': False, 'description': f'Network error: {e.reason}'}
+    except Exception as e:
+        return {'ok': False, 'description': str(e)}
 
 
-def _save_telegram_user(chat_id, username, first_name, last_name, student=None, teacher=None, is_parent=False):
+def _save_telegram_user(chat_id, username, first_name, last_name,
+                        student=None, teacher=None, is_parent=False, force_links=False):
     """
     Сохраняет или обновляет запись в TelegramUser.
-    
+
     Эта функция гарантирует, что у нас есть запись о каждом chat_id,
     который когда-либо писал боту, даже если у пользователя нет @username.
+
+    При повторном обращении НЕ затирает связи (student/teacher/is_parent),
+    если force_links=False — чтобы запись, у которой роль пока не определена,
+    не «обнулила» уже корректно привязанного к ней ученика/родителя.
     """
     from students.models import TelegramUser
-    
-    defaults = {
-        'username': username or '',
-        'first_name': first_name or '',
-        'last_name': last_name or '',
-    }
-    if student:
-        defaults['student'] = student
-    if teacher:
-        defaults['teacher'] = teacher
-    defaults['is_parent'] = is_parent
-    
-    tg_user, created = TelegramUser.objects.update_or_create(
+
+    tg_user, created = TelegramUser.objects.get_or_create(
         chat_id=chat_id,
-        defaults=defaults
+        defaults={
+            'username': username or '',
+            'first_name': first_name or '',
+            'last_name': last_name or '',
+            'student': student,
+            'teacher': teacher,
+            'is_parent': is_parent,
+        }
     )
+    if created:
+        return tg_user, created
+
+    to_update = {}
+    if username:
+        to_update['username'] = username
+    if first_name:
+        to_update['first_name'] = first_name
+    if last_name:
+        to_update['last_name'] = last_name
+    if force_links:
+        if student is not None:
+            to_update['student'] = student
+        if teacher is not None:
+            to_update['teacher'] = teacher
+        to_update['is_parent'] = is_parent
+
+    if to_update:
+        for key, value in to_update.items():
+            setattr(tg_user, key, value)
+        tg_user.save(update_fields=list(to_update.keys()))
     return tg_user, created
+
+
+def send_welcome_to_student(student):
+    """
+    Отправляет персональное приветствие ученику сразу после регистрации.
+
+    ВАЖНО: Telegram разрешает боту писать только тем, кто сам открыл чат
+    с ботом и нажал /start. Поэтому приветствие доставляется, только когда
+    у ученика уже известен числовой telegram_chat_id.
+
+    Returns:
+        dict: {'sent': bool, 'reason': str, 'message': str}
+    """
+    if not getattr(student, 'telegram_chat_id', None):
+        return {
+            'sent': False,
+            'reason': 'no_chat_id',
+            'message': (
+                f'Ученик {student.first_name} {student.last_name} ещё не активировал бота — '
+                f'приветствие придёт автоматически, когда он/она напишет боту и нажмёт /start.'
+            ),
+        }
+
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+    if not token:
+        logger.warning('TELEGRAM_BOT_TOKEN not configured, welcome not sent')
+        return {'sent': False, 'reason': 'no_token', 'message': 'TELEGRAM_BOT_TOKEN не настроен'}
+
+    base_url = getattr(settings, 'BASE_URL', 'https://mathphysedu.ru')
+    result = _send_telegram_raw(token, student.telegram_chat_id, WELCOME_MESSAGE.format(base_url=base_url))
+
+    if result.get('ok'):
+        logger.info(
+            f'Welcome sent to student {student.first_name} {student.last_name} '
+            f'(chat_id={student.telegram_chat_id})'
+        )
+        return {'sent': True, 'reason': 'ok', 'message': 'Приветствие отправлено ученику'}
+
+    logger.warning(
+        f'Failed to send welcome to student {student.first_name} {student.last_name} '
+        f'(chat_id={student.telegram_chat_id}): {result.get("description", "Unknown error")}'
+    )
+    return {
+        'sent': False,
+        'reason': 'api_error',
+        'message': result.get('description', 'Неизвестная ошибка Telegram'),
+    }
+
+
+def send_welcome_to_parent(student):
+    """
+    Отправляет персональное приветствие родителю ученика сразу после регистрации.
+
+    Доставка возможна, только если известен числовой parent_telegram_chat_id
+    (родитель нажал /start у бота).
+
+    Returns:
+        dict: {'sent': bool, 'reason': str, 'message': str}
+    """
+    if not getattr(student, 'parent_telegram_chat_id', None):
+        return {
+            'sent': False,
+            'reason': 'no_chat_id',
+            'message': (
+                f'Родитель ученика {student.first_name} {student.last_name} ещё не активировал '
+                f'бота — приветствие придёт автоматически после /start.'
+            ),
+        }
+
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+    if not token:
+        logger.warning('TELEGRAM_BOT_TOKEN not configured, parent welcome not sent')
+        return {'sent': False, 'reason': 'no_token', 'message': 'TELEGRAM_BOT_TOKEN не настроен'}
+
+    base_url = getattr(settings, 'BASE_URL', 'https://mathphysedu.ru')
+    result = _send_telegram_raw(token, student.parent_telegram_chat_id, PARENT_WELCOME_MESSAGE.format(base_url=base_url))
+
+    if result.get('ok'):
+        logger.info(
+            f'Parent welcome sent for student {student.first_name} {student.last_name} '
+            f'(parent chat_id={student.parent_telegram_chat_id})'
+        )
+        return {'sent': True, 'reason': 'ok', 'message': 'Приветствие отправлено родителю'}
+
+    logger.warning(
+        f'Failed to send parent welcome for student {student.first_name} {student.last_name} '
+        f'(chat_id={student.parent_telegram_chat_id}): {result.get("description", "Unknown error")}'
+    )
+    return {
+        'sent': False,
+        'reason': 'api_error',
+        'message': result.get('description', 'Неизвестная ошибка Telegram'),
+    }
+
+
+def link_telegram_users_for_student(student):
+    """
+    Привязывает записи TelegramUser к профилю ученика по @username.
+
+    Сценарий: пользователь нажал /start у бота ДО того, как преподаватель
+    внёс его @username в профиль ученика. Тогда запись TelegramUser уже есть,
+    но без связи с учеником/родителем, и числовой chat_id не переносится в
+    модели Student. Функция находит такие записи, привязывает их и заполняет
+    telegram_chat_id / parent_telegram_chat_id — после этого становятся
+    возможными немедленная отправка приветствия и последующие уведомления.
+
+    Args:
+        student: экземпляр модели Student (уже сохранённый)
+
+    Returns:
+        list[str]: описания выполненных привязок (пустой список — связей нет)
+    """
+    from students.models import TelegramUser
+
+    changed_fields = set()
+    changes = []
+
+    # ---- Ученик ---------------------------------------------------------
+    if student.telegram_username:
+        username = student.telegram_username.lstrip('@').lower()
+        for tg in TelegramUser.objects.filter(username__iexact=username):
+            if tg.teacher is not None:
+                continue  # запись занята преподавателем
+            if tg.student_id != student.id or tg.is_parent:
+                tg.student = student
+                tg.is_parent = False
+                tg.save(update_fields=['student', 'is_parent'])
+                logger.info(f'Linked TelegramUser chat_id={tg.chat_id} to student {student.id}')
+                changes.append(f'student chat_id={tg.chat_id}')
+                changed_fields.add('telegram_chat_id')
+
+        if student.telegram_chat_id is None:
+            tg = (
+                TelegramUser.objects
+                .filter(username__iexact=username, student=student, teacher__isnull=True)
+                .exclude(is_parent=True)
+                .order_by('-updated_at')
+                .first()
+            )
+            if tg:
+                student.telegram_chat_id = tg.chat_id
+                changed_fields.add('telegram_chat_id')
+                logger.info(f'Filled student.telegram_chat_id={tg.chat_id} for student {student.id}')
+
+    # ---- Родитель -------------------------------------------------------
+    if student.parent_telegram:
+        username = student.parent_telegram.lstrip('@').lower()
+        for tg in TelegramUser.objects.filter(username__iexact=username):
+            if tg.teacher is not None:
+                continue
+            if tg.student_id is None:
+                tg.student = student
+                tg.is_parent = True
+                tg.save(update_fields=['student', 'is_parent'])
+                logger.info(f'Linked parent TelegramUser chat_id={tg.chat_id} to student {student.id}')
+                changes.append(f'parent chat_id={tg.chat_id}')
+                changed_fields.add('parent_telegram_chat_id')
+
+        if student.parent_telegram_chat_id is None:
+            tg = (
+                TelegramUser.objects
+                .filter(username__iexact=username, student=student, is_parent=True)
+                .order_by('-updated_at')
+                .first()
+            )
+            if tg:
+                student.parent_telegram_chat_id = tg.chat_id
+                changed_fields.add('parent_telegram_chat_id')
+                logger.info(f'Filled parent_telegram_chat_id={tg.chat_id} for student {student.id}')
+
+    if changed_fields:
+        student.save(update_fields=sorted(changed_fields))
+
+    return changes
+
+
+def get_bot_info():
+    """Запрашивает getMe — проверка токена и доступности бота."""
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+    if not token:
+        return {'ok': False, 'description': 'TELEGRAM_BOT_TOKEN не настроен'}
+    url = f'https://api.telegram.org/bot{token}/getMe'
+    try:
+        with urllib_request.urlopen(urllib_request.Request(url), timeout=10) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+    except HTTPError as e:
+        try:
+            return json.loads(e.read().decode('utf-8', errors='replace'))
+        except (json.JSONDecodeError, ValueError):
+            return {'ok': False, 'description': f'HTTP {e.code}: {e.reason}'}
+    except URLError as e:
+        return {'ok': False, 'description': f'Network error: {e.reason}'}
+
+
+def get_webhook_info():
+    """Запрашивает getWebhookInfo — текущее состояние webhook бота."""
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+    if not token:
+        return {'ok': False, 'description': 'TELEGRAM_BOT_TOKEN не настроен'}
+    url = f'https://api.telegram.org/bot{token}/getWebhookInfo'
+    try:
+        with urllib_request.urlopen(urllib_request.Request(url), timeout=10) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+    except HTTPError as e:
+        try:
+            return json.loads(e.read().decode('utf-8', errors='replace'))
+        except (json.JSONDecodeError, ValueError):
+            return {'ok': False, 'description': f'HTTP {e.code}: {e.reason}'}
+    except URLError as e:
+        return {'ok': False, 'description': f'Network error: {e.reason}'}
 
 
 def process_single_update(update_data):
@@ -374,7 +615,10 @@ def process_single_update(update_data):
             last_name=from_last_name,
             student=student or parent_student,
             teacher=teacher,
-            is_parent=(user_role == 'parent')
+            is_parent=(user_role == 'parent'),
+            # Роль определена — разрешаем (пере)привязать запись к ученику/родителю.
+            # Если роль не определена — НЕ затираем связи предыдущих записей.
+            force_links=(user_role is not None)
         )
         logger.info(f'Saved/updated TelegramUser for chat_id={chat_id}')
 
@@ -521,11 +765,13 @@ def sync_telegram_chat_ids():
                     updated_count += 1
     
     # Заполняем TelegramUser для всех chat_id, которые писали боту
-    # Это гарантирует, что даже пользователи без @username будут сохранены
+    # Это гарантирует, что даже пользователи без @username будут сохранены.
+    # get_or_create (а не update_or_create): повторная синхронизация НЕ затирает
+    # уже сохранённый username и связи с учеником/преподавателем.
     for chat_id in all_chat_ids:
-        TelegramUser.objects.update_or_create(
+        TelegramUser.objects.get_or_create(
             chat_id=chat_id,
-            defaults={'username': ''}  # username может быть пустым
+            defaults={'username': ''}
         )
     
     logger.info(f'Sync complete. Updated {updated_count} records.')
